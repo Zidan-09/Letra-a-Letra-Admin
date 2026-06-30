@@ -1,0 +1,174 @@
+.container {
+  min-height: 100vh;
+  background-color: #0b0e14;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(260,40%,15%,0.3) 0, transparent 50%);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto 32px auto;
+  gap: 20px;
+}
+
+.titleGroup h1 {
+  color: #ffffff;
+  font-size: 2.24rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.titleGroup p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.addButton {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  white-space: nowrap;
+}
+
+.addButton:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4),
+              0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Estilizações de Elementos das Células da Tabela
+   ========================================================================== */
+
+.idText {
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+.cosmeticName {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+/* Badges de Tipo com transparência estrutural */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.avatar {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.background {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.border {
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.defaultBadge {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Status textuais */
+.statusActive {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.statusDisabled {
+  color: #ef4444;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Botões de Ação Dinâmicos (Para o escopo de renderActions)
+   ========================================================================== */
+
+.actionButton {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+.btnDanger:hover {
+  border-color: #ef4444;
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.btnSuccess:hover {
+  border-color: #10b981;
+  color: #ffffff;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .addButton {
+    width: 100%;
+    text-align: center;
+  }
+}

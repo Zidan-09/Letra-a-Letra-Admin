@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useNotification } from "../../hooks/useNotification";
 import type { FormEvent } from "react";
 import { login } from "../../lib/Login";
-import { user } from "../../lib/User";
 import styles from "./Login.module.css";
 
 export function LoginPage() {
@@ -20,8 +19,8 @@ export function LoginPage() {
 
     if (!data) return notify.error("Credenciais inválidas");
 
-    user.setId(data.id);
-    user.setToken(data.token);
+    localStorage.setItem("id", data.id);
+    localStorage.setItem("token", data.token);
 
     navigate("/home");
 

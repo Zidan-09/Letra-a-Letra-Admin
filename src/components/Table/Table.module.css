@@ -1,0 +1,85 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  background: rgba(20, 24, 33, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.th {
+  padding: 16px 24px;
+  background: rgba(15, 19, 27, 0.8);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.actionsHeader {
+  text-align: right;
+  padding-right: 32px;
+}
+
+.tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  transition: background-color 0.2s ease;
+}
+
+.tr:hover {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+.td {
+  padding: 16px 24px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.emptyRow {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.actionsContainer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+.btnDanger:hover {
+  border-color: #ef4444;
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.1);
+}

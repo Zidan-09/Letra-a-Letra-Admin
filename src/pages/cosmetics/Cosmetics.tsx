@@ -1,0 +1,141 @@
+import { useState, useEffect } from "react";
+import { Table, type Column } from "../../components/Table/Table";
+import { CreateCosmeticPopup } from "../../components/Cosmetic/CreatePopup/CreateCosmeticPopup";
+import { EditCosmeticPopup } from "../../components/Cosmetic/EditPopup/EditCosmeticPopup";
+import { useNotification } from "../../hooks/useNotification";
+import { type Cosmetic, CosmeticRequests } from "../../lib/Cosmetic";
+import styles from "./Cosmetics.module.css";
+
+export function CosmeticsPage() {
+  const { notify } = useNotification();
+
+  const [cosmetics, setCosmetics] = useState<Cosmetic[]>([]);
+  
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedCosmetic, setSelectedCosmetic] = useState<Cosmetic | null>(null);
+
+  const fetchCosmetics = async () => {
+    try {
+        const data = await CosmeticRequests.getCosmetics();
+        setCosmetics(data.cosmetics);
+      
+    } catch {
+      notify.error("Erro ao carregar a lista de cosméticos.");
+    }
+  };
+
+  useEffect(() => {
+    fetchCosmetics();
+  }, []);
+
+  const columns: Column<Cosmetic>[] = [
+    {
+      header: "ID",
+      render: (item) => <span className={styles.idText}>{item.id}</span>,
+    },
+    {
+      header: "Nome do Cosmético",
+      render: (item) => <strong className={styles.cosmeticName}>{item.name}</strong>,
+    },
+    {
+      header: "Tipo",
+      render: (item) => (
+        <span className={`${styles.badge} ${styles[item.type.toLowerCase()] || styles.defaultBadge}`}>
+          {item.type}
+        </span>
+      ),
+    },
+    {
+      header: "Ativo",
+      render: (item) => (
+        <span className={item.available ? styles.statusActive : styles.statusDisabled}>
+          ● {item.available ? "Ativo" : "Desativado"}
+        </span>
+      ),
+    },
+  ];
+
+  const handleViewAsset = (item: Cosmetic) => {
+    notify.success(`Abrindo visualização do asset: ${item.name}`);
+    // Caso queira abrir uma nova aba com a URL do asset futuramente:
+    // window.open(`${HTTP}/assets/${item.id}`, "_blank");
+  };
+
+  const handleOpenEdit = (item: Cosmetic) => {
+    setSelectedCosmetic(item);
+    setIsEditOpen(true);
+  };
+
+  const handleToggleStatus = async (item: Cosmetic) => {
+    try {
+      const newStatus = item.available;
+      
+      // Chamada fictícia para sua API/lib de alteração de status:
+      // await updateCosmeticStatus(item.id, newStatus);
+      
+      setCosmetics((prev) =>
+        prev.map((c) => (c.id === item.id ? { ...c, available: newStatus } : c))
+      );
+
+      notify.success(`Cosmético ${newStatus ? "ativado" : "desativado"} com sucesso!`);
+    } catch {
+      notify.error("Não foi possível alterar o status do cosmético.");
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.titleGroup}>
+          <h1>Cosméticos</h1>
+          <p>Gerencie, visualize e edite os cosméticos ativos no sistema.</p>
+        </div>
+        <button className={styles.addButton} onClick={() => setIsCreateOpen(true)}>
+          Novo Cosmético
+        </button>
+      </header>
+
+      <main className={styles.content}>
+        <Table<Cosmetic>
+          data={cosmetics}
+          columns={columns}
+          renderActions={(item) => (
+            <>
+              <button className={styles.actionButton} onClick={() => handleViewAsset(item)}>
+                Ver Asset
+              </button>
+              <button className={styles.actionButton} onClick={() => handleOpenEdit(item)}>
+                Editar
+              </button>
+              <button
+                className={`${styles.actionButton} ${item.available ? styles.btnDanger : styles.btnSuccess}`}
+                onClick={() => handleToggleStatus(item)}
+              >
+                {item.available ? "Desabilitar" : "Ativar"}
+              </button>
+            </>
+          )}
+        />
+      </main>
+
+      <CreateCosmeticPopup 
+        isOpen={isCreateOpen} 
+        onClose={() => {
+          setIsCreateOpen(false);
+          fetchCosmetics();
+        }} 
+      />
+
+      <EditCosmeticPopup
+        isOpen={isEditOpen}
+        cosmetic={selectedCosmetic}
+        onClose={() => {
+          setIsEditOpen(false);
+          setSelectedCosmetic(null);
+        }}
+        onSuccess={fetchCosmetics}
+      />
+    </div>
+  );
+}

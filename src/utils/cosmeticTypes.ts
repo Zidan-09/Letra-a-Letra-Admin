@@ -1,0 +1,1 @@
+export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
