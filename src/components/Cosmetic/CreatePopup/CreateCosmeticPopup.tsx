@@ -11,7 +11,6 @@ interface CreateCosmeticPopupProps {
 }
 
 export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProps) {
-  const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [type, setType] = useState<CosmeticTypes>("AVATAR");
   const [asset, setAsset] = useState<File | null>(null);
@@ -35,7 +34,7 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
 
     try {
       const formData = new FormData();
-      formData.append("id", id);
+
       formData.append("name", name);
       formData.append("cosmeticType", type);
       formData.append("asset", asset);
@@ -43,9 +42,9 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
       await CosmeticRequests.createCosmetic(formData);
 
       notify.success("Cosmético cadastrado com sucesso!");
+      
       onClose();
       
-      setId("");
       setName("");
       setType("AVATAR");
       setAsset(null);
@@ -66,19 +65,6 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
         </button>
 
         <h1>Criar Cosmético</h1>
-
-        <div className={styles.inputgroup}>
-          <label htmlFor="cosmetic-id" className={styles.label}>ID do Cosmético</label>
-          <input
-            id="cosmetic-id"
-            className={styles.input}
-            type="text"
-            placeholder="Ex: cos_avatar_01..."
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            required
-          />
-        </div>
 
         <div className={styles.inputgroup}>
           <label htmlFor="cosmetic-name" className={styles.label}>Nome</label>

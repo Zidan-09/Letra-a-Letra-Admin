@@ -22,7 +22,7 @@ export function LoginPage() {
     localStorage.setItem("id", data.id);
     localStorage.setItem("token", data.token);
 
-    navigate("/home");
+    navigate("/cosmetic");
 
     notify.success("Usuário autenticado")
   }

@@ -15,6 +15,8 @@ export function CosmeticsPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCosmetic, setSelectedCosmetic] = useState<Cosmetic | null>(null);
 
+  const assetsUrl = "https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev";
+
   const fetchCosmetics = async () => {
     try {
         const data = await CosmeticRequests.getCosmetics();
@@ -30,10 +32,6 @@ export function CosmeticsPage() {
   }, []);
 
   const columns: Column<Cosmetic>[] = [
-    {
-      header: "ID",
-      render: (item) => <span className={styles.idText}>{item.id}</span>,
-    },
     {
       header: "Nome do Cosmético",
       render: (item) => <strong className={styles.cosmeticName}>{item.name}</strong>,
@@ -58,8 +56,7 @@ export function CosmeticsPage() {
 
   const handleViewAsset = (item: Cosmetic) => {
     notify.success(`Abrindo visualização do asset: ${item.name}`);
-    // Caso queira abrir uma nova aba com a URL do asset futuramente:
-    // window.open(`${HTTP}/assets/${item.id}`, "_blank");
+    window.open(`${assetsUrl}/${item.assetPath}`, "_blank");
   };
 
   const handleOpenEdit = (item: Cosmetic) => {

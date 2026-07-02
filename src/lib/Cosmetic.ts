@@ -30,21 +30,24 @@ export class CosmeticRequests {
     static async createCosmetic(formData: FormData) {
         const token = localStorage.getItem("token");
 
-        console.log(formData);
+        try {
+            const res: HttpResponse<CreateBody> = await fetch(`${HTTP}/cosmetic`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            }).then(res => res.json());
 
-        const res = await fetch(`${HTTP}/cosmetic`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: formData
-        });
+            if (!res.success) throw new Error(res.message);
 
-        if (!res.ok) throw new Error();
+            return res.data;
 
-        const response: HttpResponse<CreateBody> = await res.json();
+        } catch (err) {
+            console.error(err);
 
-        return response.data;
+            throw err;
+        } 
     }
 
     static async getCosmetics() {
@@ -83,10 +86,10 @@ export class CosmeticRequests {
         return response.data;
     }
 
-    static async editCosmetic(formData: FormData) {
+    static async editCosmetic(formData: FormData, cosmeticId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTP}/cosmetic`, {
+        const res = await fetch(`${HTTP}/cosmetic/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Authorization": `Bearer ${token}`

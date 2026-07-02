@@ -46,7 +46,6 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
 
     try {
       const formData = new FormData();
-      formData.append("id", cosmetic.id);
       formData.append("name", name);
       formData.append("type", type);
       
@@ -54,7 +53,7 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
         formData.append("asset", asset);
       }
 
-      await CosmeticRequests.editCosmetic(formData);
+      await CosmeticRequests.editCosmetic(formData, cosmetic.id);
 
       notify.success("Cosmético atualizado com sucesso!");
       
