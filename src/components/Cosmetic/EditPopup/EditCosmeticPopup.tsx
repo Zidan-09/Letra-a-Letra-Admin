@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../hooks/useNotification";
 import { type CosmeticTypes } from "../../../utils/cosmeticTypes";
@@ -9,6 +9,7 @@ interface CosmeticData {
   id: string;
   name: string;
   type: CosmeticTypes;
+  assetPath: string;
 }
 
 interface EditCosmeticPopupProps {
@@ -19,11 +20,18 @@ interface EditCosmeticPopupProps {
 }
 
 export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: EditCosmeticPopupProps) {
-  const [name, setName] = useState<string>("");
-  const [type, setType] = useState<CosmeticTypes>("AVATAR");
+  const [name, setName] = useState<string>(cosmetic?.name || "");
+  const [type, setType] = useState<CosmeticTypes>(cosmetic?.type || "AVATAR");
   const [asset, setAsset] = useState<File | null>(null);
 
+  const assetsUrl = "https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev";
+
   const { notify } = useNotification();
+
+  const previewUrl = useMemo(() => {
+    if (!asset) return `${assetsUrl}/${cosmetic?.assetPath}`;
+    return URL.createObjectURL(asset);
+  }, [asset]);
 
   useEffect(() => {
     if (cosmetic) {
@@ -46,12 +54,15 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
 
     try {
       const formData = new FormData();
+
       formData.append("name", name);
       formData.append("type", type);
       
       if (asset) {
         formData.append("asset", asset);
       }
+
+      formData.append("isNewImage", `${asset !== null}`);
 
       await CosmeticRequests.editCosmetic(formData, cosmetic.id);
 
@@ -76,17 +87,6 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
         </button>
 
         <h1>Editar Cosmético</h1>
-
-        <div className={styles.inputgroup}>
-          <label htmlFor="edit-cosmetic-id" className={styles.label}>ID (Não editável)</label>
-          <input
-            id="edit-cosmetic-id"
-            className={`${styles.input} styles.disabled`}
-            type="text"
-            value={cosmetic.id}
-            disabled
-          />
-        </div>
 
         <div className={styles.inputgroup}>
           <label htmlFor="edit-cosmetic-name" className={styles.label}>Nome</label>
@@ -117,16 +117,27 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
         </div>
 
         <div className={styles.inputgroup}>
-          <label htmlFor="edit-cosmetic-asset" className={styles.label}>Novo Arquivo (Opcional)</label>
-          <label htmlFor="edit-cosmetic-asset" className={styles.fileUploadLabel}>
-            {asset ? asset.name : "Substituir arquivo existente..."}
+          <span className={styles.label}>
+            Arquivo (Asset)
+          </span>
+          <label htmlFor="cosmetic-asset" className={styles.fileUploadLabel}>
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className={styles.previewImage}
+              />
+            ) : (
+              <span>Selecionar imagem</span>
+            )}
           </label>
           <input
-            id="edit-cosmetic-asset"
+            id="cosmetic-asset"
             className={styles.fileInput}
             type="file"
             onChange={handleFileChange}
-            accept="image/*,video/*"
+            accept="image/*"
+            required
           />
         </div>
 

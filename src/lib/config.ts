@@ -1,4 +1,4 @@
-const HTTP = "http://localhost:8080"
+const HTTP = "https://api.letraaletradev.qzz.io"
 
 type HttpResponse<T> = {
     success: boolean,

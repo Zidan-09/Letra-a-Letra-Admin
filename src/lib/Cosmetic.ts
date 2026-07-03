@@ -7,6 +7,12 @@ type CreateBody = {
 
 type GetBody = {
     cosmetics: Cosmetic[];
+    first: number;
+    last: number;
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
 }
 
 type EditBody = {
@@ -14,6 +20,10 @@ type EditBody = {
 }
 
 type DisableBody = {
+    cosmeticId: string;
+}
+
+type EnableBody = {
     cosmeticId: string;
 }
 
@@ -50,10 +60,10 @@ export class CosmeticRequests {
         } 
     }
 
-    static async getCosmetics() {
+    static async getCosmetics(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTP}/cosmetic`, {
+        const res = await fetch(`${HTTP}/cosmetic?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -64,6 +74,8 @@ export class CosmeticRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<GetBody> = await res.json();
+
+        console.log(response)
 
         return response.data;
     }
@@ -82,6 +94,24 @@ export class CosmeticRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<DisableBody> = await res.json();
+
+        return response.data;
+    }
+
+    static async enableCosmetic(cosmeticId: string) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTP}/cosmetic/enable/${cosmeticId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<EnableBody> = await res.json();
 
         return response.data;
     }

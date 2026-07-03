@@ -10,6 +10,8 @@ export function CosmeticsPage() {
   const { notify } = useNotification();
 
   const [cosmetics, setCosmetics] = useState<Cosmetic[]>([]);
+  const [page, setPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -19,8 +21,9 @@ export function CosmeticsPage() {
 
   const fetchCosmetics = async () => {
     try {
-        const data = await CosmeticRequests.getCosmetics();
+        const data = await CosmeticRequests.getCosmetics(page, 5);
         setCosmetics(data.cosmetics);
+        setTotalPages(data.totalPages);
       
     } catch {
       notify.error("Erro ao carregar a lista de cosméticos.");
@@ -29,7 +32,7 @@ export function CosmeticsPage() {
 
   useEffect(() => {
     fetchCosmetics();
-  }, []);
+  }, [page]);
 
   const columns: Column<Cosmetic>[] = [
     {
@@ -66,10 +69,11 @@ export function CosmeticsPage() {
 
   const handleToggleStatus = async (item: Cosmetic) => {
     try {
-      const newStatus = item.available;
-      
-      // Chamada fictícia para sua API/lib de alteração de status:
-      // await updateCosmeticStatus(item.id, newStatus);
+      item.available ?
+        await CosmeticRequests.disableCosmetic(item.id) : 
+        await CosmeticRequests.enableCosmetic(item.id);
+
+      const newStatus = !item.available;
       
       setCosmetics((prev) =>
         prev.map((c) => (c.id === item.id ? { ...c, available: newStatus } : c))
@@ -113,6 +117,10 @@ export function CosmeticsPage() {
               </button>
             </>
           )}
+          page={page}
+          totalPages={totalPages}
+          nextPage={() => setPage(prev => prev + 1)}
+          prevPage={() => setPage(prev => Math.max(0, prev - 1))}
         />
       </main>
 

@@ -1,3 +1,9 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .tableContainer {
   width: 100%;
   overflow-x: auto;
@@ -82,4 +88,15 @@
   border-color: #ef4444;
   color: #ffffff;
   background: rgba(239, 68, 68, 0.1);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.pageNumber {
+  color: #fff;
 }

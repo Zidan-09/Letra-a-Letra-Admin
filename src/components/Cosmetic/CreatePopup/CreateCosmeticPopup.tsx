@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../hooks/useNotification";
 import { type CosmeticTypes } from "../../../utils/cosmeticTypes";
@@ -16,6 +16,11 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
   const [asset, setAsset] = useState<File | null>(null);
 
   const { notify } = useNotification();
+
+  const previewUrl = useMemo(() => {
+    if (!asset) return null;
+    return URL.createObjectURL(asset);
+  }, [asset]);
 
   if (!isOpen) return null;
 
@@ -96,9 +101,19 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
         </div>
 
         <div className={styles.inputgroup}>
-          <label htmlFor="cosmetic-asset" className={styles.label}>Arquivo (Asset)</label>
+          <span className={styles.label}>
+            Arquivo (Asset)
+          </span>
           <label htmlFor="cosmetic-asset" className={styles.fileUploadLabel}>
-            {asset ? asset.name : "Selecionar arquivo..."}
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className={styles.previewImage}
+              />
+            ) : (
+              <span>Selecionar imagem</span>
+            )}
           </label>
           <input
             id="cosmetic-asset"

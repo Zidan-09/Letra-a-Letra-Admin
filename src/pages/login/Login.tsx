@@ -4,6 +4,7 @@ import { useNotification } from "../../hooks/useNotification";
 import type { FormEvent } from "react";
 import { login } from "../../lib/Login";
 import styles from "./Login.module.css";
+import { JwtDecoderUtil } from "../../utils/decodeToken";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,16 +16,30 @@ export function LoginPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    const data = await login(email, password);
+    try {
+      const response = await login(email, password);
 
-    if (!data) return notify.error("Credenciais inválidas");
+      if (response.message !== "user_logged") throw new Error("Credenciais Inválidas");
 
-    localStorage.setItem("id", data.id);
-    localStorage.setItem("token", data.token);
+      localStorage.setItem("id", response.data.id);
+      localStorage.setItem("token", response.data.token);
 
-    navigate("/cosmetic");
+      const { admin } = JwtDecoderUtil.decode(response.data.token);
 
-    notify.success("Usuário autenticado")
+      if (!admin) throw new Error("Este painel é apenas para administradores!");
+
+      notify.success("Usuário autenticado");
+
+      navigate("/home");
+
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        notify.error(err.message);
+        return;
+      }
+
+      notify.error("Ocorreu um erro inesperado...");
+    }
   }
 
   return (
