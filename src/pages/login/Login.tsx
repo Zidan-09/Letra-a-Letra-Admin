@@ -19,14 +19,14 @@ export function LoginPage() {
     try {
       const response = await login(email, password);
 
-      if (response.message !== "user_logged") throw new Error("Credenciais Inválidas");
+      if (!response.success) throw new Error("Credenciais Inválidas");
+
+      const { role } = JwtDecoderUtil.decode(response.data.token);
+
+      if (role !== "ADMIN") throw new Error("Este painel é apenas para administradores!");
 
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("token", response.data.token);
-
-      const { admin } = JwtDecoderUtil.decode(response.data.token);
-
-      if (!admin) throw new Error("Este painel é apenas para administradores!");
 
       notify.success("Usuário autenticado");
 

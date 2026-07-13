@@ -1,0 +1,2508 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Letra a Letra - API",
+    "description": "Documentação dinâmica da API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://api.letraaletradev.qzz.io",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Offer",
+      "description": "Rotas relacionadas ao gerenciamento de ofertas da loja"
+    },
+    {
+      "name": "Level",
+      "description": "Rotas relacionadas ao gerenciamento dos níveis e suas respectivas recompensas"
+    },
+    {
+      "name": "User",
+      "description": "Rotas relacionadas a funcionalidade de usuários (jogadores)"
+    },
+    {
+      "name": "Shop",
+      "description": "Rotas relacionadas a funcionalidade da loja do jogo"
+    },
+    {
+      "name": "Game",
+      "description": "Rotas relacionadas a funcionalidade de salas"
+    },
+    {
+      "name": "Cosmetics",
+      "description": "Rotas relacionadas ao gerenciamento de cosméticos"
+    },
+    {
+      "name": "Friend",
+      "description": "Rotas relacionadas a funcionalidade de amizades"
+    },
+    {
+      "name": "Admin",
+      "description": "Rotas relacionadas a parte de administração"
+    }
+  ],
+  "paths": {
+    "/level/{levelId}": {
+      "get": {
+        "tags": [
+          "Level"
+        ],
+        "operationId": "handle",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseFindLevelResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Level"
+        ],
+        "operationId": "handle_1",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLevelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseUpdateLevelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cosmetic/{cosmeticId}": {
+      "put": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "handle_2",
+        "parameters": [
+          {
+            "name": "cosmeticId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCosmeticRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseUpdateCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "handle_3",
+        "parameters": [
+          {
+            "name": "cosmeticId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseDeleteCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_4",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseCreateUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/auth": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_5",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseAuthUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/auth/google": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_6",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseAuthUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shop/offers/{offerId}/buy": {
+      "post": {
+        "tags": [
+          "Shop"
+        ],
+        "operationId": "handle_7",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseBuyStoreOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offer": {
+      "get": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "handle_8",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetOffersResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "registerOffer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterOfferRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseRegisterOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/level": {
+      "get": {
+        "tags": [
+          "Level"
+        ],
+        "operationId": "handle_9",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetLevelsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Level"
+        ],
+        "operationId": "handle_10",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLevelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseCreateLevelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend/request": {
+      "post": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_11",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendFriendRequestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseSendFriendRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cosmetic": {
+      "get": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "handle_12",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetCosmeticsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "registerCosmetic",
+        "parameters": [
+          {
+            "name": "request",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/RegisterCosmeticRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseRegisterCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "handle_13",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterAdminRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseRegisterAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "handle_14",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthAdminRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseAuthAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/nickname": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_15",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNicknameRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseChangeNicknameResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/cosmetic/{cosmeticId}": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_16",
+        "parameters": [
+          {
+            "name": "cosmeticId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseChangeCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offer/enable/{offerId}": {
+      "patch": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "handle_17",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseEnableOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offer/disable/{offerId}": {
+      "patch": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "disableOffer",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseDisableOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend/remove": {
+      "patch": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_18",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveFriendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend/reject": {
+      "patch": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_19",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectFriendRequestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend/accept": {
+      "patch": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_20",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptFriendRequestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cosmetic/enable/{cosmeticId}": {
+      "patch": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "handle_21",
+        "parameters": [
+          {
+            "name": "cosmeticId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseEnableCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cosmetic/disable/{cosmeticId}": {
+      "patch": {
+        "tags": [
+          "Cosmetics"
+        ],
+        "operationId": "handle_22",
+        "parameters": [
+          {
+            "name": "cosmeticId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseDisableCosmeticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/inventory": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "handle_23",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetUserInventoryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shop/offers": {
+      "get": {
+        "tags": [
+          "Shop"
+        ],
+        "operationId": "handle_24",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetActiveOffersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offer/{offerId}": {
+      "get": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "handle_25",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseFindOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Offer"
+        ],
+        "operationId": "handle_26",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseDeleteOfferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "getGames",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetGamesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/code/{code}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "getGameByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseFindByCodeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend": {
+      "get": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_27",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetFriendListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friend/pending": {
+      "get": {
+        "tags": [
+          "Friend"
+        ],
+        "operationId": "handle_28",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetFriendPendingRequestsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/system": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "handle_29",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetSystemStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/logs/{type}/{file}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "handle_30",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "file",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateLevelRequest": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateLevelRewardRequest"
+            }
+          }
+        }
+      },
+      "UpdateLevelRewardRequest": {
+        "type": "object",
+        "properties": {
+          "rewardType": {
+            "type": "string",
+            "enum": [
+              "COIN",
+              "GEMS",
+              "COSMETIC"
+            ]
+          },
+          "rewardReference": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Cosmetic": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "EMOTE",
+              "FRAME"
+            ]
+          },
+          "assetPath": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CosmeticReward": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Reward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "cosmetic": {
+                "$ref": "#/components/schemas/Cosmetic"
+              }
+            }
+          }
+        ]
+      },
+      "HardGemsReward": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Reward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "Level": {
+        "type": "object",
+        "properties": {
+          "levelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LevelReward"
+            }
+          }
+        }
+      },
+      "LevelReward": {
+        "type": "object",
+        "properties": {
+          "levelRewardId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reward": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CosmeticReward"
+              },
+              {
+                "$ref": "#/components/schemas/HardGemsReward"
+              },
+              {
+                "$ref": "#/components/schemas/SoftCoinsReward"
+              }
+            ]
+          }
+        }
+      },
+      "Reward": {
+
+      },
+      "SoftCoinsReward": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Reward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "SuccessResponseUpdateLevelResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UpdateLevelResponse"
+          }
+        }
+      },
+      "UpdateLevelResponse": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/Level"
+          }
+        }
+      },
+      "UpdateCosmeticRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "EMOTE",
+              "FRAME"
+            ]
+          },
+          "asset": {
+            "type": "string",
+            "format": "binary"
+          },
+          "isNewAsset": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isNewAsset",
+          "name",
+          "type"
+        ]
+      },
+      "SuccessResponseUpdateCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UpdateCosmeticResponse"
+          }
+        }
+      },
+      "UpdateCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetic": {
+            "$ref": "#/components/schemas/Cosmetic"
+          }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseCreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateUserResponse"
+          }
+        }
+      },
+      "AuthUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseAuthUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthUserResponse"
+          }
+        }
+      },
+      "GoogleAuthRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "BuyStoreOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "Offer": {
+        "type": "object",
+        "properties": {
+          "offerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "coinType": {
+            "type": "string",
+            "enum": [
+              "SOFT",
+              "HARD",
+              "REAL"
+            ]
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfferReward"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OfferReward": {
+        "type": "object",
+        "properties": {
+          "offerRewardId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reward": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CosmeticReward"
+              },
+              {
+                "$ref": "#/components/schemas/HardGemsReward"
+              },
+              {
+                "$ref": "#/components/schemas/SoftCoinsReward"
+              }
+            ]
+          }
+        }
+      },
+      "SuccessResponseBuyStoreOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BuyStoreOfferResponse"
+          }
+        }
+      },
+      "RegisterOfferRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "coinType": {
+            "type": "string",
+            "enum": [
+              "SOFT",
+              "HARD",
+              "REAL"
+            ],
+            "minLength": 1
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisterOfferRewardRequest"
+            }
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "coinType",
+          "expiresIn",
+          "price",
+          "title"
+        ]
+      },
+      "RegisterOfferRewardRequest": {
+        "type": "object",
+        "properties": {
+          "rewardType": {
+            "type": "string",
+            "enum": [
+              "COIN",
+              "GEMS",
+              "COSMETIC"
+            ],
+            "minLength": 1
+          },
+          "rewardReference": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "rewardType"
+        ]
+      },
+      "RegisterOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "SuccessResponseRegisterOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegisterOfferResponse"
+          }
+        }
+      },
+      "CreateLevelRequest": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateLevelRewardRequest"
+            }
+          }
+        }
+      },
+      "CreateLevelRewardRequest": {
+        "type": "object",
+        "properties": {
+          "rewardType": {
+            "type": "string",
+            "enum": [
+              "COIN",
+              "GEMS",
+              "COSMETIC"
+            ]
+          },
+          "rewardReference": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateLevelResponse": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/Level"
+          }
+        }
+      },
+      "SuccessResponseCreateLevelResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateLevelResponse"
+          }
+        }
+      },
+      "SendFriendRequestRequest": {
+        "type": "object",
+        "properties": {
+          "friendId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "friendId"
+        ]
+      },
+      "Friend": {
+        "type": "object",
+        "properties": {
+          "userId1": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId2": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACCEPT",
+              "DECLINED",
+              "PENDING"
+            ]
+          },
+          "requestDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SendFriendRequestResponse": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/Friend"
+          }
+        }
+      },
+      "SuccessResponseSendFriendRequestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SendFriendRequestResponse"
+          }
+        }
+      },
+      "RegisterCosmeticRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cosmeticType": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "EMOTE",
+              "FRAME"
+            ]
+          },
+          "asset": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "asset",
+          "cosmeticType",
+          "name"
+        ]
+      },
+      "RegisterCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetic": {
+            "$ref": "#/components/schemas/Cosmetic"
+          }
+        }
+      },
+      "SuccessResponseRegisterCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegisterCosmeticResponse"
+          }
+        }
+      },
+      "RegisterAdminRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "password"
+        ]
+      },
+      "RegisterAdminResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseRegisterAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegisterAdminResponse"
+          }
+        }
+      },
+      "AuthAdminRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthAdminResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseAuthAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthAdminResponse"
+          }
+        }
+      },
+      "ChangeNicknameRequest": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 5
+          }
+        },
+        "required": [
+          "nickname"
+        ]
+      },
+      "ChangeNicknameResponse": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseChangeNicknameResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ChangeNicknameResponse"
+          }
+        }
+      },
+      "ChangeCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "inventoryItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem"
+            }
+          }
+        }
+      },
+      "InventoryItem": {
+        "type": "object",
+        "properties": {
+          "cosmeticId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "EMOTE",
+              "FRAME"
+            ]
+          },
+          "equipped": {
+            "type": "boolean"
+          },
+          "unlockedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SuccessResponseChangeCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ChangeCosmeticResponse"
+          }
+        }
+      },
+      "EnableOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "SuccessResponseEnableOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EnableOfferResponse"
+          }
+        }
+      },
+      "DisableOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "SuccessResponseDisableOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DisableOfferResponse"
+          }
+        }
+      },
+      "RemoveFriendRequest": {
+        "type": "object",
+        "properties": {
+          "friendId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "friendId"
+        ]
+      },
+      "SuccessResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+
+          }
+        }
+      },
+      "RejectFriendRequestRequest": {
+        "type": "object",
+        "properties": {
+          "friendId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "friendId"
+        ]
+      },
+      "AcceptFriendRequestRequest": {
+        "type": "object",
+        "properties": {
+          "friendId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "friendId"
+        ]
+      },
+      "CosmeticDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "EMOTE",
+              "FRAME"
+            ]
+          },
+          "assetPath": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EnableCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetic": {
+            "$ref": "#/components/schemas/CosmeticDTO"
+          }
+        }
+      },
+      "SuccessResponseEnableCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/EnableCosmeticResponse"
+          }
+        }
+      },
+      "DisableCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetic": {
+            "$ref": "#/components/schemas/CosmeticDTO"
+          }
+        }
+      },
+      "SuccessResponseDisableCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DisableCosmeticResponse"
+          }
+        }
+      },
+      "GetUserInventoryResponse": {
+        "type": "object",
+        "properties": {
+          "inventory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetUserInventoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetUserInventoryResponse"
+          }
+        }
+      },
+      "GetActiveOffersResponse": {
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Offer"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetActiveOffersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetActiveOffersResponse"
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GetOffersResponse": {
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Offer"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetOffersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetOffersResponse"
+          }
+        }
+      },
+      "FindOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "SuccessResponseFindOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FindOfferResponse"
+          }
+        }
+      },
+      "GetLevelsResponse": {
+        "type": "object",
+        "properties": {
+          "levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Level"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetLevelsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetLevelsResponse"
+          }
+        }
+      },
+      "FindLevelResponse": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/Level"
+          }
+        }
+      },
+      "SuccessResponseFindLevelResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FindLevelResponse"
+          }
+        }
+      },
+      "GameDTO": {
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "string"
+          },
+          "gameName": {
+            "type": "string"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantDTO"
+            }
+          },
+          "positions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GetGamesResponse": {
+        "type": "object",
+        "properties": {
+          "games": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameDTO"
+            }
+          }
+        }
+      },
+      "ParticipantDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "cosmeticsEquipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem"
+            }
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "PLAYER",
+              "SPECTATOR"
+            ]
+          }
+        }
+      },
+      "SuccessResponseGetGamesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetGamesResponse"
+          }
+        }
+      },
+      "FindByCodeResponse": {
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponseFindByCodeResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FindByCodeResponse"
+          }
+        }
+      },
+      "GetFriendListResponse": {
+        "type": "object",
+        "properties": {
+          "friends": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Friend"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetFriendListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetFriendListResponse"
+          }
+        }
+      },
+      "GetFriendPendingRequestsResponse": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Friend"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetFriendPendingRequestsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetFriendPendingRequestsResponse"
+          }
+        }
+      },
+      "GetCosmeticsResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CosmeticDTO"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SuccessResponseGetCosmeticsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetCosmeticsResponse"
+          }
+        }
+      },
+      "CpuOutput": {
+        "type": "object",
+        "properties": {
+          "systemUsage": {
+            "type": "number",
+            "format": "double"
+          },
+          "processUsage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "GetSystemStatusResponse": {
+        "type": "object",
+        "properties": {
+          "uptime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cpu": {
+            "$ref": "#/components/schemas/CpuOutput"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryOutput"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/StorageOutput"
+          },
+          "health": {
+            "type": "string"
+          }
+        }
+      },
+      "MemoryOutput": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "max": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "StorageOutput": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "free": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "SuccessResponseGetSystemStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetSystemStatusResponse"
+          }
+        }
+      },
+      "DeleteOfferResponse": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "$ref": "#/components/schemas/Offer"
+          }
+        }
+      },
+      "SuccessResponseDeleteOfferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeleteOfferResponse"
+          }
+        }
+      },
+      "DeleteCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "cosmetic": {
+            "$ref": "#/components/schemas/CosmeticDTO"
+          }
+        }
+      },
+      "SuccessResponseDeleteCosmeticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeleteCosmeticResponse"
+          }
+        }
+      }
+    }
+  }
+}

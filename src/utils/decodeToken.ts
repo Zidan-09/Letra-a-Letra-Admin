@@ -2,7 +2,7 @@ import { jwtDecode } from "jwt-decode";
 
 type JwtPayload = {
     id: string,
-    admin: boolean
+    role: string
 }
 
 export class JwtDecoderUtil {

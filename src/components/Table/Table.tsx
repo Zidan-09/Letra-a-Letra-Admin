@@ -76,7 +76,7 @@ export function Table<T>({ data, columns, renderActions, page, totalPages, nextP
 
         <button
         className={styles.actionButton}
-        disabled={page + 1 === totalPages}
+        disabled={page + 1 === totalPages || totalPages === 0}
         onClick={nextPage}
         >
             Próxima

@@ -1,4 +1,4 @@
-class User {
+class Admin {
     private id: string;
     private token: string;
 
@@ -24,6 +24,6 @@ class User {
     }
 }
 
-const user = new User();
+const admin = new Admin();
 
-export { user }
+export { admin }

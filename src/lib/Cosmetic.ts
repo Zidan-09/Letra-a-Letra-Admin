@@ -75,8 +75,6 @@ export class CosmeticRequests {
 
         const response: HttpResponse<GetBody> = await res.json();
 
-        console.log(response)
-
         return response.data;
     }
 
