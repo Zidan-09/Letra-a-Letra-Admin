@@ -1,4 +1,4 @@
-import { HTTP, type HttpResponse } from "./config";
+import { HTTPS, type HttpResponse } from "./config";
 
 type LoginBody = {
     id: string,
@@ -6,7 +6,7 @@ type LoginBody = {
 }
 
 async function login(email: string, password: string) {
-    const res = await fetch(`${HTTP}/admin/auth`, {
+    const res = await fetch(`${HTTPS}/admin/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

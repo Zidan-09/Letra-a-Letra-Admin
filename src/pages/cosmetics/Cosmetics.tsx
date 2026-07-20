@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, type Column } from "../../components/Table/Table";
 import { CreateCosmeticPopup } from "../../components/Cosmetic/CreatePopup/CreateCosmeticPopup";
 import { EditCosmeticPopup } from "../../components/Cosmetic/EditPopup/EditCosmeticPopup";
-import { useNotification } from "../../hooks/useNotification";
+import { useNotification } from "../../hooks/notification/useNotification";
 import { type Cosmetic, CosmeticRequests } from "../../lib/Cosmetic";
 import styles from "./Cosmetics.module.css";
 

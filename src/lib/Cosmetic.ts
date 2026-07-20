@@ -1,5 +1,5 @@
 import type { CosmeticTypes } from "../utils/cosmeticTypes";
-import { type HttpResponse, HTTP } from "./config";
+import { type HttpResponse, HTTPS } from "./config";
 
 type CreateBody = {
     cosmetic: Cosmetic;
@@ -41,7 +41,7 @@ export class CosmeticRequests {
         const token = localStorage.getItem("token");
 
         try {
-            const res: HttpResponse<CreateBody> = await fetch(`${HTTP}/cosmetic`, {
+            const res: HttpResponse<CreateBody> = await fetch(`${HTTPS}/cosmetic`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -63,7 +63,7 @@ export class CosmeticRequests {
     static async getCosmetics(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTP}/cosmetic?page=${page}&size=${size}`, {
+        const res = await fetch(`${HTTPS}/cosmetic?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export class CosmeticRequests {
     static async disableCosmetic(cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTP}/cosmetic/disable/${cosmeticId}`, {
+        const res = await fetch(`${HTTPS}/cosmetic/disable/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -99,7 +99,7 @@ export class CosmeticRequests {
     static async enableCosmetic(cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTP}/cosmetic/enable/${cosmeticId}`, {
+        const res = await fetch(`${HTTPS}/cosmetic/enable/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export class CosmeticRequests {
     static async editCosmetic(formData: FormData, cosmeticId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTP}/cosmetic/${cosmeticId}`, {
+        const res = await fetch(`${HTTPS}/cosmetic/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Authorization": `Bearer ${token}`

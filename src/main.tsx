@@ -5,7 +5,7 @@ import { RouterProvider } from "react-router";
 import "./global.css";
 
 import { router } from "./router";
-import { NotificationProvider } from "./hooks/useNotification";
+import { NotificationProvider } from "./hooks/notification/useNotification";
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

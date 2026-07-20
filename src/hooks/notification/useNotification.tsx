@@ -7,7 +7,7 @@ import {
 
 import Notification, {
     type NotificationType
-} from "../components/Notification/Notification";
+} from "../../components/Notification/Notification";
 
 import styles from "./useNotification.module.css";
 

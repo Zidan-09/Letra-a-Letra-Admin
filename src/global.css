@@ -10,6 +10,10 @@ html {
 body {
     font-family: Inter, Arial, sans-serif;
     background-color: #0b0e14;
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(260,40%,15%,0.3) 0, transparent 50%);
     color: #222;
     min-height: 100vh;
     padding: 20px;
