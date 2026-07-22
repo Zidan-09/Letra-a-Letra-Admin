@@ -13,6 +13,8 @@ export const useWebSocket = <T = any>(url: string, options?: UseWebSocketOptions
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+  if (!url) return;
+
     const socket = new WebSocket(url);
     ws.current = socket;
 

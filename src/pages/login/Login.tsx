@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { useNotification } from "../../hooks/notification/useNotification";
 import type { FormEvent } from "react";
 import { Login } from "../../lib/Login";
@@ -12,6 +13,7 @@ export function LoginPage() {
 
   const navigate = useNavigate();
   const { notify } = useNotification();
+  const { login } = useAuth();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -25,8 +27,10 @@ export function LoginPage() {
 
       if (role !== "ADMIN") throw new Error("Este painel é apenas para administradores!");
 
-      localStorage.setItem("id", response.data.id);
-      localStorage.setItem("token", response.data.token);
+      login({
+        id: response.data.id,
+        token: response.data.token
+      });
 
       notify.success("Usuário autenticado");
 
