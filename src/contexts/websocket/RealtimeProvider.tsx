@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useWebSocket } from "../../hooks/websocket/useWebSocket";
 import { WSS } from "../../lib/config";
 import {
@@ -18,6 +18,14 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
     const [logs, setLogs] = useState<string[]>([]);
 
     const { token } = useAuth();
+
+    useEffect(() => {
+        if (!token) {
+            setApplication(undefined);
+            setSystem(undefined);
+            setLogs([]);
+        }
+    }, [token]);
 
     const { isConnected } = useWebSocket(token ? `${WSS}${token}` : "", {
         onMessage: (event) => {
