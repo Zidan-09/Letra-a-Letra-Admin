@@ -1,5 +1,70 @@
 .header {
-    height: 72px;
-    background-color: black;
-    flex-shrink: 0;
+    height: var(--header-height);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 32px;
+
+    background: rgba(20, 24, 33, 0.65);
+    backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid var(--border);
+
+    position: sticky;
+    top: 0;
+
+    z-index: 100;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    flex: 1;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+}
+
+.right button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    height: 44px;
+
+    padding: 0 18px;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-md);
+
+    background: transparent;
+
+    color: var(--text-primary);
+
+    font-size: .95rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all var(--transition);
+}
+
+.right button:hover {
+    background: var(--background-hover);
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 4px rgba(99,102,241,.08);
+}
+
+.right button:active {
+    transform: scale(.98);
 }

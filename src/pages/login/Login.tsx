@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../../hooks/notification/useNotification";
 import type { FormEvent } from "react";
-import { login } from "../../lib/Login";
+import { Login } from "../../lib/Login";
 import styles from "./Login.module.css";
 import { JwtDecoderUtil } from "../../utils/decodeToken";
 
@@ -17,7 +17,7 @@ export function LoginPage() {
     event.preventDefault();
 
     try {
-      const response = await login(email, password);
+      const response = await Login.login(email, password);
 
       if (!response.success) throw new Error("Credenciais Inválidas");
 

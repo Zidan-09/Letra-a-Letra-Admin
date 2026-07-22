@@ -49,9 +49,7 @@ export function DashboardPage() {
 
   useEffect(() => {
     if (!data || !isConnected) return;
-
-    console.log(data);
-
+    
     if (data.event === "METRICS") {
       const { users, usersOnline, games } = data.application;
       const { uptime, cpu, memory, storage, health } = data.system;
@@ -71,7 +69,7 @@ export function DashboardPage() {
   }, [consoleText]);
 
   return (
-    <main className={styles.container}>
+    <div className={styles.container}>
       <div className={styles.dashboard}>
         
         <header className={styles.header}>
@@ -171,6 +169,6 @@ export function DashboardPage() {
         </section>
 
       </div>
-    </main>
+    </div>
   );
 }
