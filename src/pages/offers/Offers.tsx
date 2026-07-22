@@ -1,6 +1,6 @@
-import styles from "./Users.module.css";
+import styles from "./Offers.module.css";
 
-export function UsersPage() {
+export function OffersPage() {
     return (
         <div className={styles.container}>
 
