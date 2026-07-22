@@ -30,7 +30,7 @@ export function LoginPage() {
 
       notify.success("Usuário autenticado");
 
-      navigate("/home");
+      navigate("/admin");
 
     } catch (err: unknown) {
       if (err instanceof Error) {

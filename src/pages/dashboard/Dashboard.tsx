@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useWebSocket } from "../../hooks/websocket/useWebSocket";
 import { WSS } from "../../lib/config";
 import { formatBytes, formatPercent } from "../../utils/bytesFormatter";
-import styles from "./Home.module.css";
+import styles from "./Dashboard.module.css";
 
 type WebSocketMessage = WebSocketLogs | WebSocketMetrics;
 
@@ -21,7 +21,7 @@ type WebSocketMetrics = {
   system: { cpu: Cpu, health: string, memory: Memory, storage: Storage, uptime: number }
 }
 
-export function HomePage() {
+export function DashboardPage() {
   const token = localStorage.getItem("token");
   const consoleEndRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +49,8 @@ export function HomePage() {
 
   useEffect(() => {
     if (!data || !isConnected) return;
+
+    console.log(data);
 
     if (data.event === "METRICS") {
       const { users, usersOnline, games } = data.application;

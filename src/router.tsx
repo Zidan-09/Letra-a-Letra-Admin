@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { LoginPage } from "./pages/login/Login";
-import { HomePage } from "./pages/home/Home";
+import { AdminLayout } from "./layout/AdminLayout";
+import { DashboardPage } from "./pages/dashboard/Dashboard";
 import { CosmeticsPage } from "./pages/cosmetics/Cosmetics";
 
 export const router = createBrowserRouter([
@@ -10,11 +11,17 @@ export const router = createBrowserRouter([
         element: <LoginPage />
     },
     {
-        path: "/home",
-        element: <HomePage />
-    },
-    {
-        path: "/cosmetic",
-        element: <CosmeticsPage />
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+            {
+                index: true,
+                element: <DashboardPage />
+            },
+            {
+                path: "cosmetics",
+                element: <CosmeticsPage />
+            }
+        ]
     }
 ]);
