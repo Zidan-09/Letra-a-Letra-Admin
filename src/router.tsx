@@ -1,5 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
+import { ProtectedLayout } from "./layout/ProtectedLayout";
 import { LoginPage } from "./pages/login/Login";
 import { AdminLayout } from "./layout/AdminLayout";
 import { DashboardPage } from "./pages/dashboard/Dashboard";
@@ -16,32 +17,41 @@ export const router = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: <AdminLayout />,
+        element: <ProtectedLayout />,
         children: [
             {
-                index: true,
-                element: <DashboardPage />
-            },
-            {
-                path: "cosmetics",
-                element: <CosmeticsPage />
-            },
-            {
-                path: "admins",
-                element: <AdminsPage />
-            },
-            {
-                path: "levels",
-                element: <LevelsPage />
-            },
-            {
-                path: "offers",
-                element: <OffersPage />
-            },
-            {
-                path: "users",
-                element: <UsersPage />
+                element: <AdminLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <DashboardPage />
+                    },
+                    {
+                        path: "users",
+                        element: <UsersPage />
+                    },
+                    {
+                        path: "admins",
+                        element: <AdminsPage />
+                    },
+                    {
+                        path: "cosmetics",
+                        element: <CosmeticsPage />
+                    },
+                    {
+                        path: "offers",
+                        element: <OffersPage />
+                    },
+                    {
+                        path: "levels",
+                        element: <LevelsPage />
+                    }
+                ]
             }
         ]
+    },
+    {
+        path: "*",
+        element: <Navigate to="/admin" replace />
     }
 ]);
