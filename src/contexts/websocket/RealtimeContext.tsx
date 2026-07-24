@@ -19,8 +19,8 @@ type Storage = {
 };
 
 export type ApplicationMetrics = {
-    players: number;
-    online: number;
+    users: number;
+    usersOnline: number;
     games: number;
 };
 

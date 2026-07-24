@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
     Users,
+    Gamepad,
     Shield,
     Palette,
     Gift,
@@ -20,6 +21,11 @@ const items = [
         label: "Usuários",
         to: "/admin/users",
         icon: Users
+    },
+    {
+        label: "Games",
+        to: "/admin/games",
+        icon: Gamepad
     },
     {
         label: "Administradores",

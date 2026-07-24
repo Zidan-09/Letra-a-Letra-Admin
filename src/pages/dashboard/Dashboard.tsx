@@ -53,10 +53,10 @@ export function DashboardPage() {
           <div className={styles.kpiCard}>
             <span className={styles.kpiLabel}>Jogadores Online</span>
             <div className={styles.kpiValueHighlight}>
-              {application?.online ?? 0}
+              {application?.usersOnline ?? 0}
             </div>
             <span className={styles.kpiSubtext}>
-              {application?.players ?? 0} cadastrados no total
+              {application?.users ?? 0} cadastrados no total
             </span>
           </div>
 
