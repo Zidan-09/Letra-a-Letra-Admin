@@ -10,9 +10,4 @@ function formatBytes(bytes: number | undefined, decimals = 2): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-function formatPercent(value: number | undefined): string {
-  if (value === undefined || isNaN(value)) return '0%';
-  return `${value.toFixed(1)}%`;
-}
-
-export { formatBytes, formatPercent }
+export { formatBytes }
