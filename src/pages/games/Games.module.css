@@ -1,13 +1,197 @@
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   min-height: 100vh;
   background-color: #0b0e14;
   background-image: 
-    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.15) 0, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(260, 40%, 15%, 0.2) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(260,40%,15%,0.3) 0, transparent 50%);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 40px;
   box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto 32px auto;
+  gap: 20px;
+}
+
+.titleGroup h1 {
+  color: #ffffff;
+  font-size: 2.24rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.titleGroup p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filterGroup {
+  display: flex;
+  background: #141821;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 4px;
+}
+
+.filterButton {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  color: #f8fafc;
+}
+
+.filterActive {
+  background: #1e2533;
+  color: #a5b4fc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.gameInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.gameName {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.gameId {
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+}
+
+.participantsContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.participantCount {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.participantList {
+  color: #64748b;
+  font-size: 0.8rem;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.statusRunning {
+  color: #10b981;
+}
+
+.statusActive {
+  color: #f5e50d;
+}
+
+.statusFinished {
+  color: #94a3b8;
+}
+
+.statusCanceled {
+  color: #a30404;
+}
+
+.actionButton, .refresh {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover, .refresh:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+.refresh {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: min-content;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.rotating {
+  animation: rotate360 0.5s linear;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  .filterButton {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg);
+  }
 }

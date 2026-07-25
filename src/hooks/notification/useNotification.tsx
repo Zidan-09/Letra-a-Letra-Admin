@@ -12,7 +12,7 @@ import Notification, {
 import styles from "./useNotification.module.css";
 
 type NotificationItem = {
-    id: number;
+    id: string;
     type: NotificationType;
     message: string;
 };
@@ -36,7 +36,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         type: NotificationType,
         message: string
     ) {
-        const id = Date.now();
+        const id = crypto.randomUUID();
 
         setNotifications(old => [
             ...old,

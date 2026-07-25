@@ -61,7 +61,7 @@ export function DashboardPage() {
           </div>
 
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Partidas Ativas</span>
+            <span className={styles.kpiLabel}>Jogos Ativos</span>
             <div className={styles.kpiValue}>{application?.games ?? 0}</div>
             <span className={styles.kpiSubtext}>Em andamento agora</span>
           </div>

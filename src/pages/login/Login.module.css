@@ -61,6 +61,8 @@
   padding: 12px 16px;
   font-size: 1rem;
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input::placeholder {
@@ -73,6 +75,41 @@
   background: #242c3e;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15),
               0 0 12px rgba(99, 102, 241, 0.2);
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.passwordInput {
+  padding-right: 44px;
+}
+
+.toggleButton {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.toggleButton:hover {
+  color: #a5b4fc;
+}
+
+.toggleButton:focus {
+  outline: none;
+  color: #a5b4fc;
 }
 
 .submit {

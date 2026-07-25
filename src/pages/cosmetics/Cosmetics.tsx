@@ -22,7 +22,7 @@ export function CosmeticsPage() {
   const fetchCosmetics = async () => {
     try {
         const data = await CosmeticRequests.getCosmetics(page, 5);
-        setCosmetics(data.cosmetics);
+        setCosmetics(data.content);
         setTotalPages(data.totalPages);
       
     } catch {

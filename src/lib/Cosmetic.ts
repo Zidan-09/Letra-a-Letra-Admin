@@ -1,12 +1,13 @@
-import type { CosmeticTypes } from "../utils/cosmeticTypes";
 import { type HttpResponse, HTTPS } from "./config";
+
+export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
 
 type CreateBody = {
     cosmetic: Cosmetic;
 }
 
 type GetBody = {
-    cosmetics: Cosmetic[];
+    content: Cosmetic[];
     first: number;
     last: number;
     page: number;

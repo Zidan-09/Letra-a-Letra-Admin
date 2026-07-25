@@ -3,6 +3,7 @@
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
+  padding: 40px 20px;
   background-color: #0b0e14;
   background-image: 
     radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), 
