@@ -1,4 +1,5 @@
 import { type HttpResponse, HTTPS } from "./config";
+import type { GetBody } from "./shared";
 
 type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
 export type GameStatus = "WAITING" | "RUNNING" | "CLOSED" | "CANCELED";
@@ -42,16 +43,6 @@ type MatchHistory = {
     players: Player[];
 }
 
-type GetBody = {
-    content: Game[];
-    first: number;
-    last: number;
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-
 export class GamesRequests {
     static async getGames(page: number, size: number) {
         const token = localStorage.getItem("token");
@@ -66,7 +57,7 @@ export class GamesRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<Game>> = await res.json();
 
         return response.data;
     }
@@ -84,7 +75,7 @@ export class GamesRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<Game>> = await res.json();
 
         return response.data;
     }

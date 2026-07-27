@@ -1,5 +1,6 @@
 import { type HttpResponse, HTTPS } from "./config";
 import type { Reward, CreateReward } from "./Rewards";
+import type { GetBody, FindBody } from "./shared";
 
 type LevelReward = {
     levelRewardId: string;
@@ -17,20 +18,6 @@ export type CreateRequest = {
     rewards: CreateReward[];
 }
 
-type GetBody = {
-    content: Level[];
-    first: number;
-    last: number;
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-
-type FindBody = {
-    level: Level;
-}
-
 export class LevelsRequests {
     static async getLevels(page: number, size: number) {
         const token = localStorage.getItem("token");
@@ -45,7 +32,7 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<Level>> = await res.json();
 
         return response.data;
     }
@@ -63,7 +50,7 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody> = await res.json();
+        const response: HttpResponse<FindBody<Level>> = await res.json();
 
         return response.data;
     }
@@ -81,7 +68,7 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody> = await res.json();
+        const response: HttpResponse<FindBody<Level>> = await res.json();
 
         return response.data;
     }

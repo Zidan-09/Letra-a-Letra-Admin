@@ -1,4 +1,5 @@
 import { type HttpResponse, HTTPS } from "./config";
+import type { GetBody } from "./shared";
 
 type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
 
@@ -32,16 +33,6 @@ export type User = {
     wallet: Wallet;
 }
 
-type GetBody = {
-    content: User[];
-    first: number;
-    last: number;
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-
 export class UserRequests {
     static async getUsers(page: number, size: number) {
         const token = localStorage.getItem("token");
@@ -56,7 +47,7 @@ export class UserRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<User>> = await res.json();
 
         return response.data;
     }

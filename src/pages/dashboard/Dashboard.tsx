@@ -4,13 +4,14 @@ import { formatBytes } from "../../utils/bytesFormatter";
 import styles from "./Dashboard.module.css";
 
 export function DashboardPage() {
-  const consoleEndRef = useRef<HTMLDivElement>(null);
+  const consoleRef = useRef<HTMLDivElement>(null);
 
   const { system, application, logs, connected } = useRealtime();
 
   useEffect(() => {
-    consoleEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    }
   }, [logs]);
 
   const ramPercent = system?.memory.usage ?? 0;
@@ -151,7 +152,7 @@ export function DashboardPage() {
             <span className={styles.consoleTitle}>Console de Eventos</span>
           </div>
 
-          <div className={styles.consoleContainer}>
+          <div ref={consoleRef} className={styles.consoleContainer}>
             {logs.length === 0 ? (
               <p className={styles.consolePlaceholder}>
                 Aguardando logs e eventos da API...
@@ -163,7 +164,6 @@ export function DashboardPage() {
                 </p>
               ))
             )}
-            <div ref={consoleEndRef} />
           </div>
         </section>
       </div>

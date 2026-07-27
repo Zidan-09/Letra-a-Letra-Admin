@@ -1,4 +1,5 @@
 import { type HttpResponse, HTTPS } from "./config";
+import type { GetBody } from "./shared";
 
 type CoinType = "SOFT" | "HARD" | "REAL";
 
@@ -25,16 +26,6 @@ export type Transaction = {
     transactionDate: Date
 }
 
-type GetBody = {
-    content: Transaction[];
-    first: number;
-    last: number;
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-
 type FindBody = {
     transaction: Transaction;
 }
@@ -53,7 +44,7 @@ export class TransactionRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<Transaction>> = await res.json();
 
         return response.data;
     }

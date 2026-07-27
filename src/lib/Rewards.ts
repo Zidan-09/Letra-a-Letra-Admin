@@ -1,12 +1,11 @@
 import type { Cosmetic } from "./Cosmetic";
+import type { RewardType } from "./shared";
 
 export type CreateReward = {
     rewardType: RewardType;
     rewardReference: string;
     quantity: number;
 }
-
-export type RewardType = "COIN" | "GEMS" | "COSMETIC";
 
 export type Reward = RewardCoin | RewardGem | RewardCosmetic;
 

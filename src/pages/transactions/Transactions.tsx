@@ -24,6 +24,8 @@ export function TransactionsPage() {
 
         try {
             const data = await TransactionRequests.getTransactions(page, 8);
+
+            console.log(data);
     
             setTransactions(data.content);
             setTotalPages(data.totalPages);

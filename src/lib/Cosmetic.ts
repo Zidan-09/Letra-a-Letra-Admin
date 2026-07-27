@@ -1,19 +1,10 @@
 import { type HttpResponse, HTTPS } from "./config";
+import type { GetBody } from "./shared";
 
 export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
 
 type CreateBody = {
     cosmetic: Cosmetic;
-}
-
-type GetBody = {
-    content: Cosmetic[];
-    first: number;
-    last: number;
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
 }
 
 type EditBody = {
@@ -74,7 +65,7 @@ export class CosmeticRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody> = await res.json();
+        const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
 
         return response.data;
     }

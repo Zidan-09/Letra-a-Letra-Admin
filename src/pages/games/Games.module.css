@@ -131,12 +131,8 @@
   color: #f5e50d;
 }
 
-.statusFinished {
+.statusFinished, .statusCanceled {
   color: #94a3b8;
-}
-
-.statusCanceled {
-  color: #a30404;
 }
 
 .actionButton, .refresh {
