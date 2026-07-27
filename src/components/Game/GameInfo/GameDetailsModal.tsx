@@ -10,8 +10,6 @@ interface GameDetailsModalProps {
 export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
   if (!game) return null;
 
-  console.log(game);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();

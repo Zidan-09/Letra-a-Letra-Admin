@@ -1,18 +1,20 @@
 import { type HttpResponse, HTTPS } from "./config";
-
-type Reward = {
-    
-}
+import type { Reward, CreateReward } from "./Rewards";
 
 type LevelReward = {
     levelRewardId: string;
-    reward: any[];
+    reward: Reward;
 }
 
 export type Level = {
     levelId: string;
-    level: number;
+    value: number;
     rewards: LevelReward[];
+}
+
+export type CreateRequest = {
+    level: number;
+    rewards: CreateReward[];
 }
 
 type GetBody = {
@@ -84,7 +86,7 @@ export class LevelsRequests {
         return response.data;
     }
 
-    static async createLevel(level: Level) {
+    static async createLevel(level: CreateRequest) {
         const token = localStorage.getItem("token");
 
         const res = await fetch(`${HTTPS}/level`, {
@@ -100,7 +102,28 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody> = await res.json();
+        const response: HttpResponse<Level> = await res.json();
+
+        return response.data;
+    }
+
+    static async updateLevel(level: CreateRequest, levelId: string) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/level/${levelId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                ...level
+            })
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<Level> = await res.json();
 
         return response.data;
     }
