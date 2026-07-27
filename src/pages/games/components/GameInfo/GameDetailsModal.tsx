@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Game } from "../../../lib/Games";
+import type { Game } from "../../../../lib/Games";
 import styles from "./GameDetailsModal.module.css";
 
 interface GameDetailsModalProps {

@@ -10,6 +10,7 @@ import { CosmeticsPage } from "./pages/cosmetics/Cosmetics";
 import { LevelsPage } from "./pages/levels/Levels";
 import { OffersPage } from "./pages/offers/Offers";
 import { UsersPage } from "./pages/users/Users";
+import { TransactionsPage } from "./pages/transactions/Transactions";
 
 export const router = createBrowserRouter([
     {
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
                     {
                         path: "users",
                         element: <UsersPage />
+                    },
+                    {
+                        path: "transactions",
+                        element: <TransactionsPage />
                     },
                     {
                         path: "games",

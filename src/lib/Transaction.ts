@@ -1,6 +1,6 @@
 import { type HttpResponse, HTTPS } from "./config";
 
-type CointType = "SOFT" | "HARD" | "REAL";
+type CoinType = "SOFT" | "HARD" | "REAL";
 
 type OperationType = "CREDIT" | "DEBIT";
 
@@ -15,7 +15,7 @@ type TransactionReason =
 export type Transaction = {
     transactionId: string;
     userId: string;
-    coinType: CointType;
+    coinType: CoinType;
     amount: number;
     balanceBefore: number;
     balanceAfter: number;

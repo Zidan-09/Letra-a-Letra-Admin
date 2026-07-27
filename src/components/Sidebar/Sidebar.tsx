@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
     Users,
+    MonitorCheck,
     Gamepad,
     Shield,
     Palette,
@@ -21,6 +22,11 @@ const items = [
         label: "Usuários",
         to: "/admin/users",
         icon: Users
+    },
+    {
+        label: "Transações",
+        to: "/admin/transactions",
+        icon: MonitorCheck
     },
     {
         label: "Games",

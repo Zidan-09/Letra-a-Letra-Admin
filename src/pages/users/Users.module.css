@@ -1,0 +1,142 @@
+.container {
+  min-height: 100vh;
+  background-color: #0b0e14;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(260,40%,15%,0.3) 0, transparent 50%);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto 32px auto;
+  gap: 20px;
+}
+
+.titleGroup h1 {
+  color: #ffffff;
+  font-size: 2.24rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.titleGroup p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.refresh {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: min-content;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.refresh:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+.rotating {
+  animation: rotate360 0.5s linear;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userNickname {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.userId {
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+}
+
+.userEmail {
+  display: flex;
+  flex-direction: column;
+}
+
+.userEmailValue {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.actionButton {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  .filterButton {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg);
+  }
+}
