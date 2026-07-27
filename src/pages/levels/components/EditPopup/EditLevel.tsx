@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNotification } from "../../../hooks/notification/useNotification";
-import { type Level, type CreateRequest, LevelsRequests } from "../../../lib/Levels";
-import { RewardEditor } from "../../RewardEditor/RewardEditor";
-import { convertReward } from "../../../lib/Rewards";
+import { useNotification } from "../../../../hooks/notification/useNotification";
+import { type Level, type CreateRequest, LevelsRequests } from "../../../../lib/Levels";
+import { RewardEditor } from "../../../../components/RewardEditor/RewardEditor";
+import { convertReward } from "../../../../lib/Rewards";
 import styles from "./EditLevel.module.css";
 
 interface EditLevelPopupProps {

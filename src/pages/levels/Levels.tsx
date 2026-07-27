@@ -3,9 +3,9 @@ import { useNotification } from "../../hooks/notification/useNotification";
 import { LevelsRequests, type Level } from "../../lib/Levels";
 import styles from "./Levels.module.css";
 import { Table, type Column } from "../../components/Table/Table";
-import { LevelDetailsModal } from "../../components/Level/LevelInfo/LevelDetailsModal";
-import { CreateLevelPopup } from "../../components/Level/CreatePopup/CreateLevel";
-import { EditLevelPopup } from "../../components/Level/EditPopup/EditLevel";
+import { LevelDetailsModal } from "./components/LevelInfo/LevelDetailsModal";
+import { CreateLevelPopup } from "./components/CreatePopup/CreateLevel";
+import { EditLevelPopup } from "./components/EditPopup/EditLevel";
 
 export function LevelsPage() {
     const { notify } = useNotification();
