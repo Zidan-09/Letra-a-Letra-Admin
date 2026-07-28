@@ -4,7 +4,8 @@ import { Table, type Column } from "../../components/Table/Table";
 import { type Transaction, TransactionRequests } from "../../lib/Transaction";
 import { TransactionDetailsModal } from "./components/TransactionInfo/TransactionDetailsModal";
 import { SearchBar } from "../../components/Search/SearchBar";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ArrowUp, ArrowDown } from "lucide-react";
+import { normalizeCoinType } from "../../utils/normalizeCoinType";
 import styles from "./Transactions.module.css";
 
 export function TransactionsPage() {
@@ -39,15 +40,17 @@ export function TransactionsPage() {
     }
 
     useEffect(() => {
+        if (search.trim()) return;
+        
         fetchTransactions();
-    }, [page]);
+    }, [page, search]);
 
     const columns: Column<Transaction>[] = [
         {
-            header: "ID / ID Usuário",
+            header: "ID / Usuário",
             render: (item) => (
                 <div className={styles.info}>
-                    <strong className={styles.userId}>{item.userId || "Id de Usuário Inválido"}</strong>
+                    <strong className={styles.userId}>{item.username || "Nome de Usuário Inválido"}</strong>
                     <span className={styles.transactionId}>{item.transactionId}</span>
                 </div>
             ),
@@ -57,7 +60,7 @@ export function TransactionsPage() {
             render: (item) => (
                 <div className={styles.coinType}>
                     <span className={styles.coinTypeValue}>
-                        {item.coinType}
+                        {normalizeCoinType(item.coinType)}
                     </span>
                 </div>
             ),
@@ -73,11 +76,11 @@ export function TransactionsPage() {
             ),
         },
         {
-            header: "Valor",
+            header: "Operação",
             render: (item) => (
                 <div className={styles.operationWrapper}>
-                    <span className={styles.operation}>
-                        {item.operation}
+                    <span className={`${styles.operation} ${item.operation === "CREDIT" ? styles.credit : styles.debit}`}>
+                        {item.operation} {item.operation === "CREDIT" ? <ArrowUp size={17} /> : <ArrowDown size={17} />}
                     </span>
                 </div>
             ),
@@ -93,8 +96,6 @@ export function TransactionsPage() {
             const data = await TransactionRequests.findTransactionsByNickname(search, page, 8);
 
             notify.success(`Transações de ${search} encontradas com sucesso!`);
-
-            console.log(data);
 
             setTransactions(data.content);
             setTotalPages(data.totalPages);

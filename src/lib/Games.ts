@@ -57,7 +57,9 @@ export class GamesRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<GetBody<Game>> = await res.json();
+        const response = await res.json();
+
+        console.log(response)
 
         return response.data;
     }

@@ -16,6 +16,7 @@ type TransactionReason =
 export type Transaction = {
     transactionId: string;
     userId: string;
+    username: string;
     coinType: CoinType;
     amount: number;
     balanceBefore: number;
@@ -23,6 +24,8 @@ export type Transaction = {
     operation: OperationType;
     reason: TransactionReason;
     referenceId: string;
+    referenceType: string;
+    referenceName: string
     transactionDate: Date
 }
 

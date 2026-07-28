@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { Transaction } from "../../../../lib/Transaction";
 import styles from "./TransactionDetailsModal.module.css";
+import { normalizeCoinType } from "../../../../utils/normalizeCoinType";
 
 interface TransactionDetailsModalProps {
     isOpen: boolean;
@@ -29,6 +30,8 @@ export function TransactionDetailsModal({
     }, [transaction, onClose]);
 
     if (!isOpen || !transaction) return null;
+
+    const transactionDate = new Date(transaction.transactionDate);
 
     return (
         <div
@@ -69,90 +72,183 @@ export function TransactionDetailsModal({
 
                 <div className={styles.body}>
 
-                    <section className={styles.section}>
+                    <div className={styles.contentGrid}>
+                        <div className={styles.leftColumn}>
+                            <section className={styles.section}>
 
-                        <h3 className={styles.sectionTitle}>
-                            Informações Gerais
-                        </h3>
+                                <h3 className={styles.sectionTitle}>
+                                    Informações Gerais
+                                </h3>
 
-                        <div className={styles.infoGrid}>
+                                <div className={styles.infoGrid}>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Operação</span>
-                                <strong>{transaction.operation}</strong>
-                            </div>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Operação
+                                        </span>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Moeda</span>
-                                <strong>{transaction.coinType}</strong>
-                            </div>
+                                        <strong>
+                                            {transaction.operation}
+                                        </strong>
+                                    </div>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Quantidade</span>
-                                <strong>{transaction.amount}</strong>
-                            </div>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Moeda
+                                        </span>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Motivo</span>
-                                <strong>{transaction.reason}</strong>
-                            </div>
+                                        <strong>
+                                            {normalizeCoinType(transaction.coinType)}
+                                        </strong>
+                                    </div>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Data</span>
-                                <strong>
-                                    {new Date(transaction.transactionDate)
-                                        .toLocaleString("pt-BR")}
-                                </strong>
-                            </div>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Quantidade
+                                        </span>
 
+                                        <strong>
+                                            {transaction.amount}
+                                        </strong>
+                                    </div>
+
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Motivo
+                                        </span>
+
+                                        <strong>
+                                            {transaction.reason.replaceAll("_", " ")}
+                                        </strong>
+                                    </div>
+
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Data
+                                        </span>
+
+                                        <strong>
+                                            {transactionDate.toLocaleDateString("pt-BR") + " - " + transactionDate.toLocaleTimeString("pt-BR")}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                            <section className={styles.section}>
+
+                                <h3 className={styles.sectionTitle}>
+                                    Saldos
+                                </h3>
+
+                                <div className={styles.balanceGrid}>
+
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Saldo Anterior
+                                        </span>
+
+                                        <strong>
+                                            {transaction.balanceBefore}
+                                        </strong>
+                                    </div>
+
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Saldo Atual
+                                        </span>
+
+                                        <strong>
+                                            {transaction.balanceAfter}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                            </section>
                         </div>
 
-                    </section>
+                        <div className={styles.rightColumn}>
+                            <section className={styles.section}>
 
-                    <section className={styles.section}>
+                                <h3 className={styles.sectionTitle}>
+                                    Referências
+                                </h3>
 
-                        <h3 className={styles.sectionTitle}>
-                            Saldos
-                        </h3>
+                                <div className={styles.referenceGrid}>
 
-                        <div className={styles.infoGrid}>
+                                    <div className={styles.infoCard}>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Saldo Anterior</span>
-                                <strong>{transaction.balanceBefore}</strong>
-                            </div>
+                                        <span className={styles.infoLabel}>
+                                            Usuário
+                                        </span>
 
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Saldo Atual</span>
-                                <strong>{transaction.balanceAfter}</strong>
-                            </div>
+                                        <div className={styles.referenceItem}>
+                                            <span className={styles.referenceLabel}>
+                                                Nome
+                                            </span>
 
+                                            <strong>
+                                                {transaction.username}
+                                            </strong>
+                                        </div>
+
+                                        <div className={styles.referenceItem}>
+                                            <span className={styles.referenceLabel}>
+                                                ID
+                                            </span>
+
+                                            <code>
+                                                {transaction.userId}
+                                            </code>
+                                        </div>
+
+                                    </div>
+
+                                    <div className={styles.infoCard}>
+
+                                        <span className={styles.infoLabel}>
+                                            Referência
+                                        </span>
+
+                                        <div className={styles.referenceItem}>
+                                            <span className={styles.referenceLabel}>
+                                                Nome
+                                            </span>
+
+                                            <strong>
+                                                {transaction.referenceName ?? "-"}
+                                            </strong>
+                                        </div>
+
+                                        <div className={styles.referenceItem}>
+                                            <span className={styles.referenceLabel}>
+                                                Tipo
+                                            </span>
+
+                                            <span className={styles.referenceBadge}>
+                                                {transaction.referenceType ?? "-"}
+                                            </span>
+                                        </div>
+
+                                        <div className={styles.referenceItem}>
+                                            <span className={styles.referenceLabel}>
+                                                ID
+                                            </span>
+
+                                            <code>
+                                                {transaction.referenceId ?? "-"}
+                                            </code>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
                         </div>
-
-                    </section>
-
-                    <section className={styles.section}>
-
-                        <h3 className={styles.sectionTitle}>
-                            Referências
-                        </h3>
-
-                        <div className={styles.infoGrid}>
-
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Usuário</span>
-                                <strong>{transaction.userId}</strong>
-                            </div>
-
-                            <div className={styles.infoCard}>
-                                <span className={styles.infoLabel}>Referência</span>
-                                <strong>{transaction.referenceId || "-"}</strong>
-                            </div>
-
-                        </div>
-
-                    </section>
-
+                    </div>
                 </div>
 
                 <footer className={styles.footer}>

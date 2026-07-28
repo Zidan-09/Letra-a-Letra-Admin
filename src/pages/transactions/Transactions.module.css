@@ -104,6 +104,20 @@
   font-weight: 500;
 }
 
+.operation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.credit {
+  color: #10b981;
+}
+
+.debit {
+  color: #cf2323;
+}
+
 .actionButton {
   background: #1e2533;
   border: 1px solid #334155;

@@ -56,10 +56,10 @@ export class UserRequests {
         return response.data;
     }
 
-    static async findUserByNickname(nickname: string) {
+    static async findUserByUsername(username: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${nickname}`, {
+        const res = await fetch(`${HTTPS}/user/username/${username}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

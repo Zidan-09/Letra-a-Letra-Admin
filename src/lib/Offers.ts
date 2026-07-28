@@ -2,7 +2,7 @@ import { type HttpResponse, HTTPS } from "./config";
 import type { Reward } from "./Rewards";
 import type { GetBody, FindBody, RewardType } from "./shared";
 
-type CoinType = "SOFT" | "HARD" | "REAL";
+export type CoinType = "SOFT" | "HARD" | "REAL";
 
 type OfferReward = {
     offerRewardId: string;

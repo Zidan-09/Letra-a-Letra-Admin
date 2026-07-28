@@ -16,18 +16,20 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   width: 100%;
-  max-width: 720px;
+  max-width: 980px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, .5),
+    0 8px 10px -6px rgba(0, 0, 0, .5);
   overflow: hidden;
-  animation: slideUp 0.2s ease-out;
+  animation: slideUp .2s ease-out;
 }
 
 .header {
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255,255,255,.05);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -38,31 +40,25 @@
   display: inline-block;
   background: #1e2533;
   color: #a5b4fc;
-  font-size: 0.75rem;
+  font-size: .75rem;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 4px;
   margin-bottom: 6px;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
 
 .title {
-  color: #ffffff;
+  color: #fff;
   font-size: 1.35rem;
   font-weight: 700;
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
 }
 
-.offerId {
-    color: #64748b;
-    font-family: "JetBrains Mono", monospace;
-    font-size: .8rem;
-}
-
-.gameId {
+.transactionId {
   color: #64748b;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.8rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
 }
 
 .closeButton {
@@ -73,7 +69,7 @@
   cursor: pointer;
   line-height: 1;
   padding: 0;
-  transition: color 0.2s;
+  transition: color .2s;
 }
 
 .closeButton:hover {
@@ -88,6 +84,24 @@
   gap: 24px;
 }
 
+/* ============================
+   Layout principal
+============================ */
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.leftColumn,
+.rightColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -96,181 +110,124 @@
 
 .sectionTitle {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: .85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: .05em;
   margin: 0;
   font-weight: 600;
 }
 
-.infoRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #cbd5e1;
-  font-size: 0.95rem;
+/* ============================
+   Informações
+============================ */
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
-/* Status Badges */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.85rem;
-  font-weight: 500;
+.balanceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
 }
 
-.statusRunning { color: #10b981; }
-.statusActive { color: #f5e50d; }
-.statusFinished { color: #94a3b8; }
-.statusCanceled { color: #a30404; }
+.referenceGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
 
-/* Cards de Participantes */
-.participantsGrid {
+.infoCard {
+  background: #141821;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 8px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
-.participantCard {
-  background: #141821;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
-
-.participantHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nickname {
-  color: #f8fafc;
-  font-weight: 600;
-}
-
-.roleBadge {
-  font-size: 0.75rem;
+.infoLabel {
   color: #64748b;
-  background: #1e2533;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
 }
 
-.cosmeticsContainer {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+.infoCard strong {
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
-.cosmeticsLabel {
-  font-size: 0.75rem;
+.time {
   color: #64748b;
-  display: block;
-  margin-bottom: 6px;
+  font-size: .8rem;
 }
 
-.cosmeticBadges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+/* ============================
+   Referências
+============================ */
+
+.referenceItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,.05);
 }
 
-.cosmeticBadge {
-  font-size: 0.75rem;
-  background: rgba(165, 180, 252, 0.1);
+.referenceItem:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
+
+.referenceLabel {
+  font-size: .72rem;
+  color: #64748b;
+}
+
+.referenceItem code {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+
+    padding: 6px 8px;
+
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 6px;
+
+    color: #cbd5e1;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .8rem;
+
+    scrollbar-width: thin;
+}
+
+.referenceBadge {
+  width: fit-content;
+  background: rgba(99,102,241,.15);
   color: #a5b4fc;
-  border: 1px solid rgba(165, 180, 252, 0.2);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.positionsList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.positionBadge {
-  background: #141821;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  display: flex;
-  gap: 6px;
-}
-
-.positionBadge strong {
-  color: #f8fafc;
-}
-
-.matchesList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.matchCard {
-  background: #141821;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
-
-.matchHeader {
-  display: flex;
-  justify-content: space-between;
-  color: #a5b4fc;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-}
-
-.matchDate {
-  color: #64748b;
-  font-weight: 400;
-  font-size: 0.8rem;
-}
-
-.playersList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.playerRow {
-  display: flex;
-  justify-content: space-between;
-  color: #cbd5e1;
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.winnerRow {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  border: 1px solid rgba(99,102,241,.25);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
   font-weight: 600;
 }
 
-.playerScore {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.emptyText {
-  color: #64748b;
-  font-size: 0.9rem;
-  margin: 0;
-}
+/* ============================
+   Rodapé
+============================ */
 
 .footer {
   padding: 16px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255,255,255,.05);
   display: flex;
   justify-content: flex-end;
   background: #141821;
@@ -282,10 +239,10 @@
   color: #f8fafc;
   padding: 8px 20px;
   border-radius: 6px;
-  font-size: 0.875rem;
+  font-size: .875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all .2s ease;
 }
 
 .confirmButton:hover {
@@ -293,58 +250,57 @@
   border-color: #6366f1;
 }
 
-.infoGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+/* ============================
+   Responsividade
+============================ */
+
+@media (max-width: 900px) {
+
+  .modal {
+    max-width: 720px;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .referenceGrid {
+    grid-template-columns: 1fr;
+  }
+
 }
 
-.infoCard {
-    background: #141821;
-    border: 1px solid rgba(255,255,255,.05);
+@media (max-width: 640px) {
 
-    border-radius: 8px;
+  .infoGrid,
+  .balanceGrid {
+    grid-template-columns: 1fr;
+  }
 
-    padding: 16px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
 }
 
-.infoLabel {
-    color: #64748b;
-
-    font-size: .75rem;
-
-    text-transform: uppercase;
-
-    letter-spacing: .05em;
-}
-
-.infoCard strong {
-    color: white;
-    font-size: 1.1rem;
-}
-
-.rewardList {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.transactionId {
-    color: #64748b;
-    font-family: "JetBrains Mono", monospace;
-    font-size: .8rem;
-}
+/* ============================
+   Animações
+============================ */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

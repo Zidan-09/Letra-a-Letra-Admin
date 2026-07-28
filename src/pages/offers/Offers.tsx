@@ -6,6 +6,7 @@ import { CreateOfferPopup } from "./components/CreatePopup/CreateOfferPopup";
 import { OfferDetailsModal } from "./components/OfferInfo/OfferDetailsModal";
 import { getRemainingTime } from "../../utils/getRemainingTime";
 import { Trash2 } from "lucide-react";
+import { normalizeCoinType } from "../../utils/normalizeCoinType";
 import styles from "./Offers.module.css";
 
 export function OffersPage() {
@@ -62,7 +63,7 @@ export function OffersPage() {
             render: (item) => (
                 <div className={styles.columnContainer}>
                     <span className={styles.value}>
-                        {item.coinType}
+                        {normalizeCoinType(item.coinType)}
                     </span>
                 </div>
             ),

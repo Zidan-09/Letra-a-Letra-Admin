@@ -105,9 +105,9 @@ export function CreateOfferPopup({
                             setCoinType(e.target.value as CoinType)
                         }
                     >
-                        <option value="REAL">Real</option>
-                        <option value="SOFT">Soft</option>
-                        <option value="HARD">Hard</option>
+                        <option value="REAL">Dinheiro</option>
+                        <option value="SOFT">Moedas</option>
+                        <option value="HARD">Gemas</option>
                     </select>
                 </div>
 

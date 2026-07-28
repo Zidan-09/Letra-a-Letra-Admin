@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { Offer } from "../../../../lib/Offers";
 import { RewardCard } from "../../../../components/RewardEditor/RewardCard";
+import { normalizeCoinType } from "../../../../utils/normalizeCoinType";
 import styles from "./OfferDetailsModal.module.css";
 
 interface OfferDetailsModalProps {
@@ -92,7 +93,7 @@ export function OfferDetailsModal({
                                 </span>
 
                                 <strong>
-                                    {offer.coinType}
+                                    {normalizeCoinType(offer.coinType)}
                                 </strong>
                             </div>
 

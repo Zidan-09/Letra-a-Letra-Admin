@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { CreateReward, RewardType } from "../../lib/Rewards";
+import type { CreateReward } from "../../lib/Rewards";
+import type { RewardType } from "../../lib/shared";
 import styles from "./RewardModal.module.css";
 
 type RewardModalProps = {
@@ -44,7 +45,7 @@ export function RewardModal({
 
         onCreate({
             rewardType,
-            quantity: amount,
+            quantity: rewardType !== "COSMETIC" ? amount : 1,
             rewardReference
         });
 
@@ -105,23 +106,27 @@ export function RewardModal({
 
                     </div>
 
-                    <div className={styles.section}>
+                    {
+                        rewardType !== "COSMETIC" && (
+                            <div className={styles.section}>
 
-                        <label className={styles.label}>
-                            Quantidade
-                        </label>
+                                <label className={styles.label}>
+                                    Quantidade
+                                </label>
 
-                        <input
-                            className={styles.input}
-                            type="number"
-                            min={1}
-                            value={quantity}
-                            onChange={(e) =>
-                                setQuantity(e.target.value)
-                            }
-                        />
+                                <input
+                                    className={styles.input}
+                                    type="number"
+                                    min={1}
+                                    value={quantity}
+                                    onChange={(e) =>
+                                        setQuantity(e.target.value)
+                                    }
+                                />
 
-                    </div>
+                        </div>
+                        )
+                    }
 
                     {
                         rewardType === "COSMETIC" && (

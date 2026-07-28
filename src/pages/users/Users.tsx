@@ -39,8 +39,10 @@ export function UsersPage() {
     }
 
     useEffect(() => {
+        if (search.trim()) return;
+
         fetchUsers();
-    }, [page]);
+    }, [page, search]);
 
     const columns: Column<User>[] = [
         {
@@ -70,7 +72,7 @@ export function UsersPage() {
 
     const handleSearchUser = async () => {
         try {
-            const data = await UserRequests.findUserByNickname(search);
+            const data = await UserRequests.findUserByUsername(search);
 
             notify.success(`Usuário ${search} encontrado com sucesso!`);
 
