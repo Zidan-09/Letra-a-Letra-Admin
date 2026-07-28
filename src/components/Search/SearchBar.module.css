@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 320px;
+
+  background: #1e2533;
+  border: 1px solid #334155;
+  border-radius: 6px;
+
+  padding: 0 12px;
+  box-sizing: border-box;
+
+  transition: all 0.2s ease;
+}
+
+.container:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.input::placeholder {
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    min-width: 0;
+  }
+}

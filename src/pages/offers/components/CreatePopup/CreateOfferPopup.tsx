@@ -19,6 +19,7 @@ export function CreateOfferPopup({
     const [title, setTitle] = useState("");
     const [coinType, setCoinType] = useState<CoinType>("REAL");
     const [price, setPrice] = useState("0");
+    const [repeatable, setRepeatable] = useState(false);
     const [hasExpiration, setHasExpiration] = useState(true);
     const [expiresIn, setExpiresIn] = useState(10);
 
@@ -50,6 +51,7 @@ export function CreateOfferPopup({
                 title,
                 coinType,
                 price: Number(price),
+                repeatable,
                 hasExpiration,
                 expiresIn: hasExpiration ? expiresIn : 0,
                 rewards
@@ -147,6 +149,16 @@ export function CreateOfferPopup({
                 </div>
 
                 <div className={styles.checkboxGroup}>
+                    <label className={styles.checkbox}>
+                        <input
+                            type="checkbox"
+                            checked={repeatable}
+                            onChange={(e) => setRepeatable(e.target.checked)}
+                        />
+
+                        Compra Repetível
+                    </label>
+                    
                     <label className={styles.checkbox}>
                         <input
                             type="checkbox"

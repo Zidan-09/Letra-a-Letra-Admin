@@ -11,6 +11,7 @@ import { LevelsPage } from "./pages/levels/Levels";
 import { OffersPage } from "./pages/offers/Offers";
 import { UsersPage } from "./pages/users/Users";
 import { TransactionsPage } from "./pages/transactions/Transactions";
+import { LogsPage } from "./pages/logs/Logs";
 
 export const router = createBrowserRouter([
     {
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
                     {
                         path: "levels",
                         element: <LevelsPage />
+                    },
+                    {
+                        path: "logs",
+                        element: <LogsPage />
                     }
                 ]
             }

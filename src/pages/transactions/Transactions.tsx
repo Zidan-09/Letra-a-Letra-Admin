@@ -2,15 +2,17 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { Table, type Column } from "../../components/Table/Table";
 import { type Transaction, TransactionRequests } from "../../lib/Transaction";
+import { TransactionDetailsModal } from "./components/TransactionInfo/TransactionDetailsModal";
+import { SearchBar } from "../../components/Search/SearchBar";
 import { RotateCcw } from "lucide-react";
 import styles from "./Transactions.module.css";
-import { TransactionDetailsModal } from "./components/TransactionInfo/TransactionDetailsModal";
 
 export function TransactionsPage() {
     const { notify } = useNotification();
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+    const [search, setSearch] = useState("");
 
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -24,8 +26,6 @@ export function TransactionsPage() {
 
         try {
             const data = await TransactionRequests.getTransactions(page, 8);
-
-            console.log(data);
     
             setTransactions(data.content);
             setTotalPages(data.totalPages);
@@ -88,6 +88,22 @@ export function TransactionsPage() {
         setSelectedTransaction(item);
     }
 
+    const handleSearchUserTransaction = async () => {
+        try {
+            const data = await TransactionRequests.findTransactionsByNickname(search, page, 8);
+
+            notify.success(`Transações de ${search} encontradas com sucesso!`);
+
+            console.log(data);
+
+            setTransactions(data.content);
+            setTotalPages(data.totalPages);
+
+        } catch {
+            notify.error(`Erro ao buscar as Transações de ${search}`);
+        }
+    }
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -96,12 +112,21 @@ export function TransactionsPage() {
                     <p>Acompanhe e monitore as transações registradas no jogo.</p>
                 </div>
 
-                <button
-                    className={styles.refresh}
-                    onClick={fetchTransactions}
-                >
-                    <RotateCcw className={rotating ? styles.rotating : ""} />
-                </button>
+                <div className={styles.headerButtons}>
+                    <button
+                        className={styles.refresh}
+                        onClick={fetchTransactions}
+                    >
+                        <RotateCcw className={rotating ? styles.rotating : ""} />
+                    </button>
+
+                    <SearchBar
+                        value={search}
+                        placeholder="Pesquisar por jogador..."
+                        onChange={setSearch}
+                        search={handleSearchUserTransaction}
+                    />
+                </div>
             </header>
 
             <main className={styles.content}>
@@ -123,6 +148,7 @@ export function TransactionsPage() {
             </main>
 
             <TransactionDetailsModal
+                isOpen={!!selectedTransaction}
                 transaction={selectedTransaction}
                 onClose={() => setSelectedTransaction(null)}
             />

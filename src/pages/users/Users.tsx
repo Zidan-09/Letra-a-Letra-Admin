@@ -3,6 +3,7 @@ import { useNotification } from "../../hooks/notification/useNotification";
 import { Table, type Column } from "../../components/Table/Table";
 import { UserDetailsInfo } from "./components/UserInfo/UserDetailsInfo";
 import { UserRequests, type User } from "../../lib/Users";
+import { SearchBar } from "../../components/Search/SearchBar";
 import { RotateCcw } from "lucide-react";
 import styles from "./Users.module.css";
 
@@ -11,6 +12,7 @@ export function UsersPage() {
 
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [search, setSearch] = useState("");
 
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -66,6 +68,19 @@ export function UsersPage() {
         setSelectedUser(item);
     }
 
+    const handleSearchUser = async () => {
+        try {
+            const data = await UserRequests.findUserByNickname(search);
+
+            notify.success(`Usuário ${search} encontrado com sucesso!`);
+
+            setSelectedUser(data.user);
+
+        } catch {
+            notify.error(`Usuário ${search} não foi encontrado`);
+        }
+    }
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -74,12 +89,21 @@ export function UsersPage() {
                     <p>Acompanhe e monitore os jogadores registrados no jogo.</p>
                 </div>
 
-                <button
-                    className={styles.refresh}
-                    onClick={fetchUsers}
-                >
-                    <RotateCcw className={rotating ? styles.rotating : ""} />
-                </button>
+                <div className={styles.headerButtons}>
+                    <button
+                        className={styles.refresh}
+                        onClick={fetchUsers}
+                    >
+                        <RotateCcw className={rotating ? styles.rotating : ""} />
+                    </button>
+
+                    <SearchBar
+                        value={search}
+                        placeholder="Pesquisar por jogador..."
+                        onChange={setSearch}
+                        search={handleSearchUser}
+                    />
+                </div>
             </header>
 
             <main className={styles.content}>

@@ -33,6 +33,10 @@ export type User = {
     wallet: Wallet;
 }
 
+type FindBody = {
+    user: User;
+}
+
 export class UserRequests {
     static async getUsers(page: number, size: number) {
         const token = localStorage.getItem("token");
@@ -48,6 +52,24 @@ export class UserRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<GetBody<User>> = await res.json();
+
+        return response.data;
+    }
+
+    static async findUserByNickname(nickname: string) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${nickname}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }

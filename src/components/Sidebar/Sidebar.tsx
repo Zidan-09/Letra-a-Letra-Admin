@@ -7,7 +7,8 @@ import {
     Shield,
     Palette,
     Gift,
-    ChartColumn
+    ChartColumn,
+    ScrollText
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -52,6 +53,11 @@ const items = [
         label: "Níveis",
         to: "/admin/levels",
         icon: ChartColumn
+    },
+    {
+        label: "Logs",
+        to: "/admin/logs",
+        icon: ScrollText
     }
 ];
 

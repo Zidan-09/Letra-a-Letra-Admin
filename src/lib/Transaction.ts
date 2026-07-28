@@ -70,18 +70,36 @@ export class TransactionRequests {
     static async findTransactionByUserId(userId: string) {
         const token = localStorage.getItem("token");
         
-            const res = await fetch(`${HTTPS}/transaction/user/${userId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-    
-            if (!res.ok) throw new Error();
-    
-            const response: HttpResponse<FindBody> = await res.json();
-    
-            return response.data;
+        const res = await fetch(`${HTTPS}/transaction/user/${userId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<FindBody> = await res.json();
+
+        return response.data;
+    }
+
+    static async findTransactionsByNickname(nickname: string, page: number, size: number) {
+        const token = localStorage.getItem("token");
+        
+        const res = await fetch(`${HTTPS}/transaction/user/username/${nickname}?page=${page}&size=${size}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<GetBody<Transaction>> = await res.json();
+
+        return response.data;
     }
 }

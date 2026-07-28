@@ -19,6 +19,13 @@
   gap: 20px;
 }
 
+.headerButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: stretch;
+}
+
 .titleGroup h1 {
   color: #ffffff;
   font-size: 2.24rem;

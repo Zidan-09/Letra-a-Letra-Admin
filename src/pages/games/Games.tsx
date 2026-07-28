@@ -46,7 +46,7 @@ export function GamesPage() {
   useEffect(() => {
     fetchGames();
   }, [page, showAll]);
-  console.log(games);
+
   const columns: Column<Game>[] = [
     {
       header: "ID / Nome da Partida",

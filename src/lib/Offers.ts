@@ -22,6 +22,7 @@ export type Offer = {
     price: number;
     rewards: OfferReward[];
     active: boolean;
+    repeatable: boolean;
     hasExpiration: boolean;
     expiresAt: Date;
 }
@@ -31,6 +32,7 @@ type CreateRequest = {
     coinType: CoinType;
     price: number;
     rewards: CreateOfferReward[];
+    repeatable: boolean;
     hasExpiration: boolean;
     expiresIn: number;
 }
