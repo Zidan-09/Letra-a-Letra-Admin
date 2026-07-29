@@ -1,6 +1,6 @@
 import { HTTPS } from "../lib/config.ts";
 
-const offer = "e6d328c4-326c-4a90-8ecb-6e4212cd367d";
+const offer = "3fb9bf3b-a168-43a7-8163-c186220efe36";
 const user = "wadawueu@email.com"
 
 let token: string;
@@ -39,7 +39,7 @@ async function buy() {
 
     console.log(json);
 
-    res = await fetch(`${HTTPS}/shop/offers/${offer}/buy`, {
+    /* res = await fetch(`${HTTPS}/shop/offers/${offer}/buy`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -49,7 +49,7 @@ async function buy() {
 
     json = await res.json();
 
-    console.log(json);
+    console.log(json); */
 }
 
 buy();
