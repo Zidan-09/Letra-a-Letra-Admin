@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { Table, type Column } from "../../components/Table/Table";
 import { UserDetailsInfo } from "./components/UserInfo/UserDetailsInfo";
-import { UserRequests, type User } from "../../lib/Users";
+import { UserRequests, type User } from "./lib/Users";
 import { SearchBar } from "../../components/Search/SearchBar";
 import { RotateCcw } from "lucide-react";
 import styles from "./Users.module.css";

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { CosmeticRequests, type CosmeticTypes } from "../../../../lib/Cosmetic";
+import { CosmeticRequests, type CosmeticTypes } from "../../lib/Cosmetic";
 import styles from "./EditCosmetic.module.css";
 
 interface CosmeticData {

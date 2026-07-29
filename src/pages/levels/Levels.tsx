@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
-import { LevelsRequests, type Level } from "../../lib/Levels";
+import { LevelsRequests, type Level } from "./lib/Levels";
 import { Table, type Column } from "../../components/Table/Table";
 import { LevelDetailsModal } from "./components/LevelInfo/LevelDetailsModal";
 import { CreateLevelPopup } from "./components/CreatePopup/CreateLevel";

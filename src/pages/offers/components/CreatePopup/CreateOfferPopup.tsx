@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RewardEditor } from "../../../../components/RewardEditor/RewardEditor";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { OfferRequests } from "../../../../lib/Offers";
+import { OfferRequests } from "../../lib/Offers";
 import type { RewardType } from "../../../../lib/shared";
 import styles from "./CreateOfferPopup.module.css";
 

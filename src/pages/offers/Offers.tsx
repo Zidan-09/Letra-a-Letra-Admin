@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
-import { OfferRequests, type Offer } from "../../lib/Offers";
+import { OfferRequests, type Offer } from "./lib/Offers";
 import { Table, type Column } from "../../components/Table/Table";
 import { CreateOfferPopup } from "./components/CreatePopup/CreateOfferPopup";
 import { OfferDetailsModal } from "./components/OfferInfo/OfferDetailsModal";

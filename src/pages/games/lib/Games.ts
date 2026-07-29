@@ -1,5 +1,5 @@
-import { type HttpResponse, HTTPS } from "./config";
-import type { GetBody } from "./shared";
+import { type HttpResponse, HTTPS } from "../../../lib/config";
+import type { GetBody } from "../../../lib/shared";
 
 type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
 export type GameStatus = "WAITING" | "RUNNING" | "CLOSED" | "CANCELED";

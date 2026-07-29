@@ -1,4 +1,4 @@
-import type { Cosmetic } from "./Cosmetic";
+import type { Cosmetic } from "../pages/cosmetics/lib/Cosmetic";
 import type { RewardType } from "./shared";
 
 export type CreateReward = {

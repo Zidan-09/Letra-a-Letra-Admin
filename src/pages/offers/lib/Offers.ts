@@ -1,6 +1,6 @@
-import { type HttpResponse, HTTPS } from "./config";
-import type { Reward } from "./Rewards";
-import type { GetBody, FindBody, RewardType } from "./shared";
+import { type HttpResponse, HTTPS } from "../../../lib/config";
+import type { Reward } from "../../../lib/Rewards";
+import type { GetBody, FindBody, RewardType } from "../../../lib/shared";
 
 export type CoinType = "SOFT" | "HARD" | "REAL";
 

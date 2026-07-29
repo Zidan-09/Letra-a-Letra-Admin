@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { User } from "../../../../lib/Users";
+import type { User } from "../../lib/Users";
 import styles from "./UserDetailsInfo.module.css";
 
 interface UserDetailsInfoProps {

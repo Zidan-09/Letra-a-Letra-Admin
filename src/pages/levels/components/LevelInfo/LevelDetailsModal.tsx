@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Level } from "../../../../lib/Levels";
+import type { Level } from "../../lib/Levels";
 import { RewardCard } from "../../../../components/RewardEditor/RewardCard";
 import styles from "./LevelDetailsModal.module.css";
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Offer } from "../../../../lib/Offers";
+import type { Offer } from "../../lib/Offers";
 import { RewardCard } from "../../../../components/RewardEditor/RewardCard";
 import { normalizeCoinType } from "../../../../utils/normalizeCoinType";
 import styles from "./OfferDetailsModal.module.css";

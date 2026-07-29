@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
 import { RewardEditor } from "../../../../components/RewardEditor/RewardEditor";
-import { LevelsRequests, type CreateRequest } from "../../../../lib/Levels";
+import { LevelsRequests, type CreateRequest } from "../../lib/Levels";
 import styles from "./CreateLevel.module.css";
 
 interface CreateLevelPopupProps {

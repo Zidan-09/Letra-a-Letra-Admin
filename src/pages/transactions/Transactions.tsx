@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { Table, type Column } from "../../components/Table/Table";
-import { type Transaction, TransactionRequests } from "../../lib/Transaction";
+import { type Transaction, TransactionRequests } from "./lib/Transaction";
 import { TransactionDetailsModal } from "./components/TransactionInfo/TransactionDetailsModal";
 import { SearchBar } from "../../components/Search/SearchBar";
 import { RotateCcw, ArrowUp, ArrowDown } from "lucide-react";

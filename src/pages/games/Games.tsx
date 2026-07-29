@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, type Column } from "../../components/Table/Table";
 import { useNotification } from "../../hooks/notification/useNotification";
-import { GamesRequests, type Game } from "../../lib/Games";
+import { GamesRequests, type Game } from "./lib/Games";
 import { GameDetailsModal } from "./components/GameInfo/GameDetailsModal";
 import { RotateCcw } from "lucide-react";
 import styles from "./Games.module.css";

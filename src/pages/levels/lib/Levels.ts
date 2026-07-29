@@ -1,6 +1,6 @@
-import { type HttpResponse, HTTPS } from "./config";
-import type { Reward, CreateReward } from "./Rewards";
-import type { GetBody, FindBody } from "./shared";
+import { type HttpResponse, HTTPS } from "../../../lib/config";
+import type { Reward, CreateReward } from "../../../lib/Rewards";
+import type { GetBody, FindBody } from "../../../lib/shared";
 
 type LevelReward = {
     levelRewardId: string;

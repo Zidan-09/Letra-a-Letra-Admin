@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Transaction } from "../../../../lib/Transaction";
+import type { Transaction } from "../../lib/Transaction";
 import styles from "./TransactionDetailsModal.module.css";
 import { normalizeCoinType } from "../../../../utils/normalizeCoinType";
 

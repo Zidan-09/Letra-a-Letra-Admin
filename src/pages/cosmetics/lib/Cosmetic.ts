@@ -1,5 +1,5 @@
-import { type HttpResponse, HTTPS } from "./config";
-import type { GetBody } from "./shared";
+import { type HttpResponse, HTTPS } from "../../../lib/config";
+import type { GetBody } from "../../../lib/shared";
 
 export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
 
