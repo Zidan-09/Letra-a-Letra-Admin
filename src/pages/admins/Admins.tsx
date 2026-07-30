@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { AdminRequests, type Admin } from "./lib/Admins";
 import { Table, type Column } from "../../components/Table/Table";
-import styles from "./Admins.module.css";
 import { RegisterAdminPopup } from "./components/CreateAdmin/RegisterAdminPopup";
+import { Trash2 } from "lucide-react";
 import { AdminDetailsModal } from "./components/AdminInfo/AdminDetailsModal";
+import styles from "./Admins.module.css";
 
 export function AdminsPage() {
     const { notify } = useNotification();
@@ -95,8 +96,8 @@ export function AdminsPage() {
                                 Detalhes
                             </button>
                             
-                            <button className={styles.actionButton} onClick={() => handleDeleteAdmin(item)}>
-                                Deletar
+                            <button className={`${styles.actionButton} ${styles.deleteButton}`} onClick={() => handleDeleteAdmin(item)}>
+                                <Trash2 />
                             </button>
                         </>
                     )}

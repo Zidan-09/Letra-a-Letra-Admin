@@ -1,6 +1,6 @@
 import { HTTPS } from "../lib/config.ts";
 
-const offer = "3fb9bf3b-a168-43a7-8163-c186220efe36";
+const offer = "23f36958-373f-4f06-828a-a996a65d74a6";
 const user = "wadawueu@email.com"
 
 let token: string;

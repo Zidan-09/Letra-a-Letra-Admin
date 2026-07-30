@@ -5,6 +5,7 @@ export type Admin = {
     id: string;
     username: string;
     email: string;
+    permissions: Set<any>;
 }
 
 type FindBody = {
@@ -21,7 +22,7 @@ export class AdminRequests {
     static async getAdmins(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/cosmetic?page=${page}&size=${size}`, {
+        const res = await fetch(`${HTTPS}/admin?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -32,6 +33,8 @@ export class AdminRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<GetBody<Admin>> = await res.json();
+
+        console.log(response);
 
         return response.data;
     }
