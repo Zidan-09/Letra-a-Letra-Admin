@@ -61,7 +61,6 @@ export function CreateOfferPopup({
 
             onClose();
         } catch (err) {
-            console.error(err);
             notify.error("Erro ao cadastrar oferta");
         }
     }

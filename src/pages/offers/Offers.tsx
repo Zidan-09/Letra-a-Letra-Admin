@@ -39,7 +39,6 @@ export function OffersPage() {
           setTotalPages(data.totalPages);
 
         } catch (e) {
-          console.error(e);
           notify.error("Erro ao carregar a lista de níveis.");
         }
     };

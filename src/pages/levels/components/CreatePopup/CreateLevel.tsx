@@ -40,7 +40,6 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
 
             onClose();
         } catch (err) {
-            console.error(err);
             notify.error("Erro ao cadastrar Level");
         }
     };

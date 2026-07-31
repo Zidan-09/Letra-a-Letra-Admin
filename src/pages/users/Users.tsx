@@ -31,7 +31,6 @@ export function UsersPage() {
             setTotalPages(data.totalPages);
 
         } catch (e) {
-            console.error(e);
             notify.error("Erro ao carregar a lista de usuários.");
         } finally {
             setTimeout(() => setRotating(false), 500);

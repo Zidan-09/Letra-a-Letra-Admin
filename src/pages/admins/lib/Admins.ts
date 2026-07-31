@@ -61,8 +61,6 @@ export class AdminRequests {
 
         const response: HttpResponse<GetBody<Admin>> = await res.json();
 
-        console.log(response);
-
         return response.data;
     }
 

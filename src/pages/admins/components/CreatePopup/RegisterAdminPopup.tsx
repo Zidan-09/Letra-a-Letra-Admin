@@ -37,7 +37,6 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
 
             onClose();
         } catch (err) {
-            console.error(err);
             notify.error("Erro ao cadastrar Administrador");
         }
     };

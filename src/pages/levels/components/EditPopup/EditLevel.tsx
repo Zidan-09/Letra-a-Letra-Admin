@@ -37,8 +37,6 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
                 rewards
             };
 
-            console.log(levelToSend);
-
             await LevelsRequests.updateLevel(levelToSend, level.levelId);
 
             notify.success("Level atualizado com sucesso!");
@@ -49,7 +47,6 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
             if (onSuccess) onSuccess();
             onClose();
         } catch (err) {
-            console.error(err);
             notify.error("Erro ao atualizar Level");
         }
     };
