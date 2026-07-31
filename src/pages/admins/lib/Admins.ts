@@ -1,11 +1,33 @@
 import { HTTPS, type HttpResponse } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 
+export type Key = 
+"USER" | 
+"LOGS" | 
+"ADMIN" | 
+"COSMETIC" | 
+"GAME" | 
+"LEVELS" | 
+"OFFERS" | 
+"TRANSACTIONS";
+
+export type Action = 
+"VIEW" | 
+"CREATE" | 
+"EDIT" | 
+"DELETE" | 
+"TOGGLE";
+
+type Permission = {
+    key: Key;
+    actions: Set<Action>;
+}
+
 export type Admin = {
     id: string;
     username: string;
     email: string;
-    permissions: Set<any>;
+    permissions: Set<Permission>;
 }
 
 type FindBody = {
@@ -15,7 +37,12 @@ type FindBody = {
 type RegisterAdmin = {
     name: string;
     email: string;
-    password: string;
+}
+
+type UpdateAdmin = {
+    name: string;
+    email: string;
+    permissions: Set<Permission>;
 }
 
 export class AdminRequests {
@@ -83,6 +110,33 @@ export class AdminRequests {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<FindBody> = await res.json();
+
+        return response.data;
+    }
+
+    static async updateAdmin(admin: Admin) {
+        const token = localStorage.getItem("token");
+
+        const updateData: UpdateAdmin = {
+            name: admin.username,
+            email: admin.email,
+            permissions: admin.permissions
+        }
+
+        const res = await fetch(`${HTTPS}/admin/${admin.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                ...updateData
+            })
         });
 
         if (!res.ok) throw new Error();

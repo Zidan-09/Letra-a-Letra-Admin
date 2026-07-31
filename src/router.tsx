@@ -12,11 +12,16 @@ import { OffersPage } from "./pages/offers/Offers";
 import { UsersPage } from "./pages/users/Users";
 import { TransactionsPage } from "./pages/transactions/Transactions";
 import { LogsPage } from "./pages/logs/Logs";
+import { ActivateAccount } from "./pages/activate/ActivateAccount";
 
 export const router = createBrowserRouter([
     {
         path: "/",
         element: <LoginPage />
+    },
+    {
+        path: "/ativar-conta",
+        element: <ActivateAccount />
     },
     {
         path: "/admin",

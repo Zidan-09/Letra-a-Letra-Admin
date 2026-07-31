@@ -1,0 +1,241 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(3, 7, 18, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+    background: #10141d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.5),
+        0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.2s ease-out;
+}
+
+.header {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #141821;
+}
+
+.typeBadge {
+    display: inline-block;
+    background: #1e2533;
+    color: #a5b4fc;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    letter-spacing: .05em;
+}
+
+.title {
+    margin: 0 0 4px;
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.adminId {
+    color: #64748b;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .8rem;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 1.75rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color .2s;
+}
+
+.closeButton:hover {
+    color: #f8fafc;
+}
+
+.body {
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    margin: 0;
+    color: #94a3b8;
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-weight: 600;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.infoCard {
+    background: #141821;
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.infoCard:last-child {
+    grid-column: 1 / -1;
+}
+
+.infoLabel {
+    color: #64748b;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.infoCard strong {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.email {
+    font-size: .95rem !important;
+    word-break: break-word;
+}
+
+.permissionList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.permissionCard {
+    background: #141821;
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.permissionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.permissionKey {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(99, 102, 241, .12);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, .25);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.actionBadge {
+    background: #1e2533;
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: #cbd5e1;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+
+.emptyText {
+    color: #64748b;
+    font-size: .9rem;
+    margin: 0;
+}
+
+.footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255, 255, 255, .05);
+    display: flex;
+    justify-content: flex-end;
+    background: #141821;
+}
+
+.confirmButton {
+    background: #1e2533;
+    border: 1px solid #334155;
+    color: #f8fafc;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.confirmButton:hover {
+    background: #242c3e;
+    border-color: #6366f1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

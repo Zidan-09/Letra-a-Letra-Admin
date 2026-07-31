@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { AdminRequests, type Admin } from "./lib/Admins";
 import { Table, type Column } from "../../components/Table/Table";
-import { RegisterAdminPopup } from "./components/CreateAdmin/RegisterAdminPopup";
-import { Trash2 } from "lucide-react";
+import { RegisterAdminPopup } from "./components/CreatePopup/RegisterAdminPopup";
+import { EditAdminPopup } from "./components/EditPopup/EditAdminPopup";
 import { AdminDetailsModal } from "./components/AdminInfo/AdminDetailsModal";
+import { Trash2 } from "lucide-react";
 import styles from "./Admins.module.css";
 
 export function AdminsPage() {
@@ -18,6 +19,7 @@ export function AdminsPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     const fetchAdmins = async () => {    
         try {
@@ -61,6 +63,11 @@ export function AdminsPage() {
         setSelectedAdmin(item);
     }
 
+    const handleEditAdmin = (item: Admin) => {
+        setIsEditOpen(true);
+        setSelectedAdmin(item);
+    }
+
     const handleDeleteAdmin = async (item: Admin) => {
         try {
             await AdminRequests.removeAdmin(item.id);
@@ -95,6 +102,10 @@ export function AdminsPage() {
                             <button className={styles.actionButton} onClick={() => handleInspectAdmin(item)}>
                                 Detalhes
                             </button>
+
+                            <button className={styles.actionButton} onClick={() => handleEditAdmin(item)}>
+                                Editar
+                            </button>
                             
                             <button className={`${styles.actionButton} ${styles.deleteButton}`} onClick={() => handleDeleteAdmin(item)}>
                                 <Trash2 />
@@ -116,10 +127,23 @@ export function AdminsPage() {
                 }}
             />
 
+            <EditAdminPopup 
+                isOpen={isEditOpen}
+                admin={selectedAdmin}
+                onClose={() => {
+                    setIsEditOpen(false);
+                    setSelectedAdmin(null);
+                }}
+                onSuccess={() => fetchAdmins()}
+            />
+
             <AdminDetailsModal
                 isOpen={isModalOpen}
                 admin={selectedAdmin}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedAdmin(null);
+                }}
             />
         </div>
     );
