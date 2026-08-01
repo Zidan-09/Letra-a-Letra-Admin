@@ -6,9 +6,11 @@ import { LevelDetailsModal } from "./components/LevelInfo/LevelDetailsModal";
 import { CreateLevelPopup } from "./components/CreatePopup/CreateLevel";
 import { EditLevelPopup } from "./components/EditPopup/EditLevel";
 import styles from "./Levels.module.css";
+import { useProfile } from "../../hooks/profile/useProfile";
 
 export function LevelsPage() {
     const { notify } = useNotification();
+    const { permissions } = useProfile();
 
     const [levels, setLevels] = useState<Level[]>([]);
     const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
@@ -19,6 +21,17 @@ export function LevelsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const [canRegister, setCanRegister] = useState(false);
+    const [canEdit, setCanEdit] = useState(false);
+
+    useEffect(() => {
+        const permission = permissions.find(p => p.key === "LEVELS");
+
+        setCanRegister(permission?.actions.includes("CREATE") ?? false);
+        setCanEdit(permission?.actions.includes("EDIT") ?? false);
+        
+    }, [permissions]);
 
     const fetchLevels = async () => {    
         try {
@@ -76,7 +89,11 @@ export function LevelsPage() {
                     <p>Gerencie, visualize e edite os níveis e suas recompensas ativas no sistema.</p>
                 </div>
 
-                <button className={styles.addButton} onClick={() => setIsCreateOpen(true)}>
+                <button 
+                    className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`} 
+                    onClick={() => setIsCreateOpen(true)}
+                    disabled={!canRegister}
+                >
                     Novo Level
                 </button>
             </header>
@@ -87,11 +104,18 @@ export function LevelsPage() {
                     columns={columns}
                     renderActions={(item) => (
                         <>
-                            <button className={styles.actionButton} onClick={() => handleInspectLevel(item)}>
+                            <button 
+                                className={styles.actionButton} 
+                                onClick={() => handleInspectLevel(item)}
+                            >
                                 Detalhes
                             </button>
                             
-                            <button className={styles.actionButton} onClick={() => handleOpenEdit(item)}>
+                            <button 
+                                className={`${styles.actionButton} ${canEdit ? "" : styles.disabled}`} 
+                                onClick={() => handleOpenEdit(item)}
+                                disabled={!canEdit}
+                            >
                                 Editar
                             </button>
                         </>

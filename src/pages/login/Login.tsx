@@ -6,6 +6,7 @@ import type { FormEvent } from "react";
 import { Login } from "../../lib/Login";
 import { JwtDecoderUtil } from "../../utils/decodeToken";
 import styles from "./Login.module.css";
+import { useProfile } from "../../hooks/profile/useProfile";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { notify } = useNotification();
   const { login } = useAuth();
+  const { set } = useProfile();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -31,6 +33,15 @@ export function LoginPage() {
       login({
         id: response.data.id,
         token: response.data.token
+      });
+
+      const admin = (await Login.me()).data.admin;
+
+      set({
+          id: admin.id,
+          username: admin.username,
+          email: admin.email, 
+          permissions: admin.permissions
       });
 
       notify.success("Usuário autenticado");

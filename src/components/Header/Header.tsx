@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import { Login } from "../../lib/Login";
+import { useProfile } from "../../hooks/profile/useProfile";
 import styles from "./Header.module.css";
 
 export function Header() {
     const [admin, setAdmin] = useState<{ id: string; username: string; email: string; }>();
 
-    useEffect(() => {
-        async function getMe() {
-            const res = await Login.me();
+    const { id, username, email } = useProfile();
 
-            setAdmin(res.data.admin);
-        }
-        
-        getMe();
+    useEffect(() => {
+        setAdmin({
+            id,
+            username,
+            email
+        });
     }, []);
 
     return (

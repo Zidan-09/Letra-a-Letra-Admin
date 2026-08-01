@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
+import { useProfile } from "../../hooks/profile/useProfile";
 import { AdminRequests, type Admin } from "./lib/Admins";
 import { Table, type Column } from "../../components/Table/Table";
 import { RegisterAdminPopup } from "./components/CreatePopup/RegisterAdminPopup";
@@ -10,6 +11,7 @@ import styles from "./Admins.module.css";
 
 export function AdminsPage() {
     const { notify } = useNotification();
+    const { id, permissions } = useProfile();
 
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
@@ -20,6 +22,19 @@ export function AdminsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const [canEdit, setCanEdit] = useState(false);
+    const [canRegister, setCanRegister] = useState(true);
+    const [canDelete, setCanDelete] = useState(false);
+
+    useEffect(() => {
+        const permission = permissions.find(p => p.key === "ADMIN");
+
+        setCanRegister(permission?.actions.includes("CREATE") ?? false);
+        setCanEdit(permission?.actions.includes("EDIT") ?? false);
+        setCanDelete(permission?.actions.includes("DELETE") ?? false);
+        
+    }, [permissions]);
 
     const fetchAdmins = async () => {    
         try {
@@ -87,7 +102,11 @@ export function AdminsPage() {
                     <p>Gerencie, visualize e edite os administradores e suas permissões no sistema.</p>
                 </div>
 
-                <button className={styles.addButton} onClick={() => setIsCreateOpen(true)}>
+                <button
+                    className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`} 
+                    onClick={() => setIsCreateOpen(true)}
+                    disabled={!canRegister}
+                >
                     Novo Administrador
                 </button>
             </header>
@@ -102,11 +121,19 @@ export function AdminsPage() {
                                 Detalhes
                             </button>
 
-                            <button className={styles.actionButton} onClick={() => handleEditAdmin(item)}>
+                            <button 
+                                className={`${styles.actionButton} ${canEdit ? "" : styles.disabled} ${item.id === id ? styles.disabled : ""}`} 
+                                onClick={() => handleEditAdmin(item)}
+                                disabled={!canEdit || item.id === id}
+                            >
                                 Editar
                             </button>
                             
-                            <button className={`${styles.actionButton} ${styles.deleteButton}`} onClick={() => handleDeleteAdmin(item)}>
+                            <button
+                                className={`${styles.actionButton} ${styles.deleteButton} ${canDelete ? "" : styles.disabled} ${item.id === id ? styles.disabled : ""}`} 
+                                onClick={() => handleDeleteAdmin(item)}
+                                disabled={!canDelete || item.id === id}
+                            >
                                 <Trash2 />
                             </button>
                         </>
@@ -119,7 +146,7 @@ export function AdminsPage() {
             </main>
 
             <RegisterAdminPopup
-                isOpen={isCreateOpen}
+                isOpen={isCreateOpen && canRegister}
                 onClose={() => {
                     setIsCreateOpen(false);
                     fetchAdmins();
@@ -127,7 +154,7 @@ export function AdminsPage() {
             />
 
             <EditAdminPopup 
-                isOpen={isEditOpen}
+                isOpen={isEditOpen && canEdit}
                 admin={selectedAdmin}
                 onClose={() => {
                     setIsEditOpen(false);

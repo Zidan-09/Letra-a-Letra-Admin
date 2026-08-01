@@ -20,14 +20,15 @@ export type Action =
 
 type Permission = {
     key: Key;
-    actions: Set<Action>;
+    actions: Action[];
 }
 
 export type Admin = {
     id: string;
     username: string;
     email: string;
-    permissions: Set<Permission>;
+    isSuperAdmin: boolean;
+    permissions: Permission[];
 }
 
 type FindBody = {
@@ -42,7 +43,8 @@ type RegisterAdmin = {
 type UpdateAdmin = {
     name: string;
     email: string;
-    permissions: Set<Permission>;
+    isSuper: boolean;
+    permissions: Permission[];
 }
 
 export class AdminRequests {
@@ -123,6 +125,7 @@ export class AdminRequests {
         const updateData: UpdateAdmin = {
             name: admin.username,
             email: admin.email,
+            isSuper: admin.isSuperAdmin,
             permissions: admin.permissions
         }
 

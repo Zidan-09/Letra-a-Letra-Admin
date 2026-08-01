@@ -151,6 +151,14 @@
   border-radius: 4px;
 }
 
+.connected {
+  color: #10b981;
+}
+
+.disconnected {
+  color: #a30404;
+}
+
 .cosmeticsContainer {
   margin-top: 10px;
   padding-top: 8px;

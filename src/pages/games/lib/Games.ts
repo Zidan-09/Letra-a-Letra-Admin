@@ -19,6 +19,7 @@ type Participant = {
     nickname: string;
     cosmeticsEquipped: InventoryItem[];
     role: Role;
+    isConnected: boolean;
 }
 
 export type Game = {
@@ -54,10 +55,12 @@ export class GamesRequests {
                 "Authorization": `Bearer ${token}`
             }
         });
-
+        
         if (!res.ok) throw new Error();
 
         const response = await res.json();
+
+        console.log(response);
 
         return response.data;
     }
@@ -76,6 +79,8 @@ export class GamesRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<GetBody<Game>> = await res.json();
+
+        console.log(response);
 
         return response.data;
     }

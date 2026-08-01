@@ -1,23 +1,43 @@
 import { useState, useEffect } from "react";
+import { useNotification } from "../../hooks/notification/useNotification";
+import { useProfile } from "../../hooks/profile/useProfile";
 import { Table, type Column } from "../../components/Table/Table";
 import { CreateCosmeticPopup } from "./components/CreatePopup/CreateCosmeticPopup";
 import { EditCosmeticPopup } from "./components/EditPopup/EditCosmeticPopup";
-import { useNotification } from "../../hooks/notification/useNotification";
 import { type Cosmetic, CosmeticRequests } from "./lib/Cosmetic";
+import { Trash2 } from "lucide-react";
 import styles from "./Cosmetics.module.css";
+import { CosmeticDetailsInfo } from "./components/CosmeticInfo/CosmeticDetailsModal";
 
 export function CosmeticsPage() {
   const { notify } = useNotification();
+  const { permissions } = useProfile();
 
   const [cosmetics, setCosmetics] = useState<Cosmetic[]>([]);
+  const [selectedCosmetic, setSelectedCosmetic] = useState<Cosmetic | null>(null);
+
   const [page, setPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   
+  const [ísModalOpen, setIsModalOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedCosmetic, setSelectedCosmetic] = useState<Cosmetic | null>(null);
+  
 
-  const assetsUrl = "https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev";
+  const [canRegister, setCanRegister] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [canToggle, setCanToggle] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
+
+  useEffect(() => {
+      const permission = permissions.find(p => p.key === "ADMIN");
+
+      setCanRegister(permission?.actions.includes("CREATE") ?? false);
+      setCanEdit(permission?.actions.includes("EDIT") ?? false);
+      setCanToggle(permission?.actions.includes("TOGGLE") ?? false);
+      setCanDelete(permission?.actions.includes("DELETE") ?? false);
+      
+  }, [permissions]);
 
   const fetchCosmetics = async () => {
     try {
@@ -57,11 +77,6 @@ export function CosmeticsPage() {
     },
   ];
 
-  const handleViewAsset = (item: Cosmetic) => {
-    notify.success(`Abrindo visualização do asset: ${item.name}`);
-    window.open(`${assetsUrl}/${item.assetPath}`, "_blank");
-  };
-
   const handleOpenEdit = (item: Cosmetic) => {
     setSelectedCosmetic(item);
     setIsEditOpen(true);
@@ -85,6 +100,20 @@ export function CosmeticsPage() {
     }
   };
 
+  const handleDeleteCosmetic = async (item: Cosmetic) => {
+    try {
+
+      await CosmeticRequests.deleteCosmetic(item.id)
+
+      notify.success(`Cosmético deletado com sucesso!`);
+
+      fetchCosmetics();
+
+    } catch {
+      notify.error("Não foi possível alterar o status do cosmético.");
+    }
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -92,7 +121,11 @@ export function CosmeticsPage() {
           <h1>Cosméticos</h1>
           <p>Gerencie, visualize e edite os cosméticos ativos no sistema.</p>
         </div>
-        <button className={styles.addButton} onClick={() => setIsCreateOpen(true)}>
+        <button
+          className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`} 
+          onClick={() => setIsCreateOpen(true)}
+          disabled={!canRegister}
+        >
           Novo Cosmético
         </button>
       </header>
@@ -103,17 +136,30 @@ export function CosmeticsPage() {
           columns={columns}
           renderActions={(item) => (
             <>
-              <button className={styles.actionButton} onClick={() => handleViewAsset(item)}>
-                Ver Asset
+              <button className={styles.actionButton} onClick={() => { setSelectedCosmetic(item); setIsModalOpen(true); }}>
+                Detalhes
               </button>
-              <button className={styles.actionButton} onClick={() => handleOpenEdit(item)}>
+              <button
+                className={`${styles.actionButton} ${canEdit ? "" : styles.disabled}`} 
+                onClick={() => handleOpenEdit(item)}
+                disabled={!canEdit}
+              >
                 Editar
               </button>
               <button
-                className={`${styles.actionButton} ${item.available ? styles.btnDanger : styles.btnSuccess}`}
+                className={`${styles.actionButton} ${item.available ? styles.btnDanger : styles.btnSuccess} ${canToggle ? "" : styles.disabled}`}
                 onClick={() => handleToggleStatus(item)}
+                disabled={!canToggle}
               >
                 {item.available ? "Desabilitar" : "Ativar"}
+              </button>
+
+              <button
+                  className={`${styles.actionButton} ${styles.deleteButton} ${canDelete ? "" : styles.disabled}`} 
+                  onClick={() => handleDeleteCosmetic(item)}
+                  disabled={!canDelete}
+              >
+                  <Trash2 />
               </button>
             </>
           )}
@@ -123,6 +169,15 @@ export function CosmeticsPage() {
           prevPage={() => setPage(prev => Math.max(0, prev - 1))}
         />
       </main>
+
+      <CosmeticDetailsInfo 
+        isOpen={ísModalOpen}
+        cosmetic={selectedCosmetic}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedCosmetic(null);
+        }}
+      />
 
       <CreateCosmeticPopup 
         isOpen={isCreateOpen} 

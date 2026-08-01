@@ -30,6 +30,7 @@ export function GamesPage() {
 
       setGames(data.content);
       setTotalPages(data.totalPages);
+      
     } catch (e) {
       notify.error("Erro ao carregar a lista de partidas.");
     } finally {
@@ -44,7 +45,7 @@ export function GamesPage() {
 
   useEffect(() => {
     fetchGames();
-  }, [page, showAll]);
+  }, [page, showAll, games]);
 
   const columns: Column<Game>[] = [
     {

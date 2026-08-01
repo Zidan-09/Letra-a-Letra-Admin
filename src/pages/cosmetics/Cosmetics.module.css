@@ -151,15 +151,45 @@
 }
 
 .btnDanger:hover {
-  border-color: #ef4444;
+  border-color: #ecef44;
   color: #ffffff;
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 236, 68, 0.05);
 }
 
 .btnSuccess:hover {
   border-color: #10b981;
   color: #ffffff;
   background: rgba(16, 185, 129, 0.1);
+}
+
+.deleteButton {
+  padding: 6px;
+}
+
+.deleteButton:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.disabled {
+  background: #171717;
+  border: 1px solid #262626;
+  color: #525252;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+  transition: none;
+}
+
+.disabled:hover {
+  background: #171717;
+  border-color: #262626;
+  color: #525252;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
 }
 
 @media (max-width: 768px) {

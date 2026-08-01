@@ -8,9 +8,11 @@ import { getRemainingTime } from "../../utils/getRemainingTime";
 import { Trash2 } from "lucide-react";
 import { normalizeCoinType } from "../../utils/normalizeCoinType";
 import styles from "./Offers.module.css";
+import { useProfile } from "../../hooks/profile/useProfile";
 
 export function OffersPage() {
     const { notify } = useNotification();
+    const { permissions } = useProfile();
 
     const [offers, setOffers] = useState<Offer[]>([]);
     const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -20,6 +22,19 @@ export function OffersPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+    const [canRegister, setCanRegister] = useState(false);
+    const [canToggle, setCanToggle] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
+
+    useEffect(() => {
+        const permission = permissions.find(p => p.key === "OFFERS");
+
+        setCanRegister(permission?.actions.includes("CREATE") ?? false);
+        setCanToggle(permission?.actions.includes("TOGGLE") ?? false);
+        setCanDelete(permission?.actions.includes("DELETE") ?? false);
+      
+  }, [permissions]);
 
     const [, forceUpdate] = useState(0);
 
@@ -138,7 +153,11 @@ export function OffersPage() {
                     <p>Gerencie, visualize e edite as Ofertas e suas recompensas ativas no sistema.</p>
                 </div>
 
-                <button className={styles.addButton} onClick={() => setIsCreateOpen(true)}>
+                <button 
+                    className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`} 
+                    onClick={() => setIsCreateOpen(true)}
+                    disabled={!canRegister}
+                >
                     Nova Oferta
                 </button>
             </header>
@@ -154,13 +173,18 @@ export function OffersPage() {
                             </button>
                             
                             <button
-                                className={`${styles.actionButton} ${item.active ? styles.btnDanger : styles.btnSuccess}`}
+                                className={`${styles.actionButton} ${item.active ? styles.btnDanger : styles.btnSuccess} ${canToggle ? "" : styles.disabled}`}
                                 onClick={() => handleToggleStatus(item)}
+                                disabled={!canToggle}
                             >
                                 {item.active ? "Desabilitar" : "Ativar"}
                             </button>
 
-                            <button className={`${styles.actionButton} ${styles.deleteButton}`} onClick={() => handleDeleteOffer(item)}>
+                            <button 
+                                className={`${styles.actionButton} ${styles.deleteButton} ${canDelete ? "" : styles.disabled}`} 
+                                onClick={() => handleDeleteOffer(item)}
+                                disabled={!canDelete}
+                            >
                                 <Trash2 />
                             </button>
                         </>

@@ -28,7 +28,10 @@ export function ActivateAccount() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (password !== confirmPassowrd) return;
+    if (password !== confirmPassowrd) {
+      notify.error("As senhas devem ser iguais!")
+      return;
+    }
 
     try {
       await ActivateRequest.active({ token, password });
@@ -59,7 +62,7 @@ export function ActivateAccount() {
           <div className={styles.passwordWrapper}>
             <input
               id="password"
-              className={`${styles.input} ${styles.passwordInput}`}
+              className={`${styles.input} ${styles.passwordInput} ${confirmPassowrd && (password !== confirmPassowrd) ? styles.notEquals : ""}`}
               type={showPassword ? "text" : "password"}
               placeholder="Digite sua senha..."
               value={password}
@@ -112,7 +115,7 @@ export function ActivateAccount() {
           <div className={styles.passwordWrapper}>
             <input
               id="confirm"
-              className={`${styles.input} ${styles.passwordInput}`}
+              className={`${styles.input} ${styles.passwordInput} ${confirmPassowrd && (password !== confirmPassowrd) ? styles.notEquals : ""}`}
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Digite sua senha novamente..."
               value={confirmPassowrd}
@@ -159,7 +162,7 @@ export function ActivateAccount() {
         </div>
 
         <button type="submit" className={styles.submit}>
-          Entrar
+          Ativar
         </button>
       </form>
     </div>

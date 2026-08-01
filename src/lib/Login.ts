@@ -5,11 +5,34 @@ type LoginBody = {
     token: string
 }
 
+export type Key = 
+"USER" | 
+"LOGS" | 
+"ADMIN" | 
+"COSMETIC" | 
+"GAME" | 
+"LEVELS" | 
+"OFFERS" | 
+"TRANSACTIONS";
+
+export type Action = 
+"VIEW" | 
+"CREATE" | 
+"EDIT" | 
+"DELETE" | 
+"TOGGLE";
+
+type Permission = {
+    key: Key;
+    actions: Action[];
+}
+
 type MeBody = {
     admin: {
         id: string;
         username: string;
         email: string;
+        permissions: Permission[];
     }
 }
 

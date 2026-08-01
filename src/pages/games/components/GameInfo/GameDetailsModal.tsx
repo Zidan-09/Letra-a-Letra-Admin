@@ -103,6 +103,7 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
                         <div className={styles.participantHeader}>
                           <strong className={styles.nickname}>{p.nickname}</strong>
                           <span className={styles.roleBadge}>{p.role}</span>
+                          <span className={p.isConnected ? styles.connected : styles.disconnected}>{p.isConnected ? "● Conectado" : "● Desconectado"}</span>
                         </div>
 
                         {p.cosmeticsEquipped && p.cosmeticsEquipped.length > 0 && (

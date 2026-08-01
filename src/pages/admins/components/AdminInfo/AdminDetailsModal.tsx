@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Admin } from "../../lib/Admins";
+import type { Admin, Action } from "../../lib/Admins";
 import styles from "./AdminDetailsModal.module.css";
 
 interface AdminDetailsModalProps {
@@ -119,51 +119,68 @@ export function AdminDetailsModal({
                             Permissões
                         </h3>
 
-                        {
-                            permissions.length === 0
-                                ? (
-                                    <p className={styles.emptyText}>
-                                        Este administrador não possui permissões.
-                                    </p>
-                                )
-                                : (
-                                    <div className={styles.permissionList}>
+                        <div className={styles.permissionTable}>
 
-                                        {
-                                            permissions.map(permission => (
-                                                <div
-                                                    key={permission.key}
-                                                    className={styles.permissionCard}
-                                                >
+                            <div className={styles.permissionRowHeader}>
+                                <span>Recurso</span>
 
-                                                    <div className={styles.permissionHeader}>
-                                                        <span className={styles.permissionKey}>
-                                                            {permission.key}
-                                                        </span>
-                                                    </div>
+                                {["VIEW", "CREATE", "EDIT", "DELETE", "TOGGLE"].map(action => (
+                                    <span key={action}>
+                                        {action}
+                                    </span>
+                                ))}
+                            </div>
 
-                                                    <div className={styles.actions}>
 
-                                                        {
-                                                            Array.from(permission.actions).map(action => (
-                                                                <span
-                                                                    key={action}
-                                                                    className={styles.actionBadge}
-                                                                >
-                                                                    {action}
-                                                                </span>
-                                                            ))
-                                                        }
+                            {[
+                                "USER",
+                                "LOGS",
+                                "ADMIN",
+                                "COSMETIC",
+                                "GAME",
+                                "LEVELS",
+                                "OFFERS",
+                                "TRANSACTIONS"
+                            ].map(key => {
 
-                                                    </div>
+                                const permission = permissions.find(
+                                    p => p.key === key
+                                );
 
-                                                </div>
-                                            ))
-                                        }
+                                return (
+                                    <div
+                                        key={key}
+                                        className={styles.permissionRow}
+                                    >
+
+                                        <strong>
+                                            {key}
+                                        </strong>
+
+                                        {["VIEW", "CREATE", "EDIT", "DELETE", "TOGGLE"].map(action => (
+
+                                            <span
+                                                key={action}
+                                                className={
+                                                    permission?.actions.includes(action as Action)
+                                                        ? styles.activePermission
+                                                        : styles.inactivePermission
+                                                }
+                                            >
+                                                {
+                                                    permission?.actions.includes(action as Action)
+                                                        ? "✓"
+                                                        : "—"
+                                                }
+                                            </span>
+
+                                        ))}
 
                                     </div>
-                                )
-                        }
+                                );
+                            })}
+
+                        </div>
 
                     </section>
 

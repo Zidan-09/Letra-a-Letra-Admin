@@ -166,6 +166,26 @@
   animation: rotate360 0.5s linear;
 }
 
+.disabled {
+  background: #171717;
+  border: 1px solid #262626;
+  color: #525252;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+  transition: none;
+}
+
+.disabled:hover {
+  background: #171717;
+  border-color: #262626;
+  color: #525252;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
