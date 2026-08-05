@@ -13,6 +13,7 @@ import { UsersPage } from "./pages/users/Users";
 import { TransactionsPage } from "./pages/transactions/Transactions";
 import { LogsPage } from "./pages/logs/Logs";
 import { ActivateAccount } from "./pages/activate/ActivateAccount";
+import { ResetPasswordPage } from "./pages/reset/ResetPassword";
 
 export const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
     {
         path: "/ativar-conta",
         element: <ActivateAccount />
+    },
+    {
+        path: "/redefinir-senha",
+        element: <ResetPasswordPage />
     },
     {
         path: "/admin",

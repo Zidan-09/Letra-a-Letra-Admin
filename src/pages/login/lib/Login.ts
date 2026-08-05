@@ -1,4 +1,4 @@
-import { HTTPS, type HttpResponse } from "./config";
+import { HTTPS, type HttpResponse } from "../../../lib/config";
 
 type LoginBody = {
     id: string,
@@ -36,7 +36,7 @@ type MeBody = {
     }
 }
 
-class Login {
+class LoginRequests {
     static async login(email: string, password: string) {
         const res = await fetch(`${HTTPS}/admin/auth`, {
             method: "POST",
@@ -57,7 +57,8 @@ class Login {
 
         const res = await fetch(`${HTTPS}/admin/me`, {
             method: "GET",
-            headers: { 
+            headers: {
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}` 
             }
         });
@@ -66,6 +67,20 @@ class Login {
 
         return response;
     }
+
+    static async forgotPassword(email: string) {
+        const res = await fetch(`${HTTPS}/admin/auth/forgot-password`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email
+            })
+        });
+
+        if (!res.ok) throw new Error();
+    }
 }
 
-export { Login }
+export { LoginRequests }

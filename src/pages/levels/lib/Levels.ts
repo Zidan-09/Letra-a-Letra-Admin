@@ -1,6 +1,6 @@
 import { type HttpResponse, HTTPS } from "../../../lib/config";
 import type { Reward, CreateReward } from "../../../lib/Rewards";
-import type { GetBody, FindBody } from "../../../lib/shared";
+import type { GetBody } from "../../../lib/shared";
 
 type LevelReward = {
     levelRewardId: string;
@@ -16,6 +16,10 @@ export type Level = {
 export type CreateRequest = {
     level: number;
     rewards: CreateReward[];
+}
+
+type FindBody = {
+    level: Level;
 }
 
 export class LevelsRequests {
@@ -50,7 +54,7 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Level>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }
@@ -68,7 +72,7 @@ export class LevelsRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Level>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }

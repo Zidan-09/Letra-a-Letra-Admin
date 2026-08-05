@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuth";
 import { useNotification } from "../../hooks/notification/useNotification";
 import type { FormEvent } from "react";
-import { Login } from "../../lib/Login";
+import { LoginRequests } from "./lib/Login";
 import { JwtDecoderUtil } from "../../utils/decodeToken";
 import styles from "./Login.module.css";
 import { useProfile } from "../../hooks/profile/useProfile";
+import { ForgotPasswordPopup } from "./components/ForgotPassword/ForgotPasswordPopup";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const navigate = useNavigate();
   const { notify } = useNotification();
@@ -22,7 +25,7 @@ export function LoginPage() {
     event.preventDefault();
 
     try {
-      const response = await Login.login(email, password);
+      const response = await LoginRequests.login(email, password);
 
       if (!response.success) throw new Error("Credenciais Inválidas");
 
@@ -35,7 +38,7 @@ export function LoginPage() {
         token: response.data.token
       });
 
-      const admin = (await Login.me()).data.admin;
+      const admin = (await LoginRequests.me()).data.admin;
 
       set({
           id: admin.id,
@@ -57,6 +60,10 @@ export function LoginPage() {
       notify.error("Ocorreu um erro inesperado...");
     }
   };
+
+  const handleForgotPassword = () => {
+    setForgotPasswordOpen(true);
+  }
 
   return (
     <div className={styles.container}>
@@ -107,10 +114,16 @@ export function LoginPage() {
               )}
             </button>
           </div>
+          <p className={styles.forgotPassword} onClick={handleForgotPassword}>Esqueci minha senha</p>
         </div>
 
         <button type="submit" className={styles.submit}>Entrar</button>
       </form>
+
+      <ForgotPasswordPopup 
+        isOpen={forgotPasswordOpen}
+        onClose={() => setForgotPasswordOpen(false)}
+      />
     </div>
   );
 }

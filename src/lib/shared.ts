@@ -8,8 +8,4 @@ export type GetBody<T> = {
     totalPages: number;
 }
 
-export type FindBody<T> = {
-    level: T;
-}
-
 export type RewardType = "COIN" | "GEMS" | "COSMETIC";
