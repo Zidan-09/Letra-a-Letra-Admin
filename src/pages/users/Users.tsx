@@ -114,7 +114,7 @@ export function UsersPage() {
                     renderActions={(item) => (
                         <>
                             <button className={styles.actionButton} onClick={() => handleInspectUser(item)}>
-                                Detalhes
+                                Gerenciar
                             </button>
                         </>
                     )}

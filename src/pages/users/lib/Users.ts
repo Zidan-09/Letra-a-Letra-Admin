@@ -3,6 +3,14 @@ import type { GetBody } from "../../../lib/shared";
 
 type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
 
+export type BanType = "PERMANENT" | "TEMPORARY";
+
+type BanInfo = {
+    type: BanType | null;
+    reason: string | null;
+    expiresAt: string | null;
+}
+
 type UserStats = {
     totalMatches: number;
     totalWins: number;
@@ -28,6 +36,7 @@ export type User = {
     userId: string;
     nickname: string;
     email: string;
+    banInfo: BanInfo;
     stats: UserStats;
     equipped: ItemInventory[];
     wallet: Wallet;
@@ -35,6 +44,12 @@ export type User = {
 
 type FindBody = {
     user: User;
+}
+
+type BanUserRequest = {
+    type: BanType;
+    expiresIn?: number;
+    reason: string;
 }
 
 export class UserRequests {
@@ -72,5 +87,34 @@ export class UserRequests {
         const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
+    }
+
+    static async banUser(userId: string, body: BanUserRequest) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/ban`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) throw new Error();
+    }
+
+    static async unbanUser(userId: string) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/unban`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
     }
 }
