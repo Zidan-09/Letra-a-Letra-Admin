@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserRequests, type User, type BanType, type ItemInventory, type RevokeWallet } from "../../lib/Users";
+import { UserRequests, type User, type BanType, type ItemInventory, type RevokeWallet, COSMETIC_TYPES } from "../../lib/Users";
 import { useNotification } from "../../../../hooks/notification/useNotification";
 import { Shield, ShieldAlert, Gift, User as UserIcon, AlertTriangle, Shirt, Trash2, Wallet } from "lucide-react";
 import type { CreateReward } from "../../../../lib/Rewards";
@@ -20,7 +20,7 @@ type TabType = "info" | "moderation" | "grant" | "inventory" | "wallet";
 export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInfoProps) {
     const { notify } = useNotification();
     const { permissions } = useProfile();
-    
+
     const [activeTab, setActiveTab] = useState<TabType>("info");
     
     const [banType, setBanType] = useState<BanType>("TEMPORARY");
@@ -135,7 +135,9 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         }
     };
 
-    const handleGrant = async () => {
+    const handleGrant = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         try {
             await UserRequests.grantReward(user.userId, reward);
 
@@ -143,7 +145,8 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
 
             onUserUpdated?.();
             onClose();
-        } catch {
+        } catch (e) {
+            console.error(e);
             notify.error(`Erro ao conceder ${reward.rewardType.toLowerCase()} ao usuário`)
         }
     }
@@ -163,6 +166,8 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
 
     const handleRevokeWallet = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (wallet.amount <= 0) return;
 
         try {
             await UserRequests.revokeUserWallet(user.userId, wallet);
@@ -261,7 +266,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                         onClick={() => setActiveTab("wallet")}
                     >
                         <Wallet size={16} />
-                        Carteira
+                        Revogar Valor
                     </button>
                 </nav>
 
@@ -293,8 +298,8 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                         <strong>{user.stats.experience} XP</strong>
                                     </div>
                                     <div className={styles.infoCard}>
-                                        <span className={styles.infoLabel}>Pontos</span>
-                                        <strong>{user.stats.points}</strong>
+                                        <span className={styles.infoLabel}>Pontos Ranqueada</span>
+                                        <strong>{user.stats.rankingPoints}</strong>
                                     </div>
                                     <div className={styles.infoCard}>
                                         <span className={styles.infoLabel}>Partidas</span>
@@ -335,18 +340,24 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
 
                             <section className={styles.section}>
                                 <h3 className={styles.sectionTitle}>Cosméticos Equipados</h3>
-                                {user.equipped.length === 0 ? (
-                                    <p className={styles.empty}>Nenhum cosmético equipado.</p>
-                                ) : (
-                                    <div className={styles.infoGrid}>
-                                        {user.equipped.map((item) => (
-                                            <div key={item.cosmeticId} className={styles.infoCard}>
-                                                <span className={styles.infoLabel}>{item.type}</span>
-                                                <strong>{item.name}</strong>
+
+                                <div className={styles.infoCosmeticGrid}>
+                                    {COSMETIC_TYPES.map((type) => {
+                                        const equipped = user.equipped.find(item => item.type === type);
+
+                                        return (
+                                            <div key={type} className={styles.infoCard}>
+                                                <span className={styles.infoLabel}>{type}</span>
+
+                                                {equipped ? (
+                                                    <strong>{equipped.name}</strong>
+                                                ) : (
+                                                    <span className={styles.empty}>Nenhum equipado</span>
+                                                )}
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
+                                        );
+                                    })}
+                                </div>
                             </section>
                         </>
                     )}
@@ -478,6 +489,20 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
 
                     {activeTab === "wallet" && (
                         <div className={styles.tabContent}>
+                            <section className={styles.section}>
+                                <h3 className={styles.sectionTitle}>Carteira</h3>
+                                <div className={styles.infoGrid}>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>Moedas</span>
+                                        <strong>{user.wallet.coins}</strong>
+                                    </div>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>Gemas</span>
+                                        <strong>{user.wallet.gems}</strong>
+                                    </div>
+                                </div>
+                            </section>
+
                             <form
                                 onSubmit={handleRevokeWallet}
                                 className={styles.formContainer}
@@ -494,24 +519,32 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                             })
                                         }
                                     >
-                                        <option value="COIN">Moedas</option>
-                                        <option value="GEM">Gemas</option>
+                                        <option value="SOFT">Moedas</option>
+                                        <option value="HARD">Gemas</option>
                                     </select>
                                 </div>
 
                                 <div className={styles.formGroup}>
                                     <label>Quantidade</label>
                                     <input
-                                        type="number"
-                                        min={1}
+                                        type="text"
                                         className={styles.input}
                                         value={wallet.amount}
-                                        onChange={(e) =>
-                                            setWallet({
-                                                ...wallet,
-                                                amount: Number(e.target.value)
-                                            })
-                                        }
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+
+                                            if (value === "" || Number(value) >= 0) {
+                                                value.startsWith("0") ? 
+                                                setWallet({
+                                                    ...wallet,
+                                                    amount: Number(value.replace(/^0+(?!$)/, ""))
+                                                }) :
+                                                setWallet({
+                                                    ...wallet,
+                                                    amount: Number(value)
+                                                });
+                                            }
+                                        }}
                                     />
                                 </div>
 

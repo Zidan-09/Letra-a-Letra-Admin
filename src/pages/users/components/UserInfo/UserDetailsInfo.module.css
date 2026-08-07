@@ -98,10 +98,14 @@
   margin: 0;
 }
 
-.infoGrid {
+.infoGrid, .infoCosmeticGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+}
+
+.infoCosmeticGrid {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .infoCard {

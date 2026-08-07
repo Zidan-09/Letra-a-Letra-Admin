@@ -67,7 +67,7 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
                         placeholder="Insira o valor do nível"
                         value={levelValue}
                         onChange={(e) => {
-                            const value = e.target.value;
+                            const value = e.target.value.replace(/\D/g, "");
 
                             if (value === "" || Number(value) >= 0) {
 

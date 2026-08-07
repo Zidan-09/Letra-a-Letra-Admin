@@ -58,11 +58,11 @@ export function GamesPage() {
       ),
     },
     {
-      header: "Participantes",
+      header: showAll ? "Partidas" : "Participantes",
       render: (item) => (
         <div className={styles.participantsContainer}>
           <span className={styles.participantCount}>
-            {item.participants?.length || 0} jogador(es)
+            {showAll ? item.matches.length || 0 : item.participants?.length || 0} {showAll ? "partida(as)" : "jogador(es)"}
           </span>
           {item.participants && item.participants.length > 0 && (
             <span className={styles.participantList}>

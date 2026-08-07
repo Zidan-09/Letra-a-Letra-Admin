@@ -3,7 +3,14 @@ import type { GetBody } from "../../../lib/shared";
 import type { CreateReward } from "../../../lib/Rewards";
 import type { CoinType } from "../../offers/lib/Offers";
 
-type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
+export const COSMETIC_TYPES = [
+    "AVATAR",
+    "BANNER",
+    "EMOTE",
+    "FRAME",
+] as const;
+
+export type CosmeticType = typeof COSMETIC_TYPES[number];
 
 export type BanType = "PERMANENT" | "TEMPORARY";
 
@@ -19,7 +26,7 @@ type UserStats = {
     winStreak: number;
     level: number;
     experience: number;
-    points: number;
+    rankingPoints: number;
 }
 
 export type ItemInventory = {
@@ -71,9 +78,9 @@ export class UserRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<GetBody<User>> = await res.json();
+
+        if (!res.ok) throw new Error(response.message);
 
         return response.data;
     }
@@ -126,7 +133,10 @@ export class UserRequests {
             body: JSON.stringify(body)
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+            const response: HttpResponse<null> = await res.json();
+            throw new Error(response.message);
+        }
     }
 
     static async unbanUser(userId: string) {
@@ -140,7 +150,10 @@ export class UserRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+            const response: HttpResponse<null> = await res.json();
+            throw new Error(response.message);
+        }
     }
 
     static async grantReward(userId: string, reward: CreateReward) {
@@ -155,9 +168,10 @@ export class UserRequests {
             body: JSON.stringify(reward)
         });
 
-        const response: HttpResponse<null> = await res.json();
-
-        if (!res.ok) throw new Error(response.message);
+        if (!res.ok) {
+            const response: HttpResponse<null> = await res.json();
+            throw new Error(response.message);
+        }
     }
 
     static async revokeUserCosmetic(userId: string, cosmeticId: string) {
@@ -171,7 +185,10 @@ export class UserRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+            const response: HttpResponse<null> = await res.json();
+            throw new Error(response.message);
+        }
     }
 
     static async revokeUserWallet(userId: string, remove: RevokeWallet) {
@@ -186,6 +203,9 @@ export class UserRequests {
             body: JSON.stringify(remove)
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+            const response: HttpResponse<null> = await res.json();
+            throw new Error(response.message);
+        }
     }
 }
