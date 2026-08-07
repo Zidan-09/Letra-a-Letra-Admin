@@ -6,17 +6,21 @@ interface SearchBarProps {
   placeholder?: string;
   onChange: (value: string) => void;
   search: () => void;
+  variant?: "default" | "modal";
+  trigger?: "default" | "on-change"
 }
 
 export function SearchBar({
   value,
   placeholder = "Pesquisar...",
   onChange,
-  search
+  search,
+  variant = "default",
+  trigger = "default"
 }: SearchBarProps) {
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${variant === "modal" ? styles.containerModal : ""}`}>
             <Search size={18} className={styles.icon} />
 
             <input
@@ -24,7 +28,13 @@ export function SearchBar({
                 type="text"
                 value={value}
                 placeholder={placeholder}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => {
+                    onChange(e.target.value)
+
+                    if (trigger === "on-change") {
+                        search();
+                    }
+                }}
                 onKeyDown={(e) => {
                     if (e.key === "Enter") {
                     search();

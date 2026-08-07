@@ -25,9 +25,9 @@ export function CosmeticDetailsInfo({
         window.addEventListener("keydown", listener);
 
         return () => window.removeEventListener("keydown", listener);
-    }, [cosmetic, onClose]);
+    }, [cosmetic, isOpen, onClose]);
 
-    if (!cosmetic) return null;
+    if (!cosmetic || !isOpen) return null;
 
     const assetUrl = `https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev/${cosmetic.assetPath}`;
 
@@ -68,7 +68,7 @@ export function CosmeticDetailsInfo({
                         <img
                             src={assetUrl}
                             alt={cosmetic.name}
-                            className={styles.preview}
+                            className={`${styles.preview} ${cosmetic.type === "BANNER" ? styles.banner : ""}`}
                         />
                     </section>
 

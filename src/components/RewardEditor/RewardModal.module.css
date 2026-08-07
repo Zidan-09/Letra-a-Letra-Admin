@@ -118,7 +118,6 @@
 
 .input,
 .select {
-
     background: #141821;
 
     border: 1px solid rgba(255,255,255,.08);
@@ -199,6 +198,91 @@
 
 .confirmButton:hover {
     background: #6366f1;
+}
+
+.searchResults {
+    margin-top: 4px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #1e2533;
+    overflow: hidden;
+}
+
+.searchItem {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: #141821;
+    text-align: left;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+}
+
+.searchItem:last-child {
+    align-self: flex-end;
+}
+
+.searchItem:hover {
+    background: #1e2533;
+}
+
+.cosmeticName {
+  color: #f8fafc;
+  font-weight: 600;
+  justify-self: start;
+}
+
+.statusActive {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.9rem;
+  justify-self: end;
+}
+
+.statusDisabled {
+  color: #ef4444;
+  font-weight: 500;
+  font-size: 0.9rem;
+  justify-self: end;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  width: min-content;
+  justify-self: center;
+}
+
+.avatar {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.banner {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.frame {
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.emote {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 @keyframes fadeIn {

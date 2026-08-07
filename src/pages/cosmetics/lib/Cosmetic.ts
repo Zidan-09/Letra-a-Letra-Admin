@@ -140,4 +140,28 @@ export class CosmeticRequests {
 
         return response.data;
     }
+
+    static async search(search: string, page: number, size: number) {
+        const token = localStorage.getItem("token");
+
+        const params = new URLSearchParams({
+            search: search,
+            page: page.toString(),
+            size: size.toString()
+        });
+
+        const res = await fetch(`${HTTPS}/cosmetic/search?${params}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
+
+        return response.data;
+    }
 }

@@ -103,7 +103,7 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
           <span className={styles.label}>
             Arquivo (Asset)
           </span>
-          <label htmlFor="cosmetic-asset" className={styles.fileUploadLabel}>
+          <label htmlFor="cosmetic-asset" className={`${styles.fileUploadLabel} ${type === "BANNER" ? styles.bannerFileLabel : ""}`}>
             {previewUrl ? (
               <img
                 src={previewUrl}

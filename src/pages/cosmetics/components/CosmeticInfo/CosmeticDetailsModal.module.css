@@ -92,13 +92,18 @@
 }
 
 .preview {
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  aspect-ratio: 1;
   object-fit: contain;
   background: #141821;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 12px;
+}
+
+.banner {
+  width: 100%;
+  aspect-ratio: 5 / 2;
 }
 
 .section {

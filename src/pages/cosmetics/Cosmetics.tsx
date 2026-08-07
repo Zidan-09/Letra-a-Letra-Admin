@@ -136,7 +136,7 @@ export function CosmeticsPage() {
           columns={columns}
           renderActions={(item) => (
             <>
-              <button className={styles.actionButton} onClick={() => { setSelectedCosmetic(item); setIsModalOpen(true); }}>
+              <button className={styles.actionButton} onClick={() => { setSelectedCosmetic(item); setIsModalOpen(true); console.trace("ABRINDO DETALHES"); }}>
                 Detalhes
               </button>
               <button

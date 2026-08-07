@@ -110,8 +110,9 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
             required
           >
             <option value="AVATAR">Avatar</option>
-            <option value="BACKGROUND">Background</option>
-            <option value="BORDER">Borda</option>
+            <option value="BANNER">Banner</option>
+            <option value="FRAME">Moldura</option>
+            <option value="EMOTE">Emote</option>
           </select>
         </div>
 
@@ -119,7 +120,7 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
           <span className={styles.label}>
             Arquivo (Asset)
           </span>
-          <label htmlFor="cosmetic-asset" className={styles.fileUploadLabel}>
+          <label htmlFor="cosmetic-asset" className={`${styles.fileUploadLabel} ${type === "BANNER" ? styles.bannerFileLabel : ""}`}>
             {previewUrl ? (
               <img
                 src={previewUrl}

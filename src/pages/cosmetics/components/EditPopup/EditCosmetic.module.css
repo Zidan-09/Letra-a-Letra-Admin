@@ -148,6 +148,11 @@
   object-fit: cover;
 }
 
+.bannerFileLabel {
+  width: 100%;
+  aspect-ratio: 5 / 2;
+}
+
 .submit {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   border: none;
