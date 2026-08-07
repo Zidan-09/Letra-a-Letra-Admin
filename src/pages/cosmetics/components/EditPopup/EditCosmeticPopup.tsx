@@ -61,7 +61,7 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
         formData.append("asset", asset);
       }
 
-      formData.append("isNewImage", `${asset !== null}`);
+      formData.append("isNewAsset", `${asset !== null}`);
 
       await CosmeticRequests.editCosmetic(formData, cosmetic.id);
 
@@ -137,7 +137,6 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
             type="file"
             onChange={handleFileChange}
             accept="image/*"
-            required
           />
         </div>
 

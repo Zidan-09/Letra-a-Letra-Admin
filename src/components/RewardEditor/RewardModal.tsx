@@ -64,7 +64,7 @@ export function RewardModal({
 
     const handleSearchCosmetic = async () => {
         try {
-            const data = await CosmeticRequests.search(search, 0, 5);
+            const data = await CosmeticRequests.search(search, 0, 3);
 
             setResults(data.content);
 

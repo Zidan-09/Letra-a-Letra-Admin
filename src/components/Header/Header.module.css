@@ -30,9 +30,10 @@
 .right {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
-.right button {
+.right button, .notifications {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -57,7 +58,7 @@
     transition: all var(--transition);
 }
 
-.right button:hover {
+.right button:hover, .notifications:hover {
     background: var(--background-hover);
 
     border-color: var(--primary);
@@ -66,6 +67,109 @@
         0 0 0 4px rgba(99,102,241,.08);
 }
 
-.right button:active {
+.right button:active, .notifications:active {
     transform: scale(.98);
+}
+
+.notifications {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 5px;
+    width: 3rem;
+}
+
+.notificationDot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 15px;
+    aspect-ratio: 1;
+    background-color: white;
+    border-radius: 100rem;
+}
+
+.profilePanel {
+    width: 340px;
+    height: 100vh;
+
+    background: rgba(20, 24, 33, .9);
+    backdrop-filter: blur(18px);
+
+    border-left: 1px solid var(--border);
+    box-shadow: -20px 0 40px rgba(0,0,0,.35);
+
+    transition: transform .3s ease;
+}
+
+.show {
+    transform: translateX(0);
+}
+
+.hide {
+    transform: translateX(100%);
+}
+
+.profileHeader {
+    padding: 24px;
+
+    border-bottom: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profileHeader h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.profileHeader span {
+    color: var(--text-secondary);
+    font-size: .9rem;
+}
+
+.profileContent {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, .35);
+    backdrop-filter: blur(2px);
+
+    display: flex;
+    justify-content: flex-end;
+
+    z-index: 998;
+
+    transition: opacity .25s ease, visibility .25s ease;
+}
+
+.showOverlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.hideOverlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }

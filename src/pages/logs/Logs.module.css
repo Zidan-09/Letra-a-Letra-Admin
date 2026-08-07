@@ -1,5 +1,5 @@
 .container {
-    max-height: 100vh;
+    min-height: calc(100vh - var(--header-height) - 48px);
     background-color: #0b0e14;
     background-image:
         radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
@@ -7,7 +7,10 @@
         radial-gradient(at 100% 100%, hsla(260, 40%, 15%, 0.3) 0, transparent 50%);
     font-family: "Inter", system-ui, -apple-system, sans-serif;
     padding: 40px;
+    padding-bottom: 0;
+    padding-top: 20px;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .header {
@@ -214,7 +217,6 @@
 
 .viewerContent {
     background: #0d1117;
-    max-height: 700px;
     overflow: auto;
 }
 
@@ -235,7 +237,7 @@
     white-space: pre-wrap;
     word-break: break-word;
 
-    max-height: calc(18 * 1.6em);
+    max-height: calc(22 * 1.6em);
     
 }
 

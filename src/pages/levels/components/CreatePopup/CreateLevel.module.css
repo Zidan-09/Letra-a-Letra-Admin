@@ -26,8 +26,6 @@
   flex-direction: column;
   gap: 24px;
 
-  overflow-y: auto;
-
   padding: 40px;
 
   background: rgba(20, 24, 33, .92);

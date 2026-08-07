@@ -38,9 +38,11 @@ export function RewardEditor({
                 onChange(rewards);
                 return;
             }
-        }
+        } else {
+            if (value.filter(c => c.rewardReference === reward.rewardReference).length > 0) return;
 
-        onChange([...value, reward]);
+            onChange([...value, reward]);
+        }
     };
 
     const handleDeleteReward = (index: number) => {

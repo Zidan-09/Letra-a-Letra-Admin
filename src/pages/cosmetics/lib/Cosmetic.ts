@@ -62,9 +62,11 @@ export class CosmeticRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }
@@ -80,9 +82,11 @@ export class CosmeticRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<DisableBody> = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }
@@ -98,9 +102,11 @@ export class CosmeticRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<EnableBody> = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }
@@ -109,16 +115,18 @@ export class CosmeticRequests {
         const token = localStorage.getItem("token");
         
         const res = await fetch(`${HTTPS}/cosmetic/${cosmeticId}`, {
-            method: "PATCH",
+            method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`
             },
             body: formData
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<EditBody> = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }
@@ -134,9 +142,11 @@ export class CosmeticRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }
@@ -158,9 +168,11 @@ export class CosmeticRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
+
+        if (!res.ok) {
+            throw new Error(response.message);
+        }
 
         return response.data;
     }

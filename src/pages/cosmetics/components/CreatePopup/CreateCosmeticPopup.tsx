@@ -14,6 +14,8 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
   const [type, setType] = useState<CosmeticTypes>("AVATAR");
   const [asset, setAsset] = useState<File | null>(null);
 
+  const [loading, setLoading] = useState(false);
+
   const { notify } = useNotification();
 
   const previewUrl = useMemo(() => {
@@ -29,8 +31,19 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    setName("");
+    setType("AVATAR");
+    setAsset(null);
+  }
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+
+    if (loading) return;
+
+    setLoading(true);
 
     if (!asset) {
       return notify.error("Por favor, selecione um arquivo de asset.");
@@ -47,24 +60,23 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
 
       notify.success("Cosmético cadastrado com sucesso!");
       
-      onClose();
+      handleClose();
       
-      setName("");
-      setType("AVATAR");
-      setAsset(null);
     } catch (error) {
       notify.error("Erro ao cadastrar cosmético.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={handleClose}>
       <form 
         className={styles.card} 
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className={styles.closeButton} onClick={onClose}>
+        <button type="button" className={styles.closeButton} onClick={handleClose}>
           &times;
         </button>
 
@@ -124,7 +136,7 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
           />
         </div>
 
-        <button type="submit" className={styles.submit}>Cadastrar Cosmético</button>
+        <button type="submit" className={styles.submit} disabled={loading}>Cadastrar Cosmético</button>
       </form>
     </div>
   );

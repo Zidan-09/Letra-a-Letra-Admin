@@ -60,8 +60,6 @@ export class GamesRequests {
 
         const response = await res.json();
 
-        console.log(response);
-
         return response.data;
     }
 
@@ -79,8 +77,6 @@ export class GamesRequests {
         if (!res.ok) throw new Error();
 
         const response: HttpResponse<GetBody<Game>> = await res.json();
-
-        console.log(response);
 
         return response.data;
     }
