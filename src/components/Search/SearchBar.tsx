@@ -37,7 +37,7 @@ export function SearchBar({
                 }}
                 onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                    search();
+                        search();
                     }
                 }}
             />

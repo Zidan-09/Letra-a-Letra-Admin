@@ -177,6 +177,7 @@
   padding: 2px 8px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
 
 /* Navegação por Abas */
@@ -333,6 +334,122 @@
   margin: 0;
   font-size: 0.85rem;
   max-width: 400px;
+}
+
+.rewardContainer {
+  gap: 2rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cosmeticName {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.cosmeticId {
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.avatar {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.banner {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.frame {
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.emote {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Status textuais */
+.statusActive {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.statusDisabled {
+  color: #ef4444;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.actionButton {
+  background: #1e2533;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  border-color: #6366f1;
+  color: #ffffff;
+  background: #242c3e;
+}
+
+.deleteButton {
+  padding: 6px;
+}
+
+.deleteButton:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.disabled {
+  background: #171717;
+  border: 1px solid #262626;
+  color: #525252;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+  transition: none;
+}
+
+.disabled:hover {
+  background: #171717;
+  border-color: #262626;
+  color: #525252;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
 }
 
 @keyframes fadeIn {

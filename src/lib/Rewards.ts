@@ -29,6 +29,6 @@ export function convertReward(reward: Reward): CreateReward {
     return {
         rewardType: reward.type,
         rewardReference: reward.type === "COSMETIC" ? reward.cosmetic.id : "",
-        quantity: reward.amount
+        quantity: reward.amount ?? 1
     }
 }

@@ -1,6 +1,6 @@
 import { type HttpResponse, HTTPS } from "../../../lib/config";
 import type { Reward } from "../../../lib/Rewards";
-import type { GetBody, FindBody, RewardType } from "../../../lib/shared";
+import type { GetBody, RewardType } from "../../../lib/shared";
 
 export type CoinType = "SOFT" | "HARD" | "REAL";
 
@@ -37,6 +37,10 @@ type CreateRequest = {
     expiresIn: number;
 }
 
+type FindBody = {
+    offer: Offer;
+}
+
 export class OfferRequests {
     static async getOffers(page: number, size: number) {
         const token = localStorage.getItem("token");
@@ -69,7 +73,7 @@ export class OfferRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Offer>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }
@@ -108,7 +112,7 @@ export class OfferRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Offer>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }
@@ -126,7 +130,7 @@ export class OfferRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Offer>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }
@@ -144,7 +148,7 @@ export class OfferRequests {
 
         if (!res.ok) throw new Error();
 
-        const response: HttpResponse<FindBody<Offer>> = await res.json();
+        const response: HttpResponse<FindBody> = await res.json();
 
         return response.data;
     }

@@ -5,9 +5,10 @@ const HTTPS = "http://localhost:8080";
 const WSS = "ws://localhost:8080/ws/admin?token=";
 
 type HttpResponse<T> = {
-    success: boolean,
-    message: string,
-    data: T
+    success: boolean;
+    code: string;
+    message: string;
+    data: T;
 }
 
 export { HTTPS, WSS, type HttpResponse }

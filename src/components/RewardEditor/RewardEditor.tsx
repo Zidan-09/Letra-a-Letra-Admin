@@ -19,15 +19,12 @@ export function RewardEditor({
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleCreateReward = (reward: CreateReward) => {
-
         if (reward.rewardType !== "COSMETIC") {
-
             const index = value.findIndex(
                 r => r.rewardType === reward.rewardType
             );
 
             if (index !== -1) {
-
                 const rewards = [...value];
 
                 rewards[index] = {
@@ -38,11 +35,16 @@ export function RewardEditor({
                 onChange(rewards);
                 return;
             }
-        } else {
-            if (value.filter(c => c.rewardReference === reward.rewardReference).length > 0) return;
 
             onChange([...value, reward]);
+            return;
         }
+
+        if (value.some(c => c.rewardReference === reward.rewardReference)) {
+            return;
+        }
+
+        onChange([...value, reward]);
     };
 
     const handleDeleteReward = (index: number) => {

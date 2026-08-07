@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
-import { UserRequests, type User, type BanType } from "../../lib/Users";
+import { UserRequests, type User, type BanType, type ItemInventory, type RevokeWallet } from "../../lib/Users";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { Shield, ShieldAlert, Gift, User as UserIcon, AlertTriangle } from "lucide-react";
+import { Shield, ShieldAlert, Gift, User as UserIcon, AlertTriangle, Shirt, Trash2, Wallet } from "lucide-react";
+import type { CreateReward } from "../../../../lib/Rewards";
+import { RewardInput } from "../../../../components/RewardEditor/RewardInput";
+import { Table, type Column } from "../../../../components/Table/Table";
 import styles from "./UserDetailsInfo.module.css";
+import { useProfile } from "../../../../hooks/profile/useProfile";
+import type { CoinType } from "../../../offers/lib/Offers";
 
 interface UserDetailsInfoProps {
     user: User | null;
@@ -10,16 +15,58 @@ interface UserDetailsInfoProps {
     onUserUpdated?: () => void;
 }
 
-type TabType = "info" | "moderation" | "grant";
+type TabType = "info" | "moderation" | "grant" | "inventory" | "wallet";
 
 export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInfoProps) {
     const { notify } = useNotification();
+    const { permissions } = useProfile();
+    
     const [activeTab, setActiveTab] = useState<TabType>("info");
     
     const [banType, setBanType] = useState<BanType>("TEMPORARY");
     const [expiresIn, setExpiresIn] = useState<number>(20);
     const [banReason, setBanReason] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [reward, setReward] = useState<CreateReward>({
+        rewardType: "COIN",
+        quantity: 1,
+        rewardReference: ""
+    });
+
+    const [inventory, setInventory] = useState<ItemInventory[]>([]);
+    const [page, setPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(1);
+
+    const [canDelete, setCanDelete] = useState(false);
+
+    const [wallet, setWallet] = useState<RevokeWallet>({
+        type: "SOFT",
+        amount: 1
+    });
+
+    useEffect(() => {
+        const permission = permissions.find(p => p.key === "ADMIN");
+
+        setCanDelete(permission?.actions.includes("DELETE") ?? false);
+      
+    }, [permissions]);
+
+    const fetchInventory = async () => {
+        if (!user) return;
+
+        const data = await UserRequests.getUserInventory(user.userId, page, 5);
+        
+        setInventory(data.content);
+        setTotalPages(data.totalPages);
+    }
+
+    useEffect(() => {
+        if (activeTab !== "inventory" || !user) return;
+
+        fetchInventory();
+
+    }, [activeTab]);
 
     useEffect(() => {
         if (!user) return;
@@ -35,6 +82,17 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
     }, [user, onClose]);
 
     if (!user) return null;
+
+    function formatBanType(banType: BanType | null) {
+        if (!banType) return "";
+
+        switch (banType) {
+            case "PERMANENT":
+                return "PERMANENTE"
+            case "TEMPORARY":
+                return "TEMPORÁRIO"
+        }
+    }
 
     const isBanned = Boolean(user.banInfo && user.banInfo.type);
 
@@ -77,6 +135,75 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         }
     };
 
+    const handleGrant = async () => {
+        try {
+            await UserRequests.grantReward(user.userId, reward);
+
+            notify.success(`${reward.rewardType.toLowerCase()} concedidas ao usuário com sucesso`);
+
+            onUserUpdated?.();
+            onClose();
+        } catch {
+            notify.error(`Erro ao conceder ${reward.rewardType.toLowerCase()} ao usuário`)
+        }
+    }
+
+    const handleDelete = async (item: ItemInventory) => {
+        try {
+            await UserRequests.revokeUserCosmetic(user.userId, item.cosmeticId);
+
+            notify.success(`O cosmético ${item.name} foi removido do inventário do usuário`);
+
+            fetchInventory();
+
+        } catch (e) {
+            notify.error(`Erro ao remover o cosmético ${item.name} do usuário`)
+        }
+    }
+
+    const handleRevokeWallet = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            await UserRequests.revokeUserWallet(user.userId, wallet);
+
+            notify.success("Saldo removido com sucesso.");
+
+            onUserUpdated?.();
+            onClose();
+        } catch {
+            notify.error("Erro ao remover saldo do usuário.");
+        }
+    };
+
+    const columns: Column<ItemInventory>[] = [
+        {
+            header: "Nome do Cosmético",
+            render: (item) => (
+                <div className={styles.info}>
+                    <strong className={styles.cosmeticName}>{item.name || "Nome inválido"}</strong>
+                    <span className={styles.cosmeticId}>{item.cosmeticId}</span>
+                </div>
+            )
+        },
+        {
+            header: "Tipo",
+            render: (item) => (
+                <span className={`${styles.badge} ${styles[item.type.toLowerCase()] || styles.defaultBadge}`}>
+                {item.type}
+                </span>
+            ),
+        },
+        {
+            header: "Ativo",
+            render: (item) => (
+                <span className={item.equipped ? styles.statusActive : styles.statusDisabled}>
+                    ● {item.equipped ? "Equipado" : "Desequipado"}
+                </span>
+            ),
+        },
+    ]
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -86,7 +213,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                             <span className={styles.typeBadge}>USER</span>
                             {isBanned && (
                                 <span className={styles.bannedBadge}>
-                                    BANIDO ({user.banInfo.type})
+                                    BANIDO ({formatBanType(user.banInfo.type)})
                                 </span>
                             )}
                         </div>
@@ -100,7 +227,6 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                     </button>
                 </header>
 
-                {/* Navegação por Abas */}
                 <nav className={styles.tabsNav}>
                     <button 
                         className={`${styles.tabButton} ${activeTab === "info" ? styles.activeTab : ""}`}
@@ -122,6 +248,20 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                     >
                         <Gift size={16} />
                         Conceder Recurso
+                    </button>
+                    <button 
+                        className={`${styles.tabButton} ${activeTab === "inventory" ? styles.activeTab : ""}`}
+                        onClick={() => setActiveTab("inventory")}
+                    >
+                        <Shirt size={16} />
+                        Inventário
+                    </button>
+                    <button 
+                        className={`${styles.tabButton} ${activeTab === "wallet" ? styles.activeTab : ""}`}
+                        onClick={() => setActiveTab("wallet")}
+                    >
+                        <Wallet size={16} />
+                        Carteira
                     </button>
                 </nav>
 
@@ -219,7 +359,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                         <Shield size={24} />
                                         <div>
                                             <h4>Banimento Ativo</h4>
-                                            <p>Tipo: <strong>{user.banInfo.type}</strong></p>
+                                            <p>Tipo: <strong>{formatBanType(user.banInfo.type)}</strong></p>
                                             <p>Motivo: {user.banInfo.reason || "Nenhum"}</p>
                                         </div>
                                     </div>
@@ -232,7 +372,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                     </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleBan} className={styles.formContainer}>
+                                <form onSubmit={handleBan} className={styles.formContainer} id="moderation">
                                     <div className={styles.formGroup}>
                                         <label>Tipo de Banimento</label>
                                         <select 
@@ -291,25 +431,97 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                         </div>
                     )}
 
-                    {/* ABA 3: CONCEDER RECURSOS (FUTURO) */}
                     {activeTab === "grant" && (
                         <div className={styles.tabContent}>
-                            <div className={styles.placeholderBox}>
-                                <Gift size={32} />
-                                <h3>Conceder Itens & Recursos</h3>
-                                <p>Esta funcionalidade está sendo preparada para permitir a injeção manual de Moedas, Gemas ou Cosméticos em casos de suporte ao jogador.</p>
-                            </div>
+                            <form onSubmit={handleGrant} className={`${styles.formContainer} ${styles.rewardContainer}`} id="grant">
+                                <div className={styles.formGroup}>                                    
+                                    <RewardInput
+                                        value={reward}
+                                        onChange={setReward}
+                                    />
+                                </div>
+                                <button
+                                    className={styles.confirmButton} 
+                                    disabled={!reward}
+                                    onClick={handleGrant}
+                                >
+                                    Conceder
+                                </button>
 
-                            <form onSubmit={(e) => e.preventDefault()} className={styles.formContainer} style={{ opacity: 0.5, pointerEvents: 'none' }}>
+                            </form>
+                        </div>
+                    )}
+
+                    {activeTab === "inventory" && (
+                        <div className={styles.tabContent}>
+                            <Table
+                                data={inventory}
+                                columns={columns}
+                                renderActions={(item) => (
+                                    <>
+                                        <button
+                                            className={`${styles.actionButton} ${styles.deleteButton} ${canDelete ? "" : styles.disabled}`} 
+                                            onClick={() => handleDelete(item)}
+                                            disabled={!canDelete}
+                                        >
+                                            <Trash2 />
+                                        </button>
+                                    </>
+                                )}
+                                page={page}
+                                totalPages={totalPages}
+                                nextPage={() => setPage(prev => prev + 1)}
+                                prevPage={() => setPage(prev => Math.max(0, prev - 1))}
+                            />
+                        </div>
+                    )}
+
+                    {activeTab === "wallet" && (
+                        <div className={styles.tabContent}>
+                            <form
+                                onSubmit={handleRevokeWallet}
+                                className={styles.formContainer}
+                            >
                                 <div className={styles.formGroup}>
-                                    <label>Tipo de Recurso</label>
-                                    <select className={styles.input} disabled>
-                                        <option>Selecione um tipo...</option>
-                                        <option>Moedas / Gemas</option>
-                                        <option>Cosmético / Item</option>
+                                    <label>Tipo</label>
+                                    <select
+                                        className={styles.input}
+                                        value={wallet.type}
+                                        onChange={(e) =>
+                                            setWallet({
+                                                ...wallet,
+                                                type: e.target.value as CoinType
+                                            })
+                                        }
+                                    >
+                                        <option value="COIN">Moedas</option>
+                                        <option value="GEM">Gemas</option>
                                     </select>
                                 </div>
-                                <button className={styles.confirmButton} disabled>Em breve</button>
+
+                                <div className={styles.formGroup}>
+                                    <label>Quantidade</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        className={styles.input}
+                                        value={wallet.amount}
+                                        onChange={(e) =>
+                                            setWallet({
+                                                ...wallet,
+                                                amount: Number(e.target.value)
+                                            })
+                                        }
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className={styles.dangerButton}
+                                    disabled={wallet.amount <= 0}
+                                >
+                                    Remover Saldo
+                                </button>
                             </form>
                         </div>
                     )}

@@ -1,5 +1,7 @@
 import { type HttpResponse, HTTPS } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
+import type { CreateReward } from "../../../lib/Rewards";
+import type { CoinType } from "../../offers/lib/Offers";
 
 type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
 
@@ -20,7 +22,7 @@ type UserStats = {
     points: number;
 }
 
-type ItemInventory = {
+export type ItemInventory = {
     cosmeticId: string;
     name: string;
     type: CosmeticType;
@@ -50,6 +52,11 @@ type BanUserRequest = {
     type: BanType;
     expiresIn?: number;
     reason: string;
+}
+
+export type RevokeWallet = {
+    type: CoinType;
+    amount: number;
 }
 
 export class UserRequests {
@@ -89,6 +96,24 @@ export class UserRequests {
         return response.data;
     }
 
+    static async getUserInventory(userId: string, page: number, size: number) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/inventory?page=${page}&size=${size}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+
+        const response: HttpResponse<GetBody<ItemInventory>> = await res.json();
+
+        return response.data;
+    }
+
     static async banUser(userId: string, body: BanUserRequest) {
         const token = localStorage.getItem("token");
 
@@ -113,6 +138,52 @@ export class UserRequests {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+        });
+
+        if (!res.ok) throw new Error();
+    }
+
+    static async grantReward(userId: string, reward: CreateReward) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/grant-reward`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(reward)
+        });
+
+        const response: HttpResponse<null> = await res.json();
+
+        if (!res.ok) throw new Error(response.message);
+    }
+
+    static async revokeUserCosmetic(userId: string, cosmeticId: string) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/inventory/${cosmeticId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error();
+    }
+
+    static async revokeUserWallet(userId: string, remove: RevokeWallet) {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${HTTPS}/user/${userId}/wallet/revoke`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(remove)
         });
 
         if (!res.ok) throw new Error();

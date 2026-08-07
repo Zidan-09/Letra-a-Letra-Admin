@@ -1,4 +1,4 @@
-import { Delete } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { CreateReward } from "../../lib/Rewards";
 import styles from "./RewardCard.module.css";
 
@@ -76,7 +76,7 @@ export function RewardCard({
                     type="button"
                     aria-label="Remover recompensa"
                 >
-                    <Delete />
+                    <Trash2 />
                 </button>
             )}
         </div>

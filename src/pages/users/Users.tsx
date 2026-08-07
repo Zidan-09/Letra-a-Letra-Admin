@@ -128,6 +128,7 @@ export function UsersPage() {
             <UserDetailsInfo
                 user={selectedUser}
                 onClose={() => setSelectedUser(null)}
+                onUserUpdated={fetchUsers}
             />
 
         </div>  
