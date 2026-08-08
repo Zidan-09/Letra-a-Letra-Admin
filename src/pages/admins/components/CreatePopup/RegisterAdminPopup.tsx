@@ -24,11 +24,10 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
     if (!isOpen) return;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        if (loading) return;
-
-        setLoading(true);
-
         e.preventDefault();
+        
+        if (loading) return;
+        setLoading(true);
 
         try {
             await AdminRequests.registerAdmin({
