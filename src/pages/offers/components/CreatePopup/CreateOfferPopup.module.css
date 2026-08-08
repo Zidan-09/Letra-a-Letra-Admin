@@ -241,7 +241,7 @@ select.input {
   background: #171717;
   border: 1px solid #262626;
   color: #525252;
-  cursor: not-allowed;
+  cursor: wait;
   box-shadow: none;
   filter: grayscale(0.4);
   transform: none;
