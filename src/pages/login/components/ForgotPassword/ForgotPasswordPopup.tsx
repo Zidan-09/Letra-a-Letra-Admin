@@ -14,12 +14,17 @@ export function ForgotPasswordPopup({
 }: ForgotPasswordPopupProps) {
   const [email, setEmail] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const { notify } = useNotification();
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
     if (!email.trim()) return;
+
+    if (loading) return;
+    setLoading(true);
 
     try {
         await LoginRequests.forgotPassword(email);
@@ -30,11 +35,13 @@ export function ForgotPasswordPopup({
 
     } catch {
         notify.error("Erro ao solicitar redefinição de senha")
-    }    
+    } finally {
+      setLoading(false);
+    } 
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
       <div className={styles.card} onClick={(event) => event.stopPropagation()}>
         <h1>Redefinir Senha</h1>
 
@@ -65,8 +72,9 @@ export function ForgotPasswordPopup({
 
           <button
             type="button"
-            className={styles.submit}
+            className={`${styles.submit} ${loading ? styles.disabled : ""}`}
             onClick={handleSubmit}
+            disabled={loading}
           >
             Enviar Link
           </button>

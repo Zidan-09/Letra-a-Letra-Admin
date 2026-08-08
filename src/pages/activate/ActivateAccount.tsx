@@ -14,6 +14,8 @@ export function ActivateAccount() {
 
   const [searchParams] = useSearchParams();
 
+  const [loading, setLoading] = useState(false);
+
   const token = searchParams.get("token");
 
   if (!token) return (
@@ -26,6 +28,10 @@ export function ActivateAccount() {
   const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
+    if (loading) return;
+
+    setLoading(true);
+
     event.preventDefault();
 
     if (password !== confirmPassowrd) {
@@ -47,6 +53,8 @@ export function ActivateAccount() {
       }
 
       notify.error("Ocorreu um erro inesperado...");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,7 +169,7 @@ export function ActivateAccount() {
           </div>
         </div>
 
-        <button type="submit" className={styles.submit}>
+        <button type="submit" className={`${styles.submit} ${loading ? styles.disabled : ""}`} disabled={loading}>
           Ativar
         </button>
       </form>

@@ -14,6 +14,8 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         setName("");
         setEmail("");
@@ -22,6 +24,10 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
     if (!isOpen) return;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        if (loading) return;
+
+        setLoading(true);
+
         e.preventDefault();
 
         try {
@@ -38,11 +44,13 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
             onClose();
         } catch (err) {
             notify.error("Erro ao cadastrar Administrador");
+        } finally {
+            setLoading(false);
         }
     };
     
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
             <form 
                 className={styles.card} 
                 onSubmit={handleSubmit}
@@ -80,7 +88,13 @@ export function RegisterAdminPopup({ isOpen, onClose }: RegisterAdminPopupProps)
                     />
                 </div>
 
-                <button type="submit" className={styles.submit}>Cadastrar Administrador</button>
+                <button 
+                    type="submit" 
+                    className={`${styles.submit} ${loading ? styles.disabled : ""}`}
+                    disabled={loading}
+                >
+                    Cadastrar Administrador
+                </button>
             </form>
         </div>
     );

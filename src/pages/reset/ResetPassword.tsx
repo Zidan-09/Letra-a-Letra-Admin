@@ -17,6 +17,8 @@ export function ResetPasswordPage() {
   const [loading, setLoading] = useState(true);
   const [validToken, setValidToken] = useState(false);
 
+  const [loadingReq, setLoadingReq] = useState(false);
+
   const [searchParams] = useSearchParams();
 
   const token = searchParams.get("token");
@@ -47,6 +49,9 @@ export function ResetPasswordPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (loadingReq) return;
+    setLoadingReq(true);
+
     if (newPassword !== confirmPassword) {
       notify.error("As senhas devem ser iguais!");
       return;
@@ -68,6 +73,8 @@ export function ResetPasswordPage() {
       }
 
       notify.error("Ocorreu um erro inesperado...");
+    } finally {
+      setLoadingReq(false);
     }
   };
 
@@ -88,7 +95,7 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${loadingReq ? styles.loading : ""}`}>
       <form className={styles.card} onSubmit={handleSubmit}>
         <h1>Redefinir Senha</h1>
 
@@ -208,7 +215,11 @@ export function ResetPasswordPage() {
           </div>
         </div>
 
-        <button className={styles.submit} type="submit">
+        <button 
+          className={`${styles.submit} ${loadingReq ? styles.disabled : ""}`} 
+          type="submit"
+          disabled={loadingReq}
+        >
           Redefinir Senha
         </button>
       </form>

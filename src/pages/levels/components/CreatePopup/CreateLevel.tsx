@@ -13,6 +13,8 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
     const [levelValue, setLevelValue] = useState<number>(0);
     const [rewards, setRewards] = useState<CreateRequest["rewards"]>([]);
 
+    const [loading, setLoading] = useState(false);
+
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -24,6 +26,9 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (loading) return;
+        setLoading(true);
 
         try {
             const level: CreateRequest = {
@@ -41,11 +46,13 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
             onClose();
         } catch (err) {
             notify.error("Erro ao cadastrar Level");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
             <form 
                 className={styles.card} 
                 onSubmit={handleSubmit}
@@ -92,7 +99,13 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
                     />
                 </div>
 
-                <button type="submit" className={styles.submit}>Cadastrar Level</button>
+                <button
+                    type="submit" 
+                    className={`${styles.submit} ${loading ? styles.disabled : ""}`}
+                    disabled={loading}
+                >
+                    Cadastrar Level
+                </button>
             </form>
         </div>
     );

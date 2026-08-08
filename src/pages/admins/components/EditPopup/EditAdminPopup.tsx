@@ -42,8 +42,9 @@ export function EditAdminPopup({
     const [permissions, setPermissions] = useState<
         Map<Key, Set<Action>>
     >(new Map());
-
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+    const [loading, setLoading] = useState(false);
 
     function createSuperAdminPermissions(): Map<Key, Set<Action>> {
         return new Map(
@@ -114,6 +115,10 @@ export function EditAdminPopup({
     }
 
     const handleSubmit = async () => {
+        if (loading) return;
+
+        setLoading(true);
+
         try {
             const payload = {
                 id: admin?.id,
@@ -140,12 +145,14 @@ export function EditAdminPopup({
             onClose();  
         } catch (err) {
             notify.error("Erro ao editar Administrador");
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
         <div
-            className={styles.overlay}
+            className={`${styles.overlay} ${loading ? styles.loading : ""}`}
             onClick={onClose}
         >
 
@@ -336,8 +343,9 @@ export function EditAdminPopup({
 
 
                     <button
-                        className={styles.saveButton}
+                        className={`${styles.saveButton} ${loading ? styles.disabled : ""}`}
                         onClick={handleSubmit}
+                        disabled={loading}
                     >
                         Salvar
                     </button>

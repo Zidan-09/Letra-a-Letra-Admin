@@ -23,6 +23,8 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
   const [type, setType] = useState<CosmeticTypes>(cosmetic?.type || "AVATAR");
   const [asset, setAsset] = useState<File | null>(null);
 
+  const [loading, setLoading] = useState(false);
+
   const assetsUrl = "https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev";
 
   const { notify } = useNotification();
@@ -51,6 +53,9 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (loading) return;
+    setLoading(true);
+
     try {
       const formData = new FormData();
 
@@ -71,11 +76,13 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
       onClose();
     } catch (error) {
       notify.error("Erro ao atualizar cosmético.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
       <form 
         className={styles.card} 
         onSubmit={handleSubmit}
@@ -140,7 +147,7 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
           />
         </div>
 
-        <button type="submit" className={styles.submit}>Salvar Alterações</button>
+        <button type="submit" disabled={loading} className={`${styles.submit} ${loading ? styles.disabled : ""}`}>Salvar Alterações</button>
       </form>
     </div>
   );

@@ -70,7 +70,7 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
   };
 
   return (
-    <div className={styles.overlay} onClick={handleClose}>
+    <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={handleClose}>
       <form 
         className={styles.card} 
         onSubmit={handleSubmit}
@@ -136,7 +136,7 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
           />
         </div>
 
-        <button type="submit" className={styles.submit} disabled={loading}>Cadastrar Cosmético</button>
+        <button type="submit" className={`${styles.submit} ${loading ? styles.disabled : ""}`} disabled={loading}>Cadastrar Cosmético</button>
       </form>
     </div>
   );

@@ -16,6 +16,8 @@ export function LoginPage() {
 
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { notify } = useNotification();
   const { login } = useAuth();
@@ -23,6 +25,9 @@ export function LoginPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+
+    if (loading) return;
+    setLoading(true);
 
     try {
       const response = await LoginRequests.login(email, password);
@@ -58,6 +63,8 @@ export function LoginPage() {
       }
 
       notify.error("Ocorreu um erro inesperado...");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +73,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${loading ? styles.loading : ""}`}>
       <form className={styles.card} onSubmit={handleSubmit}>
         <h1>Entrar</h1>
 
@@ -117,7 +124,13 @@ export function LoginPage() {
           <p className={styles.forgotPassword} onClick={handleForgotPassword}>Esqueci minha senha</p>
         </div>
 
-        <button type="submit" className={styles.submit}>Entrar</button>
+        <button 
+          type="submit" 
+          className={`${styles.submit} ${loading ? styles.disabled : ""}`}
+          disabled={loading}
+        >
+          Entrar
+        </button>
       </form>
 
       <ForgotPasswordPopup 

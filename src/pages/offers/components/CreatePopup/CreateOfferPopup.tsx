@@ -31,6 +31,8 @@ export function CreateOfferPopup({
         }[]
     >([]);
 
+    const [loading, setLoading] = useState(false);
+
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -45,6 +47,9 @@ export function CreateOfferPopup({
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        if (loading) return;
+        setLoading(true);
 
         try {
             await OfferRequests.createOffer({
@@ -62,11 +67,13 @@ export function CreateOfferPopup({
             onClose();
         } catch (err) {
             notify.error("Erro ao cadastrar oferta");
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
             <form
                 className={styles.card}
                 onClick={(e) => e.stopPropagation()}
@@ -208,7 +215,7 @@ export function CreateOfferPopup({
                     />
                 </div>
 
-                <button className={styles.submit} type="submit">
+                <button className={styles.submit} type="submit" disabled={loading}>
                     Cadastrar Oferta
                 </button>
             </form>

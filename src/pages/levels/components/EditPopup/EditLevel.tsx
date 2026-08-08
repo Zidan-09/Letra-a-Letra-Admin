@@ -16,6 +16,8 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
     const [levelValue, setLevelValue] = useState<number>(level?.value ?? 0);
     const [rewards, setRewards] = useState<CreateRequest["rewards"]>([]);
 
+    const [loading, setLoading] = useState(false);
+
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -30,6 +32,9 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (loading) return;
+        setLoading(true);
 
         try {
             const levelToSend: CreateRequest = {
@@ -48,11 +53,13 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
             onClose();
         } catch (err) {
             notify.error("Erro ao atualizar Level");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
             <form 
                 className={styles.card} 
                 onSubmit={handleSubmit}
@@ -99,7 +106,13 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
                     />
                 </div>
 
-                <button type="submit" className={styles.submit}>Salvar Alterações</button>
+                <button 
+                    type="submit" 
+                    className={`${styles.submit} ${loading ? styles.disabled : ""}`}
+                    disabled={loading}
+                >
+                    Salvar Alterações
+                </button>
             </form>
         </div>
     )

@@ -15,6 +15,10 @@
   animation: fadeIn .2s ease-out;
 }
 
+.loading, .loading:hover {
+  cursor: wait;
+}
+
 .card {
   position: relative;
 
@@ -209,6 +213,26 @@
 
 .submit:active {
   transform: translateY(1px);
+}
+
+.disabled {
+  background: #171717;
+  border: 1px solid #262626;
+  color: #525252;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+  transition: none;
+}
+
+.disabled:hover {
+  background: #171717;
+  border-color: #262626;
+  color: #525252;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
 }
 
 @keyframes fadeIn {
