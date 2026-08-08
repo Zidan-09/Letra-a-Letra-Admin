@@ -16,6 +16,8 @@ export function Header() {
             username,
             email
         });
+
+        setNotifications([])
     }, []);
 
     useEffect(() => {
