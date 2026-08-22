@@ -35,6 +35,7 @@ export type ProfileContextData = {
     email: string;
     permissions: Permission[];
     set: (profile: Profile) => void;
+    reset: () => void;
 }
 
 export const ProfileContext = createContext<ProfileContextData | null>(null);

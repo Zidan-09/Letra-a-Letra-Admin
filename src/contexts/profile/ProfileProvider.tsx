@@ -20,11 +20,18 @@ export function ProfileProvider({ children }: Props) {
         setProfile(profile);
     }
 
+    function reset() {
+        localStorage.removeItem("profile");
+
+        setProfile(null);
+    }
+
     return (
         <ProfileContext.Provider
             value={{
                 ...profile,
-                set
+                set,
+                reset
             } as any}
         >
             {children}

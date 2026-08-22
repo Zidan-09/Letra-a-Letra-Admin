@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useProfile } from "../../hooks/profile/useProfile";
+import { useAuth } from "../../hooks/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import styles from "./Header.module.css";
 
@@ -8,7 +10,10 @@ export function Header() {
     const [notifications, setNotifications] = useState<string[]>([]);
     const [profilePanelOpen, setProfilePanelOpen] = useState(false);
 
-    const { id, username, email } = useProfile();
+    const { id, username, email, reset } = useProfile();
+    const { logout } = useAuth();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setAdmin({
@@ -33,6 +38,13 @@ export function Header() {
             window.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
+
+    const handleLogout = () => {
+        reset();
+        logout();
+
+        navigate("/");
+    }
 
     return (
         <header className={styles.header}>
@@ -67,7 +79,9 @@ export function Header() {
                     </div>
 
                     <div className={styles.profileContent}>
-                        {/* Conteúdo */}
+                        <button className={styles.logout} onClick={handleLogout}>
+                            Logout
+                        </button>
                     </div>
                 </div>
             </div>

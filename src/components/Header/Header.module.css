@@ -33,7 +33,7 @@
     gap: 0.5rem;
 }
 
-.right button, .notifications {
+.right button, .notifications, .logout {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -58,7 +58,7 @@
     transition: all var(--transition);
 }
 
-.right button:hover, .notifications:hover {
+.right button:hover, .notifications:hover, .logout:hover {
     background: var(--background-hover);
 
     border-color: var(--primary);
@@ -67,7 +67,7 @@
         0 0 0 4px rgba(99,102,241,.08);
 }
 
-.right button:active, .notifications:active {
+.right button:active, .notifications:active, .logout:active {
     transform: scale(.98);
 }
 
