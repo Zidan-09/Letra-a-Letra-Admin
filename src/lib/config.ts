@@ -5,13 +5,13 @@ const WSS = "wss://api.letraaletradev.qzz.io/ws/admin?token="; */
 
 // RENDER
 
-const HTTPS = "https://letra-a-letra-api.onrender.com";
-const WSS = "wss://letra-a-letra-api.onrender.com/ws/admin?token=";
+/* const HTTPS = "https://letra-a-letra-api.onrender.com";
+const WSS = "wss://letra-a-letra-api.onrender.com/ws/admin?token="; */
 
 // LOCAL
 
-/* const HTTPS = "http://localhost:8080";
-const WSS = "ws://localhost:8080/ws/admin?token="; */
+const HTTPS = "http://localhost:8080";
+const WSS = "ws://localhost:8080/ws/admin?token=";
 
 type HttpResponse<T> = {
     success: boolean;
