@@ -8,7 +8,8 @@ import {
     Palette,
     Gift,
     ChartColumn,
-    ScrollText
+    ScrollText,
+    History
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -58,6 +59,11 @@ const items = [
         label: "Logs",
         to: "/admin/logs",
         icon: ScrollText
+    },
+    {
+        label: "Auditoria",
+        to: "/admin/audit",
+        icon: History
     }
 ];
 

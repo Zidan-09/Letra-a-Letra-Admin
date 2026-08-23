@@ -12,6 +12,7 @@ import { OffersPage } from "./pages/offers/Offers";
 import { UsersPage } from "./pages/users/Users";
 import { TransactionsPage } from "./pages/transactions/Transactions";
 import { LogsPage } from "./pages/logs/Logs";
+import { AuditPage } from "./pages/audit/Audit";
 import { ActivateAccount } from "./pages/activate/ActivateAccount";
 import { ResetPasswordPage } from "./pages/reset/ResetPassword";
 
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
                     {
                         path: "logs",
                         element: <LogsPage />
+                    },
+                    {
+                        path: "audit",
+                        element: <AuditPage />
                     }
                 ]
             }
