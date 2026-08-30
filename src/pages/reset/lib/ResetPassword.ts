@@ -1,4 +1,4 @@
-import { HTTPS } from "../../../lib/config"
+import { API_URL } from "../../../lib/config"
 
 type ResetPasswordRequest = {
     token: string,
@@ -7,7 +7,7 @@ type ResetPasswordRequest = {
 
 class ResetPasswordRequests {
     static async validateToken(token: string) {
-        const res = await fetch(`${HTTPS}/admin/auth/verify-reset-token`, {
+        const res = await fetch(`${API_URL}/admin/auth/verify-reset-token`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -19,7 +19,7 @@ class ResetPasswordRequests {
     }
 
     static async reset({ token, newPassword }: ResetPasswordRequest) {
-        const res = await fetch(`${HTTPS}/admin/auth/reset-password`, {
+        const res = await fetch(`${API_URL}/admin/auth/reset-password`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

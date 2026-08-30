@@ -1,4 +1,4 @@
-import { HTTPS, type HttpResponse } from "../../../lib/config";
+import { API_URL, type HttpResponse } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 
 export type Key = 
@@ -51,7 +51,7 @@ export class AdminRequests {
     static async getAdmins(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/admin?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/admin?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export class AdminRequests {
     static async findAdminByEmail(email: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/admin/email/${email}`, {
+        const res = await fetch(`${API_URL}/admin/email/${email}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export class AdminRequests {
     static async registerAdmin(admin: RegisterAdmin) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/admin`, {
+        const res = await fetch(`${API_URL}/admin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export class AdminRequests {
     static async removeAdmin(id: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/admin/${id}`, {
+        const res = await fetch(`${API_URL}/admin/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -129,7 +129,7 @@ export class AdminRequests {
             permissions: admin.permissions
         }
 
-        const res = await fetch(`${HTTPS}/admin/${admin.id}`, {
+        const res = await fetch(`${API_URL}/admin/${admin.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

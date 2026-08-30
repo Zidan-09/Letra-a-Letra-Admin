@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { Reward, CreateReward } from "../../../lib/Rewards";
 import type { GetBody } from "../../../lib/shared";
 
@@ -26,7 +26,7 @@ export class LevelsRequests {
     static async getLevels(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/level?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/level?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export class LevelsRequests {
     static async findLevelByValue(value: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/level/value/${value}`, {
+        const res = await fetch(`${API_URL}/level/value/${value}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export class LevelsRequests {
     static async findLevelById(id: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/level/${id}`, {
+        const res = await fetch(`${API_URL}/level/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export class LevelsRequests {
     static async createLevel(level: CreateRequest) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/level`, {
+        const res = await fetch(`${API_URL}/level`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export class LevelsRequests {
     static async updateLevel(level: CreateRequest, levelId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/level/${levelId}`, {
+        const res = await fetch(`${API_URL}/level/${levelId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

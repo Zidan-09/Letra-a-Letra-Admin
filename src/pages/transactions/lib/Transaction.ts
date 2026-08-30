@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 
 type CoinType = "SOFT" | "HARD" | "REAL";
@@ -37,7 +37,7 @@ export class TransactionRequests {
     static async getTransactions(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/transaction?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/transaction?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export class TransactionRequests {
     static async findTransactionById(transactionId: string) {
         const token = localStorage.getItem("token");
         
-            const res = await fetch(`${HTTPS}/transaction/${transactionId}`, {
+            const res = await fetch(`${API_URL}/transaction/${transactionId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export class TransactionRequests {
     static async findTransactionByUserId(userId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/transaction/user/${userId}`, {
+        const res = await fetch(`${API_URL}/transaction/user/${userId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export class TransactionRequests {
     static async findTransactionsByNickname(nickname: string, page: number, size: number) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/transaction/user/username/${nickname}?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/transaction/user/username/${nickname}?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

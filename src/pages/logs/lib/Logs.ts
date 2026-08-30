@@ -1,4 +1,4 @@
-import { HTTPS } from "../../../lib/config";
+import { API_URL } from "../../../lib/config";
 
 type DatesResponse = string[];
 type GamesResponse = string[];
@@ -17,7 +17,7 @@ export class LogRequests {
     }
 
     static async getGameLogDates(): Promise<DatesResponse> {
-        const res = await fetch(`${HTTPS}/admin/logs/game`, {
+        const res = await fetch(`${API_URL}/admin/logs/game`, {
             headers: this.getHeaders()
         });
 
@@ -28,7 +28,7 @@ export class LogRequests {
 
     static async getGames(date: string): Promise<GamesResponse> {
         const res = await fetch(
-            `${HTTPS}/admin/logs/game/${encodeURIComponent(date)}`,
+            `${API_URL}/admin/logs/game/${encodeURIComponent(date)}`,
             {
                 headers: this.getHeaders()
             }
@@ -44,7 +44,7 @@ export class LogRequests {
         gameId: string
     ): Promise<FilesResponse> {
         const res = await fetch(
-            `${HTTPS}/admin/logs/game/${encodeURIComponent(date)}/${encodeURIComponent(gameId)}`,
+            `${API_URL}/admin/logs/game/${encodeURIComponent(date)}/${encodeURIComponent(gameId)}`,
             {
                 headers: this.getHeaders()
             }
@@ -61,7 +61,7 @@ export class LogRequests {
         file: string
     ): Promise<string> {
         const res = await fetch(
-            `${HTTPS}/admin/logs/game/${encodeURIComponent(date)}/${encodeURIComponent(gameId)}/${encodeURIComponent(file)}`,
+            `${API_URL}/admin/logs/game/${encodeURIComponent(date)}/${encodeURIComponent(gameId)}/${encodeURIComponent(file)}`,
             {
                 headers: this.getHeaders()
             }
@@ -73,7 +73,7 @@ export class LogRequests {
     }
 
     static async getUntrackedLogs(): Promise<UntrackedLogsResponse> {
-        const res = await fetch(`${HTTPS}/admin/logs/game/untracked`, {
+        const res = await fetch(`${API_URL}/admin/logs/game/untracked`, {
             headers: this.getHeaders()
         });
 
@@ -84,7 +84,7 @@ export class LogRequests {
 
     static async getUntrackedLog(file: string): Promise<string> {
         const res = await fetch(
-            `${HTTPS}/admin/logs/game/untracked/${encodeURIComponent(file)}`,
+            `${API_URL}/admin/logs/game/untracked/${encodeURIComponent(file)}`,
             {
                 headers: this.getHeaders()
             }
@@ -96,7 +96,7 @@ export class LogRequests {
     }
 
     static async getAdminLogs(): Promise<AdminLogsResponse> {
-        const res = await fetch(`${HTTPS}/admin/logs/admin`, {
+        const res = await fetch(`${API_URL}/admin/logs/admin`, {
             headers: this.getHeaders()
         });
 
@@ -107,7 +107,7 @@ export class LogRequests {
 
     static async getAdminLog(file: string): Promise<string> {
         const res = await fetch(
-            `${HTTPS}/admin/logs/admin/${encodeURIComponent(file)}`,
+            `${API_URL}/admin/logs/admin/${encodeURIComponent(file)}`,
             {
                 headers: this.getHeaders()
             }

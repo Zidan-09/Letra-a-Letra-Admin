@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { Reward } from "../../../lib/Rewards";
 import type { GetBody, RewardType } from "../../../lib/shared";
 
@@ -45,7 +45,7 @@ export class OfferRequests {
     static async getOffers(page: number, size: number) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/offer?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/offer?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export class OfferRequests {
     static async findOfferById(id: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/offer/${id}`, {
+        const res = await fetch(`${API_URL}/offer/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export class OfferRequests {
     static async createOffer(offer: CreateRequest) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/offer`, {
+        const res = await fetch(`${API_URL}/offer`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export class OfferRequests {
     static async enableOffer(offerId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/offer/enable/${offerId}`, {
+        const res = await fetch(`${API_URL}/offer/enable/${offerId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export class OfferRequests {
     static async disableOffer(offerId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/offer/disable/${offerId}`, {
+        const res = await fetch(`${API_URL}/offer/disable/${offerId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -138,7 +138,7 @@ export class OfferRequests {
     static async deleteOffer(offerId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/offer/${offerId}`, {
+        const res = await fetch(`${API_URL}/offer/${offerId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

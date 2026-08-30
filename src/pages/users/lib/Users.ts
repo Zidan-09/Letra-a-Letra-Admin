@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 import type { CreateReward } from "../../../lib/Rewards";
 import type { CoinType } from "../../offers/lib/Offers";
@@ -70,7 +70,7 @@ export class UserRequests {
     static async getUsers(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/user?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export class UserRequests {
     static async findUserByUsername(username: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/username/${username}`, {
+        const res = await fetch(`${API_URL}/user/username/${username}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export class UserRequests {
     static async getUserInventory(userId: string, page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/inventory?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/user/${userId}/inventory?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export class UserRequests {
     static async banUser(userId: string, body: BanUserRequest) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/ban`, {
+        const res = await fetch(`${API_URL}/user/${userId}/ban`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -142,7 +142,7 @@ export class UserRequests {
     static async unbanUser(userId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/unban`, {
+        const res = await fetch(`${API_URL}/user/${userId}/unban`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -159,7 +159,7 @@ export class UserRequests {
     static async grantReward(userId: string, reward: CreateReward) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/grant-reward`, {
+        const res = await fetch(`${API_URL}/user/${userId}/grant-reward`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -177,7 +177,7 @@ export class UserRequests {
     static async revokeUserCosmetic(userId: string, cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/inventory/${cosmeticId}`, {
+        const res = await fetch(`${API_URL}/user/${userId}/inventory/${cosmeticId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -194,7 +194,7 @@ export class UserRequests {
     static async revokeUserWallet(userId: string, remove: RevokeWallet) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/user/${userId}/wallet/revoke`, {
+        const res = await fetch(`${API_URL}/user/${userId}/wallet/revoke`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

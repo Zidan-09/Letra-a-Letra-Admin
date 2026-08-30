@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 
 export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
@@ -33,7 +33,7 @@ export class CosmeticRequests {
         const token = localStorage.getItem("token");
 
         try {
-            const res: HttpResponse<CreateBody> = await fetch(`${HTTPS}/cosmetic`, {
+            const res: HttpResponse<CreateBody> = await fetch(`${API_URL}/cosmetic`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -54,7 +54,7 @@ export class CosmeticRequests {
     static async getCosmetics(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/cosmetic?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/cosmetic?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export class CosmeticRequests {
     static async disableCosmetic(cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/cosmetic/disable/${cosmeticId}`, {
+        const res = await fetch(`${API_URL}/cosmetic/disable/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export class CosmeticRequests {
     static async enableCosmetic(cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/cosmetic/enable/${cosmeticId}`, {
+        const res = await fetch(`${API_URL}/cosmetic/enable/${cosmeticId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export class CosmeticRequests {
     static async editCosmetic(formData: FormData, cosmeticId: string) {
         const token = localStorage.getItem("token");
         
-        const res = await fetch(`${HTTPS}/cosmetic/${cosmeticId}`, {
+        const res = await fetch(`${API_URL}/cosmetic/${cosmeticId}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -134,7 +134,7 @@ export class CosmeticRequests {
     static async deleteCosmetic(cosmeticId: string) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/cosmetic/${cosmeticId}`, {
+        const res = await fetch(`${API_URL}/cosmetic/${cosmeticId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export class CosmeticRequests {
             size: size.toString()
         });
 
-        const res = await fetch(`${HTTPS}/cosmetic/search?${params}`, {
+        const res = await fetch(`${API_URL}/cosmetic/search?${params}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

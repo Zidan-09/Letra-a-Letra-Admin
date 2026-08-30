@@ -1,62 +1,62 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { useWebSocket } from "../../hooks/websocket/useWebSocket";
-import { WSS } from "../../lib/config";
+import { WS_URL } from "../../lib/config";
 import {
-    RealtimeContext,
-    type ApplicationMetrics,
-    type SystemMetrics
+  RealtimeContext,
+  type ApplicationMetrics,
+  type SystemMetrics,
 } from "./RealtimeContext";
 import { useAuth } from "../../hooks/auth/useAuth";
 
 interface RealtimeProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export function RealtimeProvider({ children }: RealtimeProviderProps) {
-    const [application, setApplication] = useState<ApplicationMetrics>();
-    const [system, setSystem] = useState<SystemMetrics>();
-    const [logs, setLogs] = useState<string[]>([]);
+  const [application, setApplication] = useState<ApplicationMetrics>();
+  const [system, setSystem] = useState<SystemMetrics>();
+  const [logs, setLogs] = useState<string[]>([]);
 
-    const { token } = useAuth();
+  const { token } = useAuth();
 
-    useEffect(() => {
-        if (!token) {
-            setApplication(undefined);
-            setSystem(undefined);
-            setLogs([]);
+  useEffect(() => {
+    if (!token) {
+      setApplication(undefined);
+      setSystem(undefined);
+      setLogs([]);
+    }
+  }, [token]);
+
+  const { isConnected } = useWebSocket(
+    token ? `${WS_URL}?token=${token}` : "",
+    {
+      onMessage: (event) => {
+        const data = JSON.parse(event.data);
+
+        switch (data.event) {
+          case "METRICS":
+            setApplication(data.application);
+            setSystem(data.system);
+            break;
+
+          case "LOG":
+            setLogs((previous) => [...previous, data.log]);
+            break;
         }
-    }, [token]);
+      },
+    },
+  );
 
-    const { isConnected } = useWebSocket(token ? `${WSS}${token}` : "", {
-        onMessage: (event) => {
-            const data = JSON.parse(event.data);
-
-            switch (data.event) {
-                case "METRICS":
-                    setApplication(data.application);
-                    setSystem(data.system);
-                    break;
-
-                case "LOG":
-                    setLogs((previous) => [
-                        ...previous,
-                        data.log
-                    ]);
-                    break;
-            }
-        }
-    });
-
-    return (
-        <RealtimeContext.Provider
-            value={{
-                connected: isConnected,
-                application,
-                system,
-                logs
-            }}
-        >
-            {children}
-        </RealtimeContext.Provider>
-    );
+  return (
+    <RealtimeContext.Provider
+      value={{
+        connected: isConnected,
+        application,
+        system,
+        logs,
+      }}
+    >
+      {children}
+    </RealtimeContext.Provider>
+  );
 }

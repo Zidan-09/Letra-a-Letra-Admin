@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 import type { GetBody } from "../../../lib/shared";
 
 type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
@@ -48,7 +48,7 @@ export class GamesRequests {
     static async getGames(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/game?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/game?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export class GamesRequests {
     static async getActiveGames(page: number, size: number) {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/game/active?page=${page}&size=${size}`, {
+        const res = await fetch(`${API_URL}/game/active?page=${page}&size=${size}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

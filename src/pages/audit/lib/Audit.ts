@@ -1,4 +1,4 @@
-import { type HttpResponse, HTTPS } from "../../../lib/config";
+import { type HttpResponse, API_URL } from "../../../lib/config";
 
 export type AuditEventType =
     | "WALLET_CREDITED"
@@ -273,7 +273,7 @@ export class AuditRequests {
         params.append("size", String(size));
         params.append("direction", direction);
 
-        return requestAuditPage(`${HTTPS}/admin/audit?${params.toString()}`);
+        return requestAuditPage(`${API_URL}/admin/audit?${params.toString()}`);
     }
 
     static async getEventsByUser(userId: string, filters: AuditFilters, page: number, size: number) {
@@ -289,7 +289,7 @@ export class AuditRequests {
         params.append("page", String(page));
         params.append("size", String(size));
 
-        return requestAuditPage(`${HTTPS}/admin/audit/user/${encodeURIComponent(userId)}?${params.toString()}`);
+        return requestAuditPage(`${API_URL}/admin/audit/user/${encodeURIComponent(userId)}?${params.toString()}`);
     }
 
     static async getEventsByResource(resourceType: string, resourceId: string, filters: AuditFilters, page: number, size: number) {
@@ -305,7 +305,7 @@ export class AuditRequests {
         params.append("size", String(size));
 
         return requestAuditPage(
-            `${HTTPS}/admin/audit/resource/${encodeURIComponent(resourceType)}/${encodeURIComponent(resourceId)}?${params.toString()}`
+            `${API_URL}/admin/audit/resource/${encodeURIComponent(resourceType)}/${encodeURIComponent(resourceId)}?${params.toString()}`
         );
     }
 }

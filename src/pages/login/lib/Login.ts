@@ -1,4 +1,4 @@
-import { HTTPS, type HttpResponse } from "../../../lib/config";
+import { API_URL, type HttpResponse } from "../../../lib/config";
 
 type LoginBody = {
     id: string,
@@ -38,7 +38,7 @@ type MeBody = {
 
 class LoginRequests {
     static async login(email: string, password: string) {
-        const res = await fetch(`${HTTPS}/admin/auth`, {
+        const res = await fetch(`${API_URL}/admin/auth`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -55,7 +55,7 @@ class LoginRequests {
     static async me() {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${HTTPS}/admin/me`, {
+        const res = await fetch(`${API_URL}/admin/me`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -69,7 +69,7 @@ class LoginRequests {
     }
 
     static async forgotPassword(email: string) {
-        const res = await fetch(`${HTTPS}/admin/auth/forgot-password`, {
+        const res = await fetch(`${API_URL}/admin/auth/forgot-password`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

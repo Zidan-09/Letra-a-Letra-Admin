@@ -1,8 +1,8 @@
-import { HTTPS } from "../../../lib/config"
+import { API_URL } from "../../../lib/config"
 
 export class ActivateRequest {
     static async active({ token, password}: { token: string, password: string }) {
-        const res = await fetch(`${HTTPS}/admin/activate?token=${token}`, {
+        const res = await fetch(`${API_URL}/admin/activate?token=${token}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
