@@ -140,7 +140,9 @@ export function AdminDetailsModal({
                                 "GAME",
                                 "LEVELS",
                                 "OFFERS",
-                                "TRANSACTIONS"
+                                "TRANSACTIONS",
+                                "AUDIT",
+                                "TICKET"
                             ].map(key => {
 
                                 const permission = permissions.find(

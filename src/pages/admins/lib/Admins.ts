@@ -9,7 +9,9 @@ export type Key =
 "GAME" | 
 "LEVELS" | 
 "OFFERS" | 
-"TRANSACTIONS";
+"TRANSACTIONS" |
+"AUDIT" | 
+"TICKET";
 
 export type Action = 
 "VIEW" | 

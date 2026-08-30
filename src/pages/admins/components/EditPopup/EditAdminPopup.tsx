@@ -18,7 +18,9 @@ const KEYS: Key[] = [
     "GAME",
     "LEVELS",
     "OFFERS",
-    "TRANSACTIONS"
+    "TRANSACTIONS",
+    "AUDIT",
+    "TICKET"
 ];
 
 const ACTIONS: Action[] = [

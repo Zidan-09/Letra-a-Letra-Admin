@@ -17,6 +17,34 @@
       "description": "Rotas relacionadas ao gerenciamento de ofertas da loja"
     },
     {
+      "name": "Ticket Admin",
+      "description": "Rotas administrativas de gerenciamento de tickets"
+    },
+    {
+      "name": "Shop",
+      "description": "Rotas relacionadas a funcionalidade da loja do jogo"
+    },
+    {
+      "name": "Game",
+      "description": "Rotas relacionadas a funcionalidade de salas"
+    },
+    {
+      "name": "Cosmetics",
+      "description": "Rotas relacionadas ao gerenciamento de cosméticos"
+    },
+    {
+      "name": "Ticket",
+      "description": "Rotas de criação e consulta de tickets de suporte pelo usuário"
+    },
+    {
+      "name": "Friend",
+      "description": "Rotas relacionadas a funcionalidade de amizades"
+    },
+    {
+      "name": "Audit",
+      "description": "Rotas administrativas de consulta da auditoria de negócio"
+    },
+    {
       "name": "Transaction",
       "description": "Rotas relacionadas a funcionalidade de transações dos usuários"
     },
@@ -37,28 +65,8 @@
       "description": "Logs das partidas"
     },
     {
-      "name": "Shop",
-      "description": "Rotas relacionadas a funcionalidade da loja do jogo"
-    },
-    {
-      "name": "Game",
-      "description": "Rotas relacionadas a funcionalidade de salas"
-    },
-    {
-      "name": "Cosmetics",
-      "description": "Rotas relacionadas ao gerenciamento de cosméticos"
-    },
-    {
-      "name": "Friend",
-      "description": "Rotas relacionadas a funcionalidade de amizades"
-    },
-    {
       "name": "Admin",
       "description": "Rotas relacionadas a parte de administração"
-    },
-    {
-      "name": "Audit",
-      "description": "Rotas administrativas de consulta da auditoria de negócio"
     }
   ],
   "paths": {
@@ -478,12 +486,42 @@
         }
       }
     },
+    "/ticket": {
+      "post": {
+        "tags": [
+          "Ticket"
+        ],
+        "operationId": "handle_13",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseCreateTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shop/offers/{offerId}/buy": {
       "post": {
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_13",
+        "operationId": "handle_14",
         "parameters": [
           {
             "name": "offerId",
@@ -514,7 +552,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_14",
+        "operationId": "handle_15",
         "parameters": [
           {
             "name": "pageable",
@@ -572,7 +610,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_15",
+        "operationId": "handle_16",
         "parameters": [
           {
             "name": "pageable",
@@ -600,7 +638,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_16",
+        "operationId": "handle_17",
         "requestBody": {
           "content": {
             "application/json": {
@@ -630,7 +668,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_17",
+        "operationId": "handle_18",
         "requestBody": {
           "content": {
             "application/json": {
@@ -660,7 +698,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_18",
+        "operationId": "handle_19",
         "parameters": [
           {
             "name": "pageable",
@@ -688,7 +726,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_19",
+        "operationId": "handle_20",
         "parameters": [
           {
             "name": "request",
@@ -718,7 +756,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_20",
+        "operationId": "handle_21",
         "parameters": [
           {
             "name": "pageable",
@@ -746,7 +784,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_21",
+        "operationId": "handle_22",
         "requestBody": {
           "content": {
             "application/json": {
@@ -776,7 +814,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_22",
+        "operationId": "handle_23",
         "requestBody": {
           "content": {
             "application/json": {
@@ -806,7 +844,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_23",
+        "operationId": "handle_24",
         "requestBody": {
           "content": {
             "application/json": {
@@ -836,7 +874,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_24",
+        "operationId": "handle_25",
         "requestBody": {
           "content": {
             "application/json": {
@@ -866,7 +904,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_25",
+        "operationId": "handle_26",
         "requestBody": {
           "content": {
             "application/json": {
@@ -896,7 +934,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_26",
+        "operationId": "handle_27",
         "parameters": [
           {
             "name": "userId",
@@ -937,7 +975,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_27",
+        "operationId": "handle_28",
         "parameters": [
           {
             "name": "userId",
@@ -968,7 +1006,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_28",
+        "operationId": "handle_29",
         "parameters": [
           {
             "name": "userId",
@@ -1009,7 +1047,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_29",
+        "operationId": "handle_30",
         "parameters": [
           {
             "name": "userId",
@@ -1050,7 +1088,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_30",
+        "operationId": "handle_31",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1080,7 +1118,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_31",
+        "operationId": "handle_32",
         "parameters": [
           {
             "name": "cosmeticId",
@@ -1111,7 +1149,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_32",
+        "operationId": "handle_33",
         "parameters": [
           {
             "name": "offerId",
@@ -1173,7 +1211,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_33",
+        "operationId": "handle_34",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1203,7 +1241,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_34",
+        "operationId": "handle_35",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1233,7 +1271,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_35",
+        "operationId": "handle_36",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1263,7 +1301,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_36",
+        "operationId": "handle_37",
         "parameters": [
           {
             "name": "cosmeticId",
@@ -1294,7 +1332,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_37",
+        "operationId": "handle_38",
         "parameters": [
           {
             "name": "cosmeticId",
@@ -1320,12 +1358,52 @@
         }
       }
     },
+    "/admin/ticket/{ticketId}/resolve": {
+      "patch": {
+        "tags": [
+          "Ticket Admin"
+        ],
+        "operationId": "handle_39",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveTicketRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseResolveTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/activate": {
       "patch": {
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_38",
+        "operationId": "handle_40",
         "parameters": [
           {
             "name": "token",
@@ -1365,7 +1443,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_39",
+        "operationId": "handle_41",
         "parameters": [
           {
             "name": "userId",
@@ -1404,7 +1482,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_40",
+        "operationId": "handle_42",
         "parameters": [
           {
             "name": "username",
@@ -1435,7 +1513,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_41",
+        "operationId": "handle_43",
         "parameters": [
           {
             "name": "pageable",
@@ -1465,7 +1543,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_42",
+        "operationId": "handle_44",
         "responses": {
           "200": {
             "description": "OK",
@@ -1485,7 +1563,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_43",
+        "operationId": "handle_45",
         "responses": {
           "200": {
             "description": "OK",
@@ -1505,7 +1583,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_44",
+        "operationId": "handle_46",
         "parameters": [
           {
             "name": "pageable",
@@ -1535,7 +1613,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_45",
+        "operationId": "handle_47",
         "parameters": [
           {
             "name": "transactionId",
@@ -1566,7 +1644,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_46",
+        "operationId": "handle_48",
         "parameters": [
           {
             "name": "userId",
@@ -1605,7 +1683,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_47",
+        "operationId": "handle_49",
         "parameters": [
           {
             "name": "username",
@@ -1638,12 +1716,94 @@
         }
       }
     },
+    "/ticket/{ticketId}": {
+      "get": {
+        "tags": [
+          "Ticket"
+        ],
+        "operationId": "handle_50",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/my": {
+      "get": {
+        "tags": [
+          "Ticket"
+        ],
+        "operationId": "handle_51",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DESC"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponsePageResponseTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shop/offers": {
       "get": {
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_48",
+        "operationId": "handle_52",
         "responses": {
           "200": {
             "description": "OK",
@@ -1663,7 +1823,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_49",
+        "operationId": "handle_53",
         "parameters": [
           {
             "name": "offerId",
@@ -1692,7 +1852,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_50",
+        "operationId": "handle_54",
         "parameters": [
           {
             "name": "offerId",
@@ -1723,7 +1883,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_51",
+        "operationId": "handle_55",
         "parameters": [
           {
             "name": "value",
@@ -1754,7 +1914,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_52",
+        "operationId": "handle_56",
         "parameters": [
           {
             "name": "pageable",
@@ -1845,7 +2005,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_53",
+        "operationId": "handle_57",
         "parameters": [
           {
             "name": "pageable",
@@ -1875,7 +2035,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_54",
+        "operationId": "handle_58",
         "responses": {
           "200": {
             "description": "OK",
@@ -1895,7 +2055,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_55",
+        "operationId": "handle_59",
         "responses": {
           "200": {
             "description": "OK",
@@ -1915,7 +2075,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_56",
+        "operationId": "handle_60",
         "parameters": [
           {
             "name": "search",
@@ -1953,7 +2113,7 @@
         "tags": [
           "Cosmetics"
         ],
-        "operationId": "handle_57",
+        "operationId": "handle_61",
         "parameters": [
           {
             "name": "name",
@@ -1979,12 +2139,98 @@
         }
       }
     },
+    "/admin/ticket": {
+      "get": {
+        "tags": [
+          "Ticket Admin"
+        ],
+        "operationId": "handle_62",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "RESOLVED"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BUG",
+                "FEEDBACK",
+                "SUGGESTION",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DESC"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponsePageResponseTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/me": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_58",
+        "operationId": "handle_63",
         "responses": {
           "200": {
             "description": "OK",
@@ -2264,7 +2510,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_59",
+        "operationId": "handle_64",
         "parameters": [
           {
             "name": "email",
@@ -2295,7 +2541,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_60",
+        "operationId": "handle_65",
         "parameters": [
           {
             "name": "targetUserId",
@@ -2334,6 +2580,8 @@
                 "PLAYER_REMOVED_INACTIVITY",
                 "MATCHMAKING_PAIRED",
                 "CATALOG_CHANGED",
+                "TICKET_CREATED",
+                "TICKET_RESOLVED",
                 "COMMAND_FAILED"
               ]
             }
@@ -2380,7 +2628,8 @@
                 "LEVEL",
                 "USER",
                 "MATCH",
-                "ROOM"
+                "ROOM",
+                "TICKET"
               ]
             }
           },
@@ -2493,7 +2742,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_61",
+        "operationId": "handle_66",
         "parameters": [
           {
             "name": "userId",
@@ -2523,6 +2772,8 @@
                 "PLAYER_REMOVED_INACTIVITY",
                 "MATCHMAKING_PAIRED",
                 "CATALOG_CHANGED",
+                "TICKET_CREATED",
+                "TICKET_RESOLVED",
                 "COMMAND_FAILED"
               ]
             }
@@ -2601,7 +2852,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_62",
+        "operationId": "handle_67",
         "parameters": [
           {
             "name": "type",
@@ -2686,7 +2937,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_63",
+        "operationId": "handle_68",
         "parameters": [
           {
             "name": "userId",
@@ -2961,7 +3212,8 @@
               "LEVELS",
               "OFFERS",
               "TRANSACTIONS",
-              "AUDIT"
+              "AUDIT",
+              "TICKET"
             ]
           },
           "actions": {
@@ -3045,7 +3297,8 @@
               "LEVELS",
               "OFFERS",
               "TRANSACTIONS",
-              "AUDIT"
+              "AUDIT",
+              "TICKET"
             ]
           },
           "actions": {
@@ -3232,6 +3485,104 @@
         "required": [
           "email"
         ]
+      },
+      "CreateTicketRequest": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "BUG",
+              "FEEDBACK",
+              "SUGGESTION",
+              "OTHER"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 5
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 10
+          }
+        },
+        "required": [
+          "category",
+          "description",
+          "subject"
+        ]
+      },
+      "CreateTicketResponse": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "$ref": "#/components/schemas/TicketResponse"
+          }
+        }
+      },
+      "SuccessResponseCreateTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateTicketResponse"
+          }
+        }
+      },
+      "TicketResponse": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "BUG",
+              "FEEDBACK",
+              "SUGGESTION",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RESOLVED"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "resolutionNote": {
+            "type": "string"
+          },
+          "resolvedByAdminId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       },
       "BuyStoreOfferResponse": {
         "type": "object",
@@ -4057,6 +4408,35 @@
           }
         }
       },
+      "ResolveTicketRequest": {
+        "type": "object",
+        "properties": {
+          "resolutionNote": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0
+          }
+        }
+      },
+      "ResolveTicketResponse": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "$ref": "#/components/schemas/TicketResponse"
+          }
+        }
+      },
+      "SuccessResponseResolveTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResolveTicketResponse"
+          }
+        }
+      },
       "ActivateAccountRequest": {
         "type": "object",
         "properties": {
@@ -4457,6 +4837,61 @@
           },
           "data": {
             "$ref": "#/components/schemas/FindTransactionResponse"
+          }
+        }
+      },
+      "SuccessResponseTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TicketResponse"
+          }
+        }
+      },
+      "PageResponseTicketResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SuccessResponsePageResponseTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResponseTicketResponse"
           }
         }
       },

@@ -9,7 +9,8 @@ import {
     Gift,
     ChartColumn,
     ScrollText,
-    History
+    History,
+    Tickets
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -64,6 +65,11 @@ const items = [
         label: "Auditoria",
         to: "/admin/audit",
         icon: History
+    },
+    {
+        label: "Tickets",
+        to: "/admin/tickets",
+        icon: Tickets
     }
 ];
 

@@ -13,6 +13,7 @@ import { UsersPage } from "./pages/users/Users";
 import { TransactionsPage } from "./pages/transactions/Transactions";
 import { LogsPage } from "./pages/logs/Logs";
 import { AuditPage } from "./pages/audit/Audit";
+import { TicketsPage } from "./pages/tickets/Tickets";
 import { ActivateAccount } from "./pages/activate/ActivateAccount";
 import { ResetPasswordPage } from "./pages/reset/ResetPassword";
 
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
                     {
                         path: "audit",
                         element: <AuditPage />
+                    },
+                    {
+                        path: "tickets",
+                        element: <TicketsPage />
                     }
                 ]
             }
