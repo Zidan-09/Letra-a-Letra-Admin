@@ -38,10 +38,8 @@ export function RewardModal({
     }, [open]);
 
     useEffect(() => {
-        console.log(search);
 
         if (!search.trim()) {
-            console.log("Entro")
             setResults([]);
             setSelectedCosmetic(false);
         }

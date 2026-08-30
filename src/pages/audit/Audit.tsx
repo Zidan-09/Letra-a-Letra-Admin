@@ -360,17 +360,17 @@ export function AuditPage() {
                     <p>Investigue os eventos de negócio registrados pelo sistema.</p>
                 </div>
 
-                <div className={styles.headerButtons}>
+                <div className={styles.actions}>
                     {scope.mode === "general" && (
-                        <div className={styles.directionGroup}>
+                        <div className={styles.filterGroup}>
                             <button
-                                className={`${styles.directionButton} ${direction === "DESC" ? styles.directionActive : ""}`}
+                                className={`${styles.filterButton} ${direction === "DESC" ? styles.filterActive : ""}`}
                                 onClick={() => handleDirectionChange("DESC")}
                             >
                                 Mais recentes
                             </button>
                             <button
-                                className={`${styles.directionButton} ${direction === "ASC" ? styles.directionActive : ""}`}
+                                className={`${styles.filterButton} ${direction === "ASC" ? styles.filterActive : ""}`}
                                 onClick={() => handleDirectionChange("ASC")}
                             >
                                 Mais antigas
@@ -383,21 +383,23 @@ export function AuditPage() {
                         onClick={handleRefresh}
                         disabled={loading || rotating}
                     >
-                        <RotateCcw size={18} className={rotating ? styles.rotating : ""} />
+                        <RotateCcw className={rotating ? styles.rotating : ""} />
                     </button>
                 </div>
             </header>
 
-            <section className={styles.filters}>
-                <div className={styles.filtersHeader}>
-                    <h2 className={styles.filtersTitle}>Filtros</h2>
+            <div className={styles.mainLayout}>
+                <aside className={styles.sidebar}>
+                    <section className={styles.filters}>
+                        <div className={styles.filtersHeader}>
+                            <h2 className={styles.filtersTitle}>Filtros</h2>
 
-                    <button className={styles.clearButton} onClick={handleClearFilters}>
-                        Limpar filtros
-                    </button>
-                </div>
+                            <button className={styles.clearButton} onClick={handleClearFilters}>
+                                Limpar filtros
+                            </button>
+                        </div>
 
-                <div className={styles.filterGrid}>
+                        <div className={styles.filterGrid}>
                     <label className={styles.field}>
                         <span className={styles.fieldLabel}>Categoria</span>
                         <select
@@ -593,7 +595,9 @@ export function AuditPage() {
                     </div>
                 )}
             </section>
+        </aside>
 
+        <div className={styles.contentArea}>
             {(loading || events.length > 0 || totalElements > 0) && (
                 <div className={styles.tableMeta}>
                     <span>{totalLabel}</span>
@@ -635,6 +639,8 @@ export function AuditPage() {
                     </div>
                 )}
             </main>
+        </div>
+    </div>
 
             <AuditDetailsModal
                 isOpen={!!selectedEvent}
