@@ -16,8 +16,8 @@
 }
 
 .modal {
-    background: var(--bg-secondary, #1e1e2e);
-    border: 1px solid var(--border-color, #3a3a4a);
+    background: #10141d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     width: 100%;
     max-width: 900px;
@@ -26,7 +26,8 @@
     display: flex;
     flex-direction: column;
     animation: slideUp 0.2s ease;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
+    0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes slideUp {
@@ -137,13 +138,13 @@
 }
 
 .infoCard {
-    background: var(--bg-tertiary, #252538);
-    border: 1px solid var(--border-color, #3a3a4a);
-    border-radius: 8px;
-    padding: 0.875rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+  background: #141821;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .infoLabel {
@@ -223,14 +224,15 @@
 
 .resolutionInput {
     width: 100%;
-    background: var(--bg-tertiary, #252538);
+    flex: 1;
+    background: var(--bg-tertiary);
     border: 1px solid var(--border-color, #3a3a4a);
     border-radius: 8px;
     padding: 0.75rem;
     color: var(--text-primary, #ffffff);
     font-size: 0.85rem;
     font-family: inherit;
-    resize: vertical;
+    resize: none;
     box-sizing: border-box;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -305,6 +307,26 @@
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--text-muted, #888);
     color: var(--text-primary, #ffffff);
+}
+
+.resolutionSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.resolutionCard {
+    flex: 1;
+}
+
+.resolveSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.resolveCard {
+    flex: 1;
 }
 
 @media (max-width: 768px) {

@@ -1755,32 +1755,11 @@
         "operationId": "handle_51",
         "parameters": [
           {
-            "name": "page",
+            "name": "pageable",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          },
-          {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "DESC"
+              "$ref": "#/components/schemas/Pageable"
             }
           }
         ],
@@ -2182,32 +2161,49 @@
             }
           },
           {
-            "name": "page",
+            "name": "pageable",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponsePageResponseTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ticket/user/username/{username}": {
+      "get": {
+        "tags": [
+          "Ticket Admin"
+        ],
+        "operationId": "handle_63",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           },
           {
-            "name": "size",
+            "name": "pageable",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          },
-          {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "DESC"
+              "$ref": "#/components/schemas/Pageable"
             }
           }
         ],
@@ -2230,7 +2226,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_63",
+        "operationId": "handle_64",
         "responses": {
           "200": {
             "description": "OK",
@@ -2510,7 +2506,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_64",
+        "operationId": "handle_65",
         "parameters": [
           {
             "name": "email",
@@ -2541,7 +2537,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_65",
+        "operationId": "handle_66",
         "parameters": [
           {
             "name": "targetUserId",
@@ -2742,7 +2738,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_66",
+        "operationId": "handle_67",
         "parameters": [
           {
             "name": "userId",
@@ -2852,7 +2848,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_67",
+        "operationId": "handle_68",
         "parameters": [
           {
             "name": "type",
@@ -2937,7 +2933,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_68",
+        "operationId": "handle_69",
         "parameters": [
           {
             "name": "userId",

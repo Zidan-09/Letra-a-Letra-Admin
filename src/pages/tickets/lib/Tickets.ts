@@ -7,30 +7,23 @@ export type TicketStatus = "PENDING" | "RESOLVED";
 export type Ticket = {
     ticketId: string;
     userId: string;
+    username: string;
     category: TicketCategory;
     status: TicketStatus;
     subject: string;
     description: string;
     resolutionNote: string | null;
     resolvedByAdminId: string | null;
+    adminName: string | null;
     resolvedAt: string | null;
     createdAt: string;
-};
-
-type TicketPage = {
-    content: Ticket[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    first: number;
-    last: number;
 };
 
 export type TicketFilters = {
     status?: TicketStatus;
     category?: TicketCategory;
     userId?: string;
+    username?: string;
     page?: number;
     size?: number;
     direction?: "DESC" | "ASC";
@@ -40,65 +33,58 @@ export type ResolveTicketRequest = {
     resolutionNote: string;
 };
 
-function appendParams(params: URLSearchParams, entries: Array<[string, string | undefined]>) {
-    for (const [name, value] of entries) {
-        if (!value) continue;
-        const trimmed = value.trim();
-        if (!trimmed) continue;
-        params.append(name, trimmed);
-    }
-}
-
-async function requestTicketPage(url: string): Promise<TicketPage> {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!res.ok) throw new Error();
-
-    const response: HttpResponse<GetBody<Ticket>> = await res.json();
-
-    return response.data;
-}
-
 export class TicketRequests {
+    private static getAuthHeaders(): Record<string, string> {
+        const token = localStorage.getItem("token");
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token ?? ""}`
+        };
+    }
+
     static async getTickets(filters: TicketFilters = {}) {
         const params = new URLSearchParams();
 
-        appendParams(params, [
-            ["status", filters.status],
-            ["category", filters.category],
-            ["userId", filters.userId],
-            ["page", filters.page?.toString()],
-            ["size", filters.size?.toString()],
-            ["direction", filters.direction]
-        ]);
+        if (filters.status) params.append("status", filters.status);
+        if (filters.category) params.append("category", filters.category);
+        if (filters.userId) params.append("userId", filters.userId);
+        if (filters.username) params.append("username", filters.username.trim());
+        if (filters.page !== undefined) params.append("page", filters.page.toString());
+        if (filters.size !== undefined) params.append("size", filters.size.toString());
+        if (filters.direction) params.append("direction", filters.direction);
 
-        return requestTicketPage(`${API_URL}/admin/ticket?${params.toString()}`);
+        const res = await fetch(`${API_URL}/admin/ticket?${params.toString()}`, {
+            method: "GET",
+            headers: this.getAuthHeaders()
+        });
+
+        if (!res.ok) throw new Error("Falha ao buscar tickets.");
+
+        const response: HttpResponse<GetBody<Ticket>> = await res.json();
+        return response.data;
+    }
+
+    static async getTicketsByUserUsername(username: string, page: number, size: number) {
+        const encodedUsername = encodeURIComponent(username.trim());
+        const res = await fetch(`${API_URL}/admin/ticket/user/username/${encodedUsername}?page=${page}&size=${size}`, {
+            method: "GET",
+            headers: this.getAuthHeaders()
+        });
+
+        if (!res.ok) throw new Error("Falha ao buscar tickets do usuário.");
+
+        const response: HttpResponse<GetBody<Ticket>> = await res.json();
+        return response.data;
     }
 
     static async resolveTicket(ticketId: string, body: ResolveTicketRequest) {
-        const token = localStorage.getItem("token");
-
         const res = await fetch(`${API_URL}/admin/ticket/${ticketId}/resolve`, {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(body)
         });
 
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
+        if (!res.ok) throw new Error("Falha ao resolver ticket.");
 
         const response: HttpResponse<{ ticket: Ticket }> = await res.json();
         return response.data.ticket;
@@ -124,8 +110,9 @@ export function formatStatus(status: TicketStatus): string {
 }
 
 export function formatDateTime(value: string): string {
+    if (!value) return "-";
     const date = new Date(value);
-    return date.toLocaleDateString("pt-BR") + " - " + date.toLocaleTimeString("pt-BR");
+    return date.toLocaleDateString("pt-BR") + " - " + date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 export const TICKET_CATEGORY_OPTIONS: TicketCategory[] = ["BUG", "FEEDBACK", "SUGGESTION", "OTHER"];

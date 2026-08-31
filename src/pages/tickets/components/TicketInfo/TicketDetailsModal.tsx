@@ -59,7 +59,6 @@ export function TicketDetailsModal({
     if (!isOpen || !ticket) return null;
 
     const isResolved = ticket.status === "RESOLVED";
-    const resolvedDate = ticket.resolvedAt ? new Date(ticket.resolvedAt) : null;
 
     return (
         <div
@@ -141,30 +140,15 @@ export function TicketDetailsModal({
                                         </strong>
                                     </div>
 
-                                    {isResolved && resolvedDate && (
-                                        <div className={styles.infoCard}>
-                                            <span className={styles.infoLabel}>
-                                                Resolvido em
-                                            </span>
+                                    <div className={styles.infoCard}>
+                                        <span className={styles.infoLabel}>
+                                            Resolvido em
+                                        </span>
 
-                                            <strong>
-                                                {formatDateTime(ticket.resolvedAt!)}
-                                            </strong>
-                                        </div>
-                                    )}
-
-                                    {isResolved && ticket.resolvedByAdminId && (
-                                        <div className={styles.infoCard}>
-                                            <span className={styles.infoLabel}>
-                                                Resolvido por (Admin ID)
-                                            </span>
-
-                                            <code title={ticket.resolvedByAdminId}>
-                                                {ticket.resolvedByAdminId}
-                                            </code>
-                                        </div>
-                                    )}
-
+                                        <strong>
+                                            {isResolved ? formatDateTime(ticket.resolvedAt!) : "Pendente"}
+                                        </strong>
+                                    </div>
                                 </div>
 
                             </section>
@@ -182,6 +166,40 @@ export function TicketDetailsModal({
 
                                     <code title={ticket.userId}>
                                         {ticket.userId}
+                                    </code>
+
+                                    <span className={styles.infoLabel}>
+                                        Username do Usuário
+                                    </span>
+
+                                    <code title={ticket.username}>
+                                        {ticket.username}
+                                    </code>
+                                </div>
+
+                            </section>
+
+                            <section className={styles.section}>
+
+                                <h3 className={styles.sectionTitle}>
+                                    Administrador
+                                </h3>
+
+                                <div className={styles.infoCard}>
+                                    <span className={styles.infoLabel}>
+                                        ID do Administrador
+                                    </span>
+
+                                    <code title={ticket.resolvedByAdminId ?? "Pendente"}>
+                                        {ticket.resolvedByAdminId ?? "Pendente"}
+                                    </code>
+
+                                    <span className={styles.infoLabel}>
+                                        Nome do Administrador
+                                    </span>
+
+                                    <code title={ticket.adminName ?? "Pendente"}>
+                                        {ticket.adminName ?? "Pendente"}
                                     </code>
                                 </div>
 
@@ -218,16 +236,16 @@ export function TicketDetailsModal({
 
                             </section>
 
-                            {isResolved && ticket.resolutionNote && (
-                                <section className={styles.section}>
+                            {isResolved && (
+                                <section className={`${styles.section} ${styles.resolutionSection}`}>
 
                                     <h3 className={styles.sectionTitle}>
                                         Observação de Resolução
                                     </h3>
 
-                                    <div className={styles.infoCard} style={{ width: "100%" }}>
+                                    <div className={`${styles.infoCard} ${styles.resolutionCard}`} style={{ width: "100%" }}>
                                         <pre className={styles.resolutionText}>
-                                            {ticket.resolutionNote}
+                                            {ticket.resolutionNote ?? "A resolução não possui mensagem..."}
                                         </pre>
                                     </div>
 
@@ -235,13 +253,13 @@ export function TicketDetailsModal({
                             )}
 
                             {!isResolved && (
-                                <section className={styles.section}>
+                                <section className={`${styles.section} ${styles.resolveSection}`}>
 
                                     <h3 className={styles.sectionTitle}>
                                         Resolver Ticket
                                     </h3>
 
-                                    <div className={styles.infoCard} style={{ width: "100%" }}>
+                                    <div className={`${styles.infoCard} ${styles.resolveCard}`} style={{ width: "100%" }}>
                                         <textarea
                                             className={styles.resolutionInput}
                                             placeholder="Observação de resolução (opcional)..."
@@ -265,7 +283,6 @@ export function TicketDetailsModal({
 
                                 </section>
                             )}
-
                         </div>
                     </div>
                 </div>
