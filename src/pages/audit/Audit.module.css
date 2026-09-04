@@ -364,6 +364,41 @@
   color: #ffffff;
 }
 
+.targetUsername {
+  color: #f8fafc;
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  display: block;
+}
+
+.targetLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #a5b4fc;
+  text-align: left;
+  display: block;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.targetLink:hover {
+  color: #ffffff;
+}
+
 .badge {
   width: fit-content;
   background: rgba(99,102,241,.15);

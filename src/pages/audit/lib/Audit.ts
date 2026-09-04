@@ -13,6 +13,8 @@ export type AuditEventType =
     | "PLAYER_REMOVED_INACTIVITY"
     | "MATCHMAKING_PAIRED"
     | "CATALOG_CHANGED"
+    | "TICKET_CREATED"
+    | "TICKET_RESOLVED"
     | "COMMAND_FAILED";
 
 export type AuditCategory =
@@ -33,7 +35,8 @@ export type AuditResourceType =
     | "LEVEL"
     | "USER"
     | "MATCH"
-    | "ROOM";
+    | "ROOM"
+    | "TICKET";
 
 export type AuditDirection = "DESC" | "ASC";
 
@@ -50,6 +53,7 @@ export type AuditEvent = {
     actorId: string | null;
     actorName: string | null;
     targetUserId: string | null;
+    targetUsername: string | null;
     resourceType: string | null;
     resourceId: string | null;
     beforeState: AuditEventState;
@@ -104,6 +108,8 @@ export const AUDIT_EVENT_TYPE_OPTIONS: AuditEventType[] = [
     "PLAYER_REMOVED_INACTIVITY",
     "MATCHMAKING_PAIRED",
     "CATALOG_CHANGED",
+    "TICKET_CREATED",
+    "TICKET_RESOLVED",
     "COMMAND_FAILED"
 ];
 
@@ -126,7 +132,8 @@ export const AUDIT_RESOURCE_TYPE_OPTIONS: AuditResourceType[] = [
     "LEVEL",
     "USER",
     "MATCH",
-    "ROOM"
+    "ROOM",
+    "TICKET"
 ];
 
 const eventTypeLabels: Record<AuditEventType, string> = {
@@ -142,6 +149,8 @@ const eventTypeLabels: Record<AuditEventType, string> = {
     PLAYER_REMOVED_INACTIVITY: "Jogador removido por inatividade",
     MATCHMAKING_PAIRED: "Pareamento de matchmaking",
     CATALOG_CHANGED: "Catálogo alterado",
+    TICKET_CREATED: "Ticket criado",
+    TICKET_RESOLVED: "Ticket resolvido",
     COMMAND_FAILED: "Comando falhou"
 };
 
@@ -162,7 +171,8 @@ const resourceTypeLabels: Record<AuditResourceType, string> = {
     LEVEL: "Nível",
     USER: "Usuário",
     MATCH: "Partida",
-    ROOM: "Sala"
+    ROOM: "Sala",
+    TICKET: "Ticket"
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

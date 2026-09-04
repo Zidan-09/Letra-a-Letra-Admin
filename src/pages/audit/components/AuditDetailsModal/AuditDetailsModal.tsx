@@ -199,7 +199,7 @@ export function AuditDetailsModal({
                                         </span>
 
                                         <strong>
-                                            {event.actorName ?? formatEnumValue(event.actorType)}
+                                            {event.actorName?.trim() ? event.actorName : formatEnumValue(event.actorType)}
                                         </strong>
 
                                         {event.actorType && (
@@ -214,7 +214,7 @@ export function AuditDetailsModal({
                                             </div>
                                         )}
 
-                                        {event.actorId && (
+                                        {event.actorId && !event.actorName?.trim() && (
                                             <div className={styles.referenceItem}>
                                                 <span className={styles.referenceLabel}>
                                                     ID
@@ -229,16 +229,24 @@ export function AuditDetailsModal({
                                     </div>
                                 )}
 
-                                {event.targetUserId && (
+                                {(event.targetUserId || event.targetUsername) && (
                                     <div className={styles.infoCard}>
 
                                         <span className={styles.infoLabel}>
                                             Usuário Alvo
                                         </span>
 
-                                        <code title={event.targetUserId}>
-                                            {event.targetUserId}
-                                        </code>
+                                        {event.targetUsername?.trim() ? (
+                                            <strong title={event.targetUsername}>
+                                                {event.targetUsername}
+                                            </strong>
+                                        ) : (
+                                            event.targetUserId && (
+                                                <code title={event.targetUserId}>
+                                                    {event.targetUserId}
+                                                </code>
+                                            )
+                                        )}
 
                                     </div>
                                 )}

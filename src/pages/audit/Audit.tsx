@@ -278,33 +278,59 @@ export function AuditPage() {
         },
         {
             header: "Ator",
-            render: (item) => (
-                <div className={styles.info}>
-                    <strong>{item.actorName ?? formatEnumValue(item.actorType)}</strong>
-                    {item.actorId && (
-                        <span className={styles.mono} title={item.actorId}>
-                            {item.actorId}
-                        </span>
-                    )}
-                </div>
-            ),
+            render: (item) => {
+                const hasActor = !!(item.actorName?.trim() || item.actorId || item.actorType);
+                if (!hasActor) {
+                    return <span className={styles.emptyCell}>—</span>;
+                }
+
+                const displayName = item.actorName?.trim()
+                    ? item.actorName
+                    : formatEnumValue(item.actorType);
+
+                return (
+                    <div className={styles.info}>
+                        <strong>{displayName}</strong>
+                        {!item.actorName?.trim() && item.actorId && (
+                            <span className={styles.mono} title={item.actorId}>
+                                {item.actorId}
+                            </span>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             header: "Alvo",
             render: (item) => {
-                if (!item.targetUserId) {
+                const hasTarget = !!(item.targetUserId || item.targetUsername?.trim());
+                if (!hasTarget) {
                     return <span className={styles.emptyCell}>—</span>;
                 }
 
+                const displayName = item.targetUsername?.trim()
+                    ? item.targetUsername
+                    : item.targetUserId!;
+
                 const targetUserId = item.targetUserId;
+
+                if (!targetUserId) {
+                    return (
+                        <span className={styles.targetUsername} title={displayName}>
+                            {displayName}
+                        </span>
+                    );
+                }
+
+                const isUsername = !!item.targetUsername?.trim();
 
                 return (
                     <button
-                        className={styles.linkMono}
-                        title={`Filtrar eventos deste usuário alvo: ${targetUserId}`}
+                        className={isUsername ? styles.targetLink : styles.linkMono}
+                        title={`Filtrar eventos deste usuário alvo: ${displayName}`}
                         onClick={() => handleFilterByTargetUser(targetUserId)}
                     >
-                        {targetUserId}
+                        {displayName}
                     </button>
                 );
             },

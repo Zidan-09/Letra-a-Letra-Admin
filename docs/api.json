@@ -3541,6 +3541,9 @@
             "type": "string",
             "format": "uuid"
           },
+          "username": {
+            "type": "string"
+          },
           "category": {
             "type": "string",
             "enum": [
@@ -3569,6 +3572,9 @@
           "resolvedByAdminId": {
             "type": "string",
             "format": "uuid"
+          },
+          "adminName": {
+            "type": "string"
           },
           "resolvedAt": {
             "type": "string",
@@ -5480,6 +5486,9 @@
           "targetUserId": {
             "type": "string",
             "format": "uuid"
+          },
+          "targetUsername": {
+            "type": "string"
           },
           "resourceType": {
             "type": "string"
