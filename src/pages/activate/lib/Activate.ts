@@ -1,19 +1,13 @@
-import { API_URL } from "../../../lib/config"
+import { apiFetch } from "../../../lib/http"
 
 export class ActivateRequest {
     static async active({ token, password}: { token: string, password: string }) {
-        const res = await fetch(`${API_URL}/admin/activate?token=${token}`, {
+        await apiFetch<Record<string, never>>(`/admin/activate?token=${encodeURIComponent(token)}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+            auth: false,
+            body: {
                 password
-            })
+            }
         });
-
-        if (!res.ok) throw new Error();
-
-        const response = await res.json();
-
-        return response;
     }
 }

@@ -1,14 +1,16 @@
 import { createContext } from "react";
 
-type Key = 
-"USER" | 
-"LOGS" | 
-"ADMIN" | 
-"COSMETIC" | 
-"GAME" | 
-"LEVELS" | 
-"OFFERS" | 
-"TRANSACTIONS";
+type Key =
+"USER" |
+"LOGS" |
+"ADMIN" |
+"COSMETIC" |
+"GAME" |
+"LEVELS" |
+"OFFERS" |
+"TRANSACTIONS" |
+"AUDIT" |
+"TICKET";
 
 type Action = 
 "VIEW" | 

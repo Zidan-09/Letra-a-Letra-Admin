@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { FormEvent } from "react";
 
@@ -8,16 +8,17 @@ import { ResetPasswordRequests } from "./lib/ResetPassword";
 import styles from "./ResetPassword.module.css";
 
 export function ResetPasswordPage() {
+  const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [loading, setLoading] = useState(true);
   const [validToken, setValidToken] = useState(false);
 
   const [loadingReq, setLoadingReq] = useState(false);
+  const [validating, setValidating] = useState(false);
 
   const [searchParams] = useSearchParams();
 
@@ -26,25 +27,28 @@ export function ResetPasswordPage() {
   const { notify } = useNotification();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const validateToken = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+  const handleValidate = async (event: FormEvent) => {
+    event.preventDefault();
 
-      try {
-        await ResetPasswordRequests.validateToken(token);
-        setValidToken(true);
-      } catch {
-        setValidToken(false);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (validating) return;
+    if (!token) return;
+    if (!email.trim()) {
+      notify.error("Informe o e-mail da conta.");
+      return;
+    }
 
-    validateToken();
-  }, [token]);
+    setValidating(true);
+
+    try {
+      await ResetPasswordRequests.validateToken({ email: email.trim(), token });
+      setValidToken(true);
+    } catch (err: unknown) {
+      setValidToken(false);
+      notify.error(err instanceof Error ? err.message : "Token inválido ou expirado.");
+    } finally {
+      setValidating(false);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -52,13 +56,27 @@ export function ResetPasswordPage() {
     if (loadingReq) return;
     setLoadingReq(true);
 
+    if (!email.trim()) {
+      notify.error("Informe o e-mail da conta.");
+      setLoadingReq(false);
+      return;
+    }
+
+    if (newPassword.length < 8 || newPassword.length > 16) {
+      notify.error("A senha deve ter entre 8 e 16 caracteres.");
+      setLoadingReq(false);
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       notify.error("As senhas devem ser iguais!");
+      setLoadingReq(false);
       return;
     }
 
     try {
       await ResetPasswordRequests.reset({
+        email: email.trim(),
         token: token!,
         newPassword: newPassword,
       });
@@ -78,18 +96,44 @@ export function ResetPasswordPage() {
     }
   };
 
-  if (loading) {
+  if (!token) {
     return (
       <div className={styles.invalidToken}>
-        <p>Validando solicitação...</p>
+        <p>O token informado é inválido ou expirou.</p>
       </div>
     );
   }
 
-  if (!validToken || !token) {
+  if (!validToken) {
     return (
-      <div className={styles.invalidToken}>
-        <p>O token informado é inválido ou expirou.</p>
+      <div className={styles.container}>
+        <form className={styles.card} onSubmit={handleValidate}>
+          <h1>Redefinir Senha</h1>
+
+          <div className={styles.inputgroup}>
+            <label htmlFor="email" className={styles.label}>
+              E-mail
+            </label>
+
+            <input
+              id="email"
+              className={styles.input}
+              type="email"
+              placeholder="Digite o e-mail da conta..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            className={`${styles.submit} ${validating ? styles.disabled : ""}`}
+            type="submit"
+            disabled={validating}
+          >
+            Validar solicitação
+          </button>
+        </form>
       </div>
     );
   }
@@ -98,6 +142,22 @@ export function ResetPasswordPage() {
     <div className={`${styles.container} ${loadingReq ? styles.loading : ""}`}>
       <form className={styles.card} onSubmit={handleSubmit}>
         <h1>Redefinir Senha</h1>
+
+        <div className={styles.inputgroup}>
+          <label htmlFor="email" className={styles.label}>
+            E-mail
+          </label>
+
+          <input
+            id="email"
+            className={styles.input}
+            type="email"
+            placeholder="Digite o e-mail da conta..."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
         <div className={styles.inputgroup}>
           <label htmlFor="password" className={styles.label}>

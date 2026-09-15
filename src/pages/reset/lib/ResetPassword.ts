@@ -1,34 +1,38 @@
-import { API_URL } from "../../../lib/config"
+import { apiFetch } from "../../../lib/http"
 
 type ResetPasswordRequest = {
+    email: string,
     token: string,
     newPassword: string,
 }
 
-class ResetPasswordRequests {
-    static async validateToken(token: string) {
-        const res = await fetch(`${API_URL}/admin/auth/verify-reset-token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token
-            })
-        });
+type ValidateTokenRequest = {
+    email: string,
+    token: string,
+}
 
-        if (!res.ok) throw new Error();
+class ResetPasswordRequests {
+    static async validateToken({ email, token }: ValidateTokenRequest) {
+        await apiFetch<Record<string, never>>("/admin/auth/verify-reset-token", {
+            method: "POST",
+            auth: false,
+            body: {
+                email,
+                token
+            }
+        });
     }
 
-    static async reset({ token, newPassword }: ResetPasswordRequest) {
-        const res = await fetch(`${API_URL}/admin/auth/reset-password`, {
+    static async reset({ email, token, newPassword }: ResetPasswordRequest) {
+        await apiFetch<Record<string, never>>("/admin/auth/reset-password", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+            auth: false,
+            body: {
+                email,
                 token,
                 newPassword
-            })
+            }
         });
-
-        if (!res.ok) throw new Error();
     }
 }
 

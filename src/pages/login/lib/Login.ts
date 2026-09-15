@@ -1,19 +1,21 @@
-import { API_URL, type HttpResponse } from "../../../lib/config";
+import { apiFetch } from "../../../lib/http";
 
 type LoginBody = {
     id: string,
     token: string
 }
 
-export type Key = 
-"USER" | 
-"LOGS" | 
-"ADMIN" | 
-"COSMETIC" | 
-"GAME" | 
-"LEVELS" | 
-"OFFERS" | 
-"TRANSACTIONS";
+export type Key =
+"USER" |
+"LOGS" |
+"ADMIN" |
+"COSMETIC" |
+"GAME" |
+"LEVELS" |
+"OFFERS" |
+"TRANSACTIONS" |
+"AUDIT" |
+"TICKET";
 
 export type Action = 
 "VIEW" | 
@@ -38,48 +40,30 @@ type MeBody = {
 
 class LoginRequests {
     static async login(email: string, password: string) {
-        const res = await fetch(`${API_URL}/admin/auth`, {
+        return apiFetch<LoginBody>("/admin/auth", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+            auth: false,
+            body: {
                 email,
                 password
-            })
+            }
         });
-
-        const response: HttpResponse<LoginBody> = await res.json();
-
-        return response;
     }
 
     static async me() {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/admin/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` 
-            }
+        return apiFetch<MeBody>("/admin/me", {
+            method: "GET"
         });
-
-        const response: HttpResponse<MeBody> = await res.json();
-
-        return response;
     }
 
     static async forgotPassword(email: string) {
-        const res = await fetch(`${API_URL}/admin/auth/forgot-password`, {
+        await apiFetch<Record<string, never>>("/admin/auth/forgot-password", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+            auth: false,
+            body: {
                 email
-            })
+            }
         });
-
-        if (!res.ok) throw new Error();
     }
 }
 

@@ -30,20 +30,18 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await LoginRequests.login(email, password);
+      const body = await LoginRequests.login(email, password);
 
-      if (!response.success) throw new Error("Credenciais Inválidas");
-
-      const { role } = JwtDecoderUtil.decode(response.data.token);
+      const { role } = JwtDecoderUtil.decode(body.token);
 
       if (role !== "ADMIN") throw new Error("Este painel é apenas para administradores!");
 
       login({
-        id: response.data.id,
-        token: response.data.token
+        id: body.id,
+        token: body.token
       });
 
-      const admin = (await LoginRequests.me()).data.admin;
+      const { admin } = await LoginRequests.me();
 
       set({
           id: admin.id,
