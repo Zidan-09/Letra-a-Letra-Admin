@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import type { Cosmetic } from "../../lib/Cosmetic";
+import type { UserItem } from "../../lib/Cosmetic";
 import styles from "./CosmeticDetailsModal.module.css";
 
 interface CosmeticDetailsInfoProps {
     isOpen: boolean;
-    cosmetic: Cosmetic | null;
+    cosmetic: UserItem | null;
     onClose: () => void;
 }
 
@@ -29,8 +29,6 @@ export function CosmeticDetailsInfo({
 
     if (!cosmetic || !isOpen) return null;
 
-    const assetUrl = `https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev/${cosmetic.assetPath}`;
-
     return (
         <div
             className={styles.overlay}
@@ -43,7 +41,7 @@ export function CosmeticDetailsInfo({
                 <header className={styles.header}>
                     <div>
                         <span className={styles.typeBadge}>
-                            {cosmetic.type}
+                            {cosmetic.category}
                         </span>
 
                         <h2 className={styles.title}>
@@ -51,7 +49,7 @@ export function CosmeticDetailsInfo({
                         </h2>
 
                         <span className={styles.levelId}>
-                            ID: {cosmetic.id}
+                            ID: {cosmetic.itemId}
                         </span>
                     </div>
 
@@ -64,13 +62,15 @@ export function CosmeticDetailsInfo({
                 </header>
 
                 <div className={styles.body}>
-                    <section className={styles.previewSection}>
-                        <img
-                            src={assetUrl}
-                            alt={cosmetic.name}
-                            className={`${styles.preview} ${cosmetic.type === "BANNER" ? styles.banner : ""}`}
-                        />
-                    </section>
+                    {cosmetic.assetPath && (
+                        <section className={styles.previewSection}>
+                            <img
+                                src={cosmetic.assetPath}
+                                alt={cosmetic.name}
+                                className={`${styles.preview} ${cosmetic.category === "BANNER" ? styles.banner : ""}`}
+                            />
+                        </section>
+                    )}
 
                     <section className={styles.section}>
                         <h3 className={styles.sectionTitle}>
@@ -88,22 +88,18 @@ export function CosmeticDetailsInfo({
 
                             <div className={styles.infoCard}>
                                 <span className={styles.infoLabel}>
-                                    Tipo
+                                    Categoria
                                 </span>
 
-                                <strong>{cosmetic.type}</strong>
+                                <strong>{cosmetic.category}</strong>
                             </div>
 
                             <div className={styles.infoCard}>
                                 <span className={styles.infoLabel}>
-                                    Disponível
+                                    Quantidade
                                 </span>
 
-                                <strong>
-                                    {cosmetic.available
-                                        ? "Sim"
-                                        : "Não"}
-                                </strong>
+                                <strong>{cosmetic.quantity}</strong>
                             </div>
                         </div>
                     </section>
@@ -119,7 +115,7 @@ export function CosmeticDetailsInfo({
                             </span>
 
                             <strong className={styles.path}>
-                                {cosmetic.assetPath}
+                                {cosmetic.assetPath || "—"}
                             </strong>
                         </div>
                     </section>

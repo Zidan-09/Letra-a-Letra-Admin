@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
-import { CosmeticRequests, type Cosmetic } from "../../pages/cosmetics/lib/Cosmetic";
+import { CosmeticRequests, type UserItem } from "../../pages/cosmetics/lib/Cosmetic";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
 import styles from "./RewardModal.module.css";
@@ -22,7 +22,7 @@ export function RewardModal({
     const [quantity, setQuantity] = useState("1");
     const [rewardReference, setRewardReference] = useState("");
 
-    const [results, setResults] = useState<Cosmetic[]>([]);
+    const [results, setResults] = useState<UserItem[]>([]);
     const [_, setSelectedCosmetic] = useState(false);
 
     const [search, setSearch] = useState("");
@@ -73,19 +73,22 @@ export function RewardModal({
 
     const handleSearchCosmetic = async () => {
         try {
-            const data = await CosmeticRequests.search(search, 0, 3);
+            const items = await CosmeticRequests.listItems();
+            const term = search.trim().toLowerCase();
 
-            setResults(data.content);
+            setResults(
+                items.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
+            );
 
         } catch {
             setResults([]);
-            notify.error(`Cosmético ${search} não foi encontrado`);
+            notify.error(`Item ${search} não foi encontrado`);
         }
     }
 
-    const handleSelectCosmetic = (cosmetic: Cosmetic) => {
-        setSearch(cosmetic.name);
-        setRewardReference(cosmetic.id);
+    const handleSelectCosmetic = (item: UserItem) => {
+        setSearch(item.name);
+        setRewardReference(item.itemId);
         setResults([]);
         setSelectedCosmetic(true);
     };
@@ -172,12 +175,12 @@ export function RewardModal({
                             <div className={styles.section}>
 
                                 <label className={styles.label}>
-                                    Selecione o Cosmético
+                                    Selecione o Item
                                 </label>
 
                                 <SearchBar
                                     value={search}
-                                    placeholder="Digite o nome do cosmético..."
+                                    placeholder="Digite o nome do item..."
                                     onChange={(value) => {
                                         setSearch(value)
                                         setSelectedCosmetic(false);
@@ -192,19 +195,19 @@ export function RewardModal({
                                     results.length > 0 && (
                                         <div className={styles.searchResults}>
                                             {
-                                                results.map((cosmetic) => (
+                                                results.map((item) => (
                                                     <button
-                                                        key={cosmetic.id}
+                                                        key={item.itemId}
                                                         type="button"
                                                         className={styles.searchItem}
-                                                        onClick={() => handleSelectCosmetic(cosmetic)}
+                                                        onClick={() => handleSelectCosmetic(item)}
                                                     >
-                                                        <strong className={styles.cosmeticName}>{cosmetic.name}</strong>
-                                                        <span className={`${styles.badge} ${styles[cosmetic.type.toLowerCase()] || styles.defaultBadge}`}>
-                                                            {cosmetic.type}
+                                                        <strong className={styles.cosmeticName}>{item.name}</strong>
+                                                        <span className={styles.badge}>
+                                                            {item.category}
                                                         </span>
-                                                        <span className={cosmetic.available ? styles.statusActive : styles.statusDisabled}>
-                                                             ● {cosmetic.available ? "Ativo" : "Desativado"}
+                                                        <span className={styles.statusActive}>
+                                                             ● x{item.quantity}
                                                         </span>
                                                     </button>
                                                 ))

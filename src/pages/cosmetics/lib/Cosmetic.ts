@@ -1,179 +1,129 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
-import type { GetBody } from "../../../lib/shared";
+import { apiFetch } from "../../../lib/http";
 
-export type CosmeticTypes = "AVATAR" | "BANNER" | "FRAME" | "EMOTE";
+export type ItemKind = "COSMETIC" | "CONSUMABLE";
 
-type CreateBody = {
-    cosmetic: Cosmetic;
-}
+export type ItemCategory =
+    | "AVATAR"
+    | "BANNER"
+    | "FRAME"
+    | "EMOTE"
+    | "BOARD_SKIN"
+    | "CELL_SKIN"
+    | "XP_BOOST";
 
-type EditBody = {
-    cosmetic: Cosmetic;
-}
+export type ItemContext = "PROFILE" | "MATCH";
 
-type DisableBody = {
-    cosmeticId: string;
-}
+export type ItemEffect = {
+    type: "XP_BOOST_PCT";
+    magnitude?: number;
+    durationMinutes?: number;
+};
 
-type EnableBody = {
-    cosmeticId: string;
-}
-
-export type Cosmetic = {
-    id: string;
+export type ItemDefinition = {
+    itemId: string;
     name: string;
-    type: CosmeticTypes;
+    kind: ItemKind;
+    category: ItemCategory;
+    contexts: ItemContext[];
+    stackable: boolean;
+    maxStack: number;
+    consumable: boolean;
+    effect?: ItemEffect | null;
     assetPath: string;
     version: number;
     available: boolean;
+};
+
+export type UserItem = {
+    itemId: string;
+    name: string;
+    kind: ItemKind;
+    category: ItemCategory;
+    contexts: ItemContext[];
+    quantity: number;
+    equipped: boolean;
+    acquiredAt: string;
+    expiresAt: string | null;
+    assetPath: string;
+};
+
+export type CreateItemRequest = {
+    name: string;
+    kind: ItemKind;
+    category: ItemCategory;
+    applicability?: ItemContext[];
+    stackable?: boolean;
+    maxStack?: number;
+    consumable?: boolean;
+    effect?: ItemEffect;
+    assetPath?: string;
+};
+
+export type UpdateItemRequest = {
+    name?: string;
+    assetPath?: string;
+    available?: boolean;
+};
+
+export type ItemFilters = {
+    kind?: string;
+    category?: string;
+    context?: string;
+    equipped?: boolean;
+};
+
+type UserItemsBody = {
+    items: UserItem[];
+};
+
+function buildQuery(filters: ItemFilters): string {
+    const params = new URLSearchParams();
+
+    if (filters.kind) params.append("kind", filters.kind);
+    if (filters.category) params.append("category", filters.category);
+    if (filters.context) params.append("context", filters.context);
+    if (filters.equipped !== undefined) params.append("equipped", String(filters.equipped));
+
+    const query = params.toString();
+
+    return query ? `?${query}` : "";
 }
 
 export class CosmeticRequests {
-    static async createCosmetic(formData: FormData) {
-        const token = localStorage.getItem("token");
-
-        try {
-            const res: HttpResponse<CreateBody> = await fetch(`${API_URL}/cosmetic`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
-            }).then(res => res.json());
-
-            if (!res.success) throw new Error(res.message);
-
-            return res.data;
-
-        } catch (err) {
-
-            throw err;
-        } 
-    }
-
-    static async getCosmetics(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/cosmetic?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async createItem(body: CreateItemRequest) {
+        return apiFetch<ItemDefinition>("/admin/items", {
+            method: "POST",
+            body
         });
-
-        const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
     }
 
-    static async disableCosmetic(cosmeticId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/cosmetic/disable/${cosmeticId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const response: HttpResponse<DisableBody> = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
-    }
-
-    static async enableCosmetic(cosmeticId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/cosmetic/enable/${cosmeticId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const response: HttpResponse<EnableBody> = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
-    }
-
-    static async editCosmetic(formData: FormData, cosmeticId: string) {
-        const token = localStorage.getItem("token");
-        
-        const res = await fetch(`${API_URL}/cosmetic/${cosmeticId}`, {
+    static async updateItem(itemId: string, body: UpdateItemRequest) {
+        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}`, {
             method: "PUT",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: formData
+            body
         });
-
-        const response: HttpResponse<EditBody> = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
     }
 
-    static async deleteCosmetic(cosmeticId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/cosmetic/${cosmeticId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async setAvailable(itemId: string, available: boolean) {
+        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}`, {
+            method: "PUT",
+            body: { available }
         });
-
-        const response = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
     }
 
-    static async search(search: string, page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const params = new URLSearchParams({
-            search: search,
-            page: page.toString(),
-            size: size.toString()
+    static async listItems(filters: ItemFilters = {}) {
+        const body = await apiFetch<UserItemsBody>(`/user/items${buildQuery(filters)}`, {
+            method: "GET"
         });
 
-        const res = await fetch(`${API_URL}/cosmetic/search?${params}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return body.items;
+    }
+
+    static async getUserItems(userId: string, filters: ItemFilters = {}) {
+        const body = await apiFetch<UserItemsBody>(`/user/${encodeURIComponent(userId)}/items${buildQuery(filters)}`, {
+            method: "GET"
         });
 
-        const response: HttpResponse<GetBody<Cosmetic>> = await res.json();
-
-        if (!res.ok) {
-            throw new Error(response.message);
-        }
-
-        return response.data;
+        return body.items;
     }
 }

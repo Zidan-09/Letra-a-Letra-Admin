@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
-import type { FormEvent, ChangeEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { CosmeticRequests, type CosmeticTypes } from "../../lib/Cosmetic";
+import { CosmeticRequests, type ItemCategory, type ItemContext } from "../../lib/Cosmetic";
 import styles from "./CreateCosmetic.module.css";
 
 interface CreateCosmeticPopupProps {
@@ -9,33 +9,37 @@ interface CreateCosmeticPopupProps {
   onClose: () => void;
 }
 
+const CATEGORIES: ItemCategory[] = ["AVATAR", "BANNER", "FRAME", "EMOTE", "BOARD_SKIN", "CELL_SKIN", "XP_BOOST"];
+const CONTEXTS: ItemContext[] = ["PROFILE", "MATCH"];
+
 export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProps) {
   const [name, setName] = useState<string>("");
-  const [type, setType] = useState<CosmeticTypes>("AVATAR");
-  const [asset, setAsset] = useState<File | null>(null);
+  const [category, setCategory] = useState<ItemCategory>("AVATAR");
+  const [assetPath, setAssetPath] = useState<string>("");
+  const [contexts, setContexts] = useState<ItemContext[]>(["PROFILE"]);
+  const [stackable, setStackable] = useState(false);
+  const [maxStack, setMaxStack] = useState("1");
 
   const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
 
-  const previewUrl = useMemo(() => {
-    if (!asset) return null;
-    return URL.createObjectURL(asset);
-  }, [asset]);
-
   if (!isOpen) return null;
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAsset(e.target.files[0]);
-    }
+  const toggleContext = (context: ItemContext) => {
+    setContexts((prev) =>
+      prev.includes(context) ? prev.filter((c) => c !== context) : [...prev, context]
+    );
   };
 
   const handleClose = () => {
     onClose();
     setName("");
-    setType("AVATAR");
-    setAsset(null);
+    setCategory("AVATAR");
+    setAssetPath("");
+    setContexts(["PROFILE"]);
+    setStackable(false);
+    setMaxStack("1");
   }
 
   const handleSubmit = async (event: FormEvent) => {
@@ -45,25 +49,24 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
 
     setLoading(true);
 
-    if (!asset) {
-      return notify.error("Por favor, selecione um arquivo de asset.");
-    }
-
     try {
-      const formData = new FormData();
-
-      formData.append("name", name);
-      formData.append("cosmeticType", type);
-      formData.append("asset", asset);
-
-      await CosmeticRequests.createCosmetic(formData);
+      await CosmeticRequests.createItem({
+        name: name.trim(),
+        kind: "COSMETIC",
+        category,
+        applicability: contexts,
+        stackable,
+        maxStack: Number(maxStack) || 1,
+        consumable: false,
+        assetPath: assetPath.trim() || undefined
+      });
 
       notify.success("Cosmético cadastrado com sucesso!");
-      
+
       handleClose();
-      
+
     } catch (error) {
-      notify.error("Erro ao cadastrar cosmético.");
+      notify.error(error instanceof Error ? error.message : "Erro ao cadastrar cosmético.");
     } finally {
       setLoading(false);
     }
@@ -71,8 +74,8 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
 
   return (
     <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={handleClose}>
-      <form 
-        className={styles.card} 
+      <form
+        className={styles.card}
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
       >
@@ -96,45 +99,70 @@ export function CreateCosmeticPopup({ isOpen, onClose }: CreateCosmeticPopupProp
         </div>
 
         <div className={styles.inputgroup}>
-          <label htmlFor="cosmetic-type" className={styles.label}>Tipo</label>
+          <label htmlFor="cosmetic-category" className={styles.label}>Categoria</label>
           <select
-            id="cosmetic-type"
+            id="cosmetic-category"
             className={styles.select}
-            value={type}
-            onChange={(e) => setType(e.target.value as CosmeticTypes)}
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ItemCategory)}
             required
           >
-            <option value="AVATAR">Avatar</option>
-            <option value="BANNER">Banner</option>
-            <option value="FRAME">Moldura</option>
-            <option value="EMOTE">Emote</option>
+            {CATEGORIES.map((value) => (
+              <option key={value} value={value}>{value}</option>
+            ))}
           </select>
         </div>
 
         <div className={styles.inputgroup}>
-          <span className={styles.label}>
-            Arquivo (Asset)
-          </span>
-          <label htmlFor="cosmetic-asset" className={`${styles.fileUploadLabel} ${type === "BANNER" ? styles.bannerFileLabel : ""}`}>
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            ) : (
-              <span>Selecionar imagem</span>
-            )}
-          </label>
+          <label htmlFor="cosmetic-asset" className={styles.label}>Asset (URL/caminho)</label>
           <input
             id="cosmetic-asset"
-            className={styles.fileInput}
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*"
-            required
+            className={styles.input}
+            type="text"
+            placeholder="https://..."
+            value={assetPath}
+            onChange={(e) => setAssetPath(e.target.value)}
           />
         </div>
+
+        <div className={styles.inputgroup}>
+          <span className={styles.label}>Contextos</span>
+          {CONTEXTS.map((context) => (
+            <label key={context}>
+              <input
+                type="checkbox"
+                checked={contexts.includes(context)}
+                onChange={() => toggleContext(context)}
+              />
+              {context}
+            </label>
+          ))}
+        </div>
+
+        <div className={styles.inputgroup}>
+          <label>
+            <input
+              type="checkbox"
+              checked={stackable}
+              onChange={(e) => setStackable(e.target.checked)}
+            />
+            Empilhável
+          </label>
+        </div>
+
+        {stackable && (
+          <div className={styles.inputgroup}>
+            <label htmlFor="cosmetic-max-stack" className={styles.label}>Máximo por pilha</label>
+            <input
+              id="cosmetic-max-stack"
+              className={styles.input}
+              type="number"
+              min={1}
+              value={maxStack}
+              onChange={(e) => setMaxStack(e.target.value)}
+            />
+          </div>
+        )}
 
         <button type="submit" className={`${styles.submit} ${loading ? styles.disabled : ""}`} disabled={loading}>Cadastrar Cosmético</button>
       </form>

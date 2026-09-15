@@ -1,54 +1,33 @@
-import { useState, useEffect, useMemo } from "react";
-import type { FormEvent, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { CosmeticRequests, type CosmeticTypes } from "../../lib/Cosmetic";
+import { CosmeticRequests, type UserItem } from "../../lib/Cosmetic";
 import styles from "./EditCosmetic.module.css";
-
-interface CosmeticData {
-  id: string;
-  name: string;
-  type: CosmeticTypes;
-  assetPath: string;
-}
 
 interface EditCosmeticPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  cosmetic: CosmeticData | null;
+  cosmetic: UserItem | null;
   onSuccess?: () => void;
 }
 
 export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: EditCosmeticPopupProps) {
   const [name, setName] = useState<string>(cosmetic?.name || "");
-  const [type, setType] = useState<CosmeticTypes>(cosmetic?.type || "AVATAR");
-  const [asset, setAsset] = useState<File | null>(null);
+  const [assetPath, setAssetPath] = useState<string>(cosmetic?.assetPath || "");
+  const [available, setAvailable] = useState<boolean>(true);
 
   const [loading, setLoading] = useState(false);
 
-  const assetsUrl = "https://pub-d49bc6f700bc45ba92fed050669b2690.r2.dev";
-
   const { notify } = useNotification();
-
-  const previewUrl = useMemo(() => {
-    if (!asset) return `${assetsUrl}/${cosmetic?.assetPath}`;
-    return URL.createObjectURL(asset);
-  }, [asset]);
 
   useEffect(() => {
     if (cosmetic) {
       setName(cosmetic.name);
-      setType(cosmetic.type);
-      setAsset(null);
+      setAssetPath(cosmetic.assetPath);
     }
   }, [cosmetic, isOpen]);
 
   if (!isOpen || !cosmetic) return null;
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAsset(e.target.files[0]);
-    }
-  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -57,25 +36,18 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
     setLoading(true);
 
     try {
-      const formData = new FormData();
-
-      formData.append("name", name);
-      formData.append("type", type);
-      
-      if (asset) {
-        formData.append("asset", asset);
-      }
-
-      formData.append("isNewAsset", `${asset !== null}`);
-
-      await CosmeticRequests.editCosmetic(formData, cosmetic.id);
+      await CosmeticRequests.updateItem(cosmetic.itemId, {
+        name: name.trim(),
+        assetPath: assetPath.trim(),
+        available
+      });
 
       notify.success("Cosmético atualizado com sucesso!");
-      
+
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
-      notify.error("Erro ao atualizar cosmético.");
+      notify.error(error instanceof Error ? error.message : "Erro ao atualizar cosmético.");
     } finally {
       setLoading(false);
     }
@@ -83,8 +55,8 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
 
   return (
     <div className={`${styles.overlay} ${loading ? styles.loading : ""}`} onClick={onClose}>
-      <form 
-        className={styles.card} 
+      <form
+        className={styles.card}
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
       >
@@ -108,43 +80,26 @@ export function EditCosmeticPopup({ isOpen, onClose, cosmetic, onSuccess }: Edit
         </div>
 
         <div className={styles.inputgroup}>
-          <label htmlFor="edit-cosmetic-type" className={styles.label}>Tipo</label>
-          <select
-            id="edit-cosmetic-type"
-            className={styles.select}
-            value={type}
-            onChange={(e) => setType(e.target.value as CosmeticTypes)}
-            required
-          >
-            <option value="AVATAR">Avatar</option>
-            <option value="BANNER">Banner</option>
-            <option value="FRAME">Moldura</option>
-            <option value="EMOTE">Emote</option>
-          </select>
+          <label htmlFor="edit-cosmetic-asset" className={styles.label}>Asset (URL/caminho)</label>
+          <input
+            id="edit-cosmetic-asset"
+            className={styles.input}
+            type="text"
+            placeholder="https://..."
+            value={assetPath}
+            onChange={(e) => setAssetPath(e.target.value)}
+          />
         </div>
 
         <div className={styles.inputgroup}>
-          <span className={styles.label}>
-            Arquivo (Asset)
-          </span>
-          <label htmlFor="cosmetic-asset" className={`${styles.fileUploadLabel} ${type === "BANNER" ? styles.bannerFileLabel : ""}`}>
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            ) : (
-              <span>Selecionar imagem</span>
-            )}
+          <label>
+            <input
+              type="checkbox"
+              checked={available}
+              onChange={(e) => setAvailable(e.target.checked)}
+            />
+            Disponível
           </label>
-          <input
-            id="cosmetic-asset"
-            className={styles.fileInput}
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*"
-          />
         </div>
 
         <button type="submit" disabled={loading} className={`${styles.submit} ${loading ? styles.disabled : ""}`}>Salvar Alterações</button>

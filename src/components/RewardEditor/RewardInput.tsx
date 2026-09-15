@@ -3,7 +3,7 @@ import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
 import {
     CosmeticRequests,
-    type Cosmetic
+    type UserItem
 } from "../../pages/cosmetics/lib/Cosmetic";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
@@ -19,29 +19,33 @@ export function RewardInput({
     onChange
 }: RewardInputProps) {
 
-    const [results, setResults] = useState<Cosmetic[]>([]);
+    const [results, setResults] = useState<UserItem[]>([]);
     const [search, setSearch] = useState("");
 
     const { notify } = useNotification();
 
     const handleSearchCosmetic = async () => {
         try {
-            const data = await CosmeticRequests.search(search, 0, 3);
-            setResults(data.content);
+            const items = await CosmeticRequests.listItems();
+            const term = search.trim().toLowerCase();
+
+            setResults(
+                items.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
+            );
         } catch {
             setResults([]);
-            notify.error(`Cosmético "${search}" não encontrado.`);
+            notify.error(`Item "${search}" não encontrado.`);
         }
     };
 
-    const handleSelectCosmetic = (cosmetic: Cosmetic) => {
-        setSearch(cosmetic.name);
+    const handleSelectCosmetic = (item: UserItem) => {
+        setSearch(item.name);
         setResults([]);
 
         onChange({
             rewardType: "ITEM",
             quantity: 1,
-            rewardReference: cosmetic.id
+            rewardReference: item.itemId
         });
     };
 
@@ -49,7 +53,7 @@ export function RewardInput({
         if (!search.trim()) {
             setResults([]);
         }
-        
+
     }, [search]);
 
     return (
@@ -86,8 +90,8 @@ export function RewardInput({
                             const tValue = e.target.value;
 
                             if (tValue === "" || Number(tValue) >= 0) {
-                                tValue.startsWith("0") ? 
-                                onChange({...value, quantity: Number(tValue.replace(/^0+(?!$)/, ""))}) : 
+                                tValue.startsWith("0") ?
+                                onChange({...value, quantity: Number(tValue.replace(/^0+(?!$)/, ""))}) :
                                 onChange({...value, quantity: Number(tValue)});
                             }
                         }}
@@ -97,11 +101,11 @@ export function RewardInput({
 
             {value.rewardType === "ITEM" && (
                 <div className={styles.formGroup}>
-                    <label>Cosmético</label>
+                    <label>Item</label>
 
                     <SearchBar
                         value={search}
-                        placeholder="Digite o nome do cosmético..."
+                        placeholder="Digite o nome do item..."
                         onChange={(value) => {
                             setSearch(value);
 
@@ -118,34 +122,23 @@ export function RewardInput({
 
                     {results.length > 0 && (
                         <div className={styles.searchResults}>
-                            {results.map((cosmetic) => (
+                            {results.map((item) => (
                                 <button
-                                    key={cosmetic.id}
+                                    key={item.itemId}
                                     type="button"
                                     className={styles.searchItem}
-                                    onClick={() => handleSelectCosmetic(cosmetic)}
+                                    onClick={() => handleSelectCosmetic(item)}
                                 >
                                     <strong className={styles.cosmeticName}>
-                                        {cosmetic.name}
+                                        {item.name}
                                     </strong>
 
-                                    <span
-                                        className={`${styles.badge} ${
-                                            styles[cosmetic.type.toLowerCase()] ??
-                                            styles.defaultBadge
-                                        }`}
-                                    >
-                                        {cosmetic.type}
+                                    <span className={styles.badge}>
+                                        {item.category}
                                     </span>
 
-                                    <span
-                                        className={
-                                            cosmetic.available
-                                                ? styles.statusActive
-                                                : styles.statusDisabled
-                                        }
-                                    >
-                                        ● {cosmetic.available ? "Ativo" : "Desativado"}
+                                    <span className={styles.statusActive}>
+                                        ● x{item.quantity}
                                     </span>
                                 </button>
                             ))}
