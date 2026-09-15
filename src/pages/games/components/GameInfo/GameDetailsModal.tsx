@@ -98,7 +98,7 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
                     {spectators.length > 0 && (
                       <>
                         <div className={styles.spectatorsContainer}>
-                          <span className={styles.cosmeticsLabel}>Espectadores ({spectators.length}):</span>
+                          <span className={styles.itemsLabel}>Espectadores ({spectators.length}):</span>
                           <ul className={styles.playersList}>
                             {spectators.map((spectator) => (
                               <li key={spectator.id} className={styles.playerRow}>
@@ -131,11 +131,11 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
                         </div>
 
                         {p.cosmeticsEquipped && p.cosmeticsEquipped.length > 0 && (
-                          <div className={styles.cosmeticsContainer}>
-                            <span className={styles.cosmeticsLabel}>Cosméticos Equipados:</span>
-                            <div className={styles.cosmeticBadges}>
+                          <div className={styles.itemsContainer}>
+                            <span className={styles.itemsLabel}>Itens Equipados:</span>
+                            <div className={styles.itemBadges}>
                               {p.cosmeticsEquipped.map((item) => (
-                                <span key={item.itemId} className={styles.cosmeticBadge}>
+                                <span key={item.itemId} className={styles.itemBadge}>
                                   {item.category}: <strong>{item.name}</strong>
                                 </span>
                               ))}

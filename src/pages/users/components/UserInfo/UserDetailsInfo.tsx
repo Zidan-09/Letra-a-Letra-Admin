@@ -187,8 +187,8 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
             header: "Nome do Item",
             render: (item) => (
                 <div className={styles.info}>
-                    <strong className={styles.cosmeticName}>{item.name || "Nome inválido"}</strong>
-                    <span className={styles.cosmeticId}>{item.itemId}</span>
+                    <strong className={styles.itemName}>{item.name || "Nome inválido"}</strong>
+                    <span className={styles.itemId}>{item.itemId}</span>
                 </div>
             )
         },
@@ -346,9 +346,9 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                             </section>
 
                             <section className={styles.section}>
-                                <h3 className={styles.sectionTitle}>Cosméticos Equipados</h3>
+                                <h3 className={styles.sectionTitle}>Itens Equipados</h3>
 
-                                <div className={styles.infoCosmeticGrid}>
+                                <div className={styles.infoItemGrid}>
                                     {ITEM_CATEGORIES.map((category) => {
                                         const equipped = user.equipped.find(item => item.category === category);
 

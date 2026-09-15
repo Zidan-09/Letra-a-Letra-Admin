@@ -4,7 +4,7 @@ type Key =
 "USER" |
 "LOGS" |
 "ADMIN" |
-"COSMETIC" |
+"ITEMS" |
 "GAME" |
 "LEVELS" |
 "OFFERS" |

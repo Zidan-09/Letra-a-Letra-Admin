@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
 import {
-    CosmeticRequests,
+    ItemRequests,
     type UserItem
-} from "../../pages/cosmetics/lib/Cosmetic";
+} from "../../pages/items/lib/Item";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
 import styles from "./RewardInput.module.css";
@@ -24,9 +24,9 @@ export function RewardInput({
 
     const { notify } = useNotification();
 
-    const handleSearchCosmetic = async () => {
+    const handleSearchItem = async () => {
         try {
-            const items = await CosmeticRequests.listItems();
+            const items = await ItemRequests.listItems();
             const term = search.trim().toLowerCase();
 
             setResults(
@@ -38,7 +38,7 @@ export function RewardInput({
         }
     };
 
-    const handleSelectCosmetic = (item: UserItem) => {
+    const handleSelectItem = (item: UserItem) => {
         setSearch(item.name);
         setResults([]);
 
@@ -115,7 +115,7 @@ export function RewardInput({
                                 rewardReference: ""
                             });
                         }}
-                        search={handleSearchCosmetic}
+                        search={handleSearchItem}
                         variant="modal"
                         trigger="on-change"
                     />
@@ -127,9 +127,9 @@ export function RewardInput({
                                     key={item.itemId}
                                     type="button"
                                     className={styles.searchItem}
-                                    onClick={() => handleSelectCosmetic(item)}
+                                    onClick={() => handleSelectItem(item)}
                                 >
-                                    <strong className={styles.cosmeticName}>
+                                    <strong className={styles.itemName}>
                                         {item.name}
                                     </strong>
 

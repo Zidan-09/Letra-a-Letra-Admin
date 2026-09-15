@@ -42,8 +42,8 @@ const items = [
         icon: Shield
     },
     {
-        label: "Cosméticos",
-        to: "/admin/cosmetics",
+        label: "Itens",
+        to: "/admin/items",
         icon: Palette
     },
     {

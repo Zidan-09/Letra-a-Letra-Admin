@@ -98,13 +98,13 @@
   margin: 0;
 }
 
-.infoGrid, .infoCosmeticGrid {
+.infoGrid, .infoItemGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
 }
 
-.infoCosmeticGrid {
+.infoItemGrid {
   grid-template-columns: repeat(4, 1fr);
 }
 
@@ -349,12 +349,12 @@
   flex-direction: column;
 }
 
-.cosmeticName {
+.itemName {
   color: #f8fafc;
   font-weight: 600;
 }
 
-.cosmeticId {
+.itemId {
   color: #64748b;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.8rem;

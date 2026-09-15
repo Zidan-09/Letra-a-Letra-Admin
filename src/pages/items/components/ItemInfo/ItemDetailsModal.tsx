@@ -1,20 +1,20 @@
 import { useEffect } from "react";
-import type { UserItem } from "../../lib/Cosmetic";
-import styles from "./CosmeticDetailsModal.module.css";
+import type { UserItem } from "../../lib/Item";
+import styles from "./ItemDetailsModal.module.css";
 
-interface CosmeticDetailsInfoProps {
+interface ItemDetailsInfoProps {
     isOpen: boolean;
-    cosmetic: UserItem | null;
+    item: UserItem | null;
     onClose: () => void;
 }
 
-export function CosmeticDetailsInfo({
+export function ItemDetailsInfo({
     isOpen,
-    cosmetic,
+    item,
     onClose
-}: CosmeticDetailsInfoProps) {
+}: ItemDetailsInfoProps) {
     useEffect(() => {
-        if (!cosmetic || !isOpen) return;
+        if (!item || !isOpen) return;
 
         const listener = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
@@ -25,9 +25,9 @@ export function CosmeticDetailsInfo({
         window.addEventListener("keydown", listener);
 
         return () => window.removeEventListener("keydown", listener);
-    }, [cosmetic, isOpen, onClose]);
+    }, [item, isOpen, onClose]);
 
-    if (!cosmetic || !isOpen) return null;
+    if (!item || !isOpen) return null;
 
     return (
         <div
@@ -41,15 +41,15 @@ export function CosmeticDetailsInfo({
                 <header className={styles.header}>
                     <div>
                         <span className={styles.typeBadge}>
-                            {cosmetic.category}
+                            {item.kind} · {item.category}
                         </span>
 
                         <h2 className={styles.title}>
-                            {cosmetic.name}
+                            {item.name}
                         </h2>
 
                         <span className={styles.levelId}>
-                            ID: {cosmetic.itemId}
+                            ID: {item.itemId}
                         </span>
                     </div>
 
@@ -62,12 +62,12 @@ export function CosmeticDetailsInfo({
                 </header>
 
                 <div className={styles.body}>
-                    {cosmetic.assetPath && (
+                    {item.assetPath && (
                         <section className={styles.previewSection}>
                             <img
-                                src={cosmetic.assetPath}
-                                alt={cosmetic.name}
-                                className={`${styles.preview} ${cosmetic.category === "BANNER" ? styles.banner : ""}`}
+                                src={item.assetPath}
+                                alt={item.name}
+                                className={`${styles.preview} ${item.category === "BANNER" ? styles.banner : ""}`}
                             />
                         </section>
                     )}
@@ -83,7 +83,15 @@ export function CosmeticDetailsInfo({
                                     Nome
                                 </span>
 
-                                <strong>{cosmetic.name}</strong>
+                                <strong>{item.name}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Tipo
+                                </span>
+
+                                <strong>{item.kind}</strong>
                             </div>
 
                             <div className={styles.infoCard}>
@@ -91,7 +99,7 @@ export function CosmeticDetailsInfo({
                                     Categoria
                                 </span>
 
-                                <strong>{cosmetic.category}</strong>
+                                <strong>{item.category}</strong>
                             </div>
 
                             <div className={styles.infoCard}>
@@ -99,7 +107,15 @@ export function CosmeticDetailsInfo({
                                     Quantidade
                                 </span>
 
-                                <strong>{cosmetic.quantity}</strong>
+                                <strong>{item.quantity}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Contextos
+                                </span>
+
+                                <strong>{item.contexts.join(", ")}</strong>
                             </div>
                         </div>
                     </section>
@@ -115,7 +131,7 @@ export function CosmeticDetailsInfo({
                             </span>
 
                             <strong className={styles.path}>
-                                {cosmetic.assetPath || "—"}
+                                {item.assetPath || "—"}
                             </strong>
                         </div>
                     </section>

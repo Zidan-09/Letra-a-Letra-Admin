@@ -55,11 +55,6 @@ export function LoginPage() {
       navigate("/admin");
 
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        notify.error(err.message);
-        return;
-      }
-
       notify.error("Ocorreu um erro inesperado...");
     } finally {
       setLoading(false);

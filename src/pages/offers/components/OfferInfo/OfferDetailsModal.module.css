@@ -157,26 +157,26 @@
   border-radius: 4px;
 }
 
-.cosmeticsContainer {
+.itemsContainer {
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px dashed rgba(255, 255, 255, 0.05);
 }
 
-.cosmeticsLabel {
+.itemsLabel {
   font-size: 0.75rem;
   color: #64748b;
   display: block;
   margin-bottom: 6px;
 }
 
-.cosmeticBadges {
+.itemBadges {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.cosmeticBadge {
+.itemBadge {
   font-size: 0.75rem;
   background: rgba(165, 180, 252, 0.1);
   color: #a5b4fc;

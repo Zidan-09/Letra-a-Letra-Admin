@@ -2,7 +2,7 @@ import { apiFetch } from "../../../lib/http";
 import type { PageResponse } from "../../../lib/shared";
 import type { CreateReward } from "../../../lib/Rewards";
 import type { CoinType } from "../../offers/lib/Offers";
-import type { ItemCategory, ItemKind } from "../../cosmetics/lib/Cosmetic";
+import type { ItemCategory, ItemKind } from "../../items/lib/Item";
 
 export const ITEM_CATEGORIES: ItemCategory[] = [
     "AVATAR",

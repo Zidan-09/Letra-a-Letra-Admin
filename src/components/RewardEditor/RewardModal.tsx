@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
-import { CosmeticRequests, type UserItem } from "../../pages/cosmetics/lib/Cosmetic";
+import { ItemRequests, type UserItem } from "../../pages/items/lib/Item";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
 import styles from "./RewardModal.module.css";
@@ -23,7 +23,7 @@ export function RewardModal({
     const [rewardReference, setRewardReference] = useState("");
 
     const [results, setResults] = useState<UserItem[]>([]);
-    const [_, setSelectedCosmetic] = useState(false);
+    const [_, setSelectedItem] = useState(false);
 
     const [search, setSearch] = useState("");
 
@@ -41,7 +41,7 @@ export function RewardModal({
 
         if (!search.trim()) {
             setResults([]);
-            setSelectedCosmetic(false);
+            setSelectedItem(false);
         }
 
     }, [search]);
@@ -71,9 +71,9 @@ export function RewardModal({
         onClose();
     };
 
-    const handleSearchCosmetic = async () => {
+    const handleSearchItem = async () => {
         try {
-            const items = await CosmeticRequests.listItems();
+            const items = await ItemRequests.listItems();
             const term = search.trim().toLowerCase();
 
             setResults(
@@ -86,11 +86,11 @@ export function RewardModal({
         }
     }
 
-    const handleSelectCosmetic = (item: UserItem) => {
+    const handleSelectItem = (item: UserItem) => {
         setSearch(item.name);
         setRewardReference(item.itemId);
         setResults([]);
-        setSelectedCosmetic(true);
+        setSelectedItem(true);
     };
 
     return (
@@ -183,10 +183,10 @@ export function RewardModal({
                                     placeholder="Digite o nome do item..."
                                     onChange={(value) => {
                                         setSearch(value)
-                                        setSelectedCosmetic(false);
+                                        setSelectedItem(false);
                                         setRewardReference("");
                                     }}
-                                    search={handleSearchCosmetic}
+                                    search={handleSearchItem}
                                     variant={"modal"}
                                     trigger={"on-change"}
                                 />
@@ -200,9 +200,9 @@ export function RewardModal({
                                                         key={item.itemId}
                                                         type="button"
                                                         className={styles.searchItem}
-                                                        onClick={() => handleSelectCosmetic(item)}
+                                                        onClick={() => handleSelectItem(item)}
                                                     >
-                                                        <strong className={styles.cosmeticName}>{item.name}</strong>
+                                                        <strong className={styles.itemName}>{item.name}</strong>
                                                         <span className={styles.badge}>
                                                             {item.category}
                                                         </span>

@@ -2,21 +2,37 @@ import { useState, useEffect } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { useProfile } from "../../hooks/profile/useProfile";
 import { Table, type Column } from "../../components/Table/Table";
-import { CreateCosmeticPopup } from "./components/CreatePopup/CreateCosmeticPopup";
-import { EditCosmeticPopup } from "./components/EditPopup/EditCosmeticPopup";
-import { type UserItem, CosmeticRequests } from "./lib/Cosmetic";
-import styles from "./Cosmetics.module.css";
-import { CosmeticDetailsInfo } from "./components/CosmeticInfo/CosmeticDetailsModal";
+import { CreateItemPopup } from "./components/CreatePopup/CreateItemPopup";
+import { EditItemPopup } from "./components/EditPopup/EditItemPopup";
+import { type UserItem, type ItemKind, type ItemCategory, ItemRequests } from "./lib/Item";
+import styles from "./Items.module.css";
+import { ItemDetailsInfo } from "./components/ItemInfo/ItemDetailsModal";
 
-export function CosmeticsPage() {
+const KIND_OPTIONS: ("ALL" | ItemKind)[] = ["ALL", "COSMETIC", "CONSUMABLE"];
+
+const CATEGORY_OPTIONS: ("ALL" | ItemCategory)[] = [
+  "ALL",
+  "AVATAR",
+  "BANNER",
+  "FRAME",
+  "EMOTE",
+  "BOARD_SKIN",
+  "CELL_SKIN",
+  "XP_BOOST"
+];
+
+export function ItemsPage() {
   const { notify } = useNotification();
   const { permissions } = useProfile();
 
-  const [cosmetics, setCosmetics] = useState<UserItem[]>([]);
-  const [selectedCosmetic, setSelectedCosmetic] = useState<UserItem | null>(null);
+  const [items, setItems] = useState<UserItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<UserItem | null>(null);
   const [availability, setAvailability] = useState<Record<string, boolean>>({});
 
-  const [ísModalOpen, setIsModalOpen] = useState(false);
+  const [kindFilter, setKindFilter] = useState<"ALL" | ItemKind>("ALL");
+  const [categoryFilter, setCategoryFilter] = useState<"ALL" | ItemCategory>("ALL");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -26,7 +42,7 @@ export function CosmeticsPage() {
   const [canToggle, setCanToggle] = useState(false);
 
   useEffect(() => {
-      const permission = permissions.find(p => p.key === "COSMETIC");
+      const permission = permissions.find(p => p.key === "ITEMS");
 
       setCanRegister(permission?.actions.includes("CREATE") ?? false);
       setCanEdit(permission?.actions.includes("EDIT") ?? false);
@@ -34,25 +50,36 @@ export function CosmeticsPage() {
 
   }, [permissions]);
 
-  const fetchCosmetics = async () => {
+  const fetchItems = async (kind: "ALL" | ItemKind = kindFilter, category: "ALL" | ItemCategory = categoryFilter) => {
     try {
-        const items = await CosmeticRequests.listItems({ kind: "COSMETIC" });
-        setCosmetics(items);
+        const data = await ItemRequests.listItems({
+          ...(kind !== "ALL" ? { kind } : {}),
+          ...(category !== "ALL" ? { category } : {})
+        });
+        setItems(data);
     } catch {
-      notify.error("Erro ao carregar a lista de cosméticos.");
+      notify.error("Erro ao carregar a lista de itens.");
     }
   };
 
   useEffect(() => {
-    fetchCosmetics();
+    fetchItems();
   }, []);
 
   const isAvailable = (item: UserItem) => availability[item.itemId] ?? true;
 
   const columns: Column<UserItem>[] = [
     {
-      header: "Nome do Cosmético",
-      render: (item) => <strong className={styles.cosmeticName}>{item.name}</strong>,
+      header: "Nome do Item",
+      render: (item) => <strong className={styles.itemName}>{item.name}</strong>,
+    },
+    {
+      header: "Tipo",
+      render: (item) => (
+        <span className={styles.badge}>
+          {item.kind}
+        </span>
+      ),
     },
     {
       header: "Categoria",
@@ -81,45 +108,75 @@ export function CosmeticsPage() {
   ];
 
   const handleOpenEdit = (item: UserItem) => {
-    setSelectedCosmetic(item);
+    setSelectedItem(item);
     setIsEditOpen(true);
   };
 
   const handleToggleStatus = async (item: UserItem) => {
     try {
-      const updated = await CosmeticRequests.setAvailable(item.itemId, !isAvailable(item));
+      const updated = await ItemRequests.setAvailable(item.itemId, !isAvailable(item));
 
       setAvailability((prev) => ({ ...prev, [item.itemId]: updated.available }));
 
-      notify.success(`Cosmético ${updated.available ? "ativado" : "desativado"} com sucesso!`);
-    } catch {
-      notify.error("Não foi possível alterar o status do cosmético.");
+      notify.success(`Item ${updated.available ? "ativado" : "desativado"} com sucesso!`);
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Não foi possível alterar o status do item.");
     }
+  };
+
+  const handleKindChange = (kind: "ALL" | ItemKind) => {
+    setKindFilter(kind);
+    fetchItems(kind, categoryFilter);
+  };
+
+  const handleCategoryChange = (category: "ALL" | ItemCategory) => {
+    setCategoryFilter(category);
+    fetchItems(kindFilter, category);
   };
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.titleGroup}>
-          <h1>Cosméticos</h1>
-          <p>Gerencie, visualize e edite os cosméticos ativos no sistema.</p>
+          <h1>Itens</h1>
+          <p>Gerencie, visualize e edite os itens ativos no sistema.</p>
         </div>
         <button
           className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`}
           onClick={() => setIsCreateOpen(true)}
           disabled={!canRegister}
         >
-          Novo Cosmético
+          Novo Item
         </button>
       </header>
 
+      <div className={styles.filters}>
+        <label className={styles.filterField}>
+          <span>Tipo</span>
+          <select value={kindFilter} onChange={(e) => handleKindChange(e.target.value as "ALL" | ItemKind)}>
+            {KIND_OPTIONS.map((kind) => (
+              <option key={kind} value={kind}>{kind === "ALL" ? "Todos" : kind}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className={styles.filterField}>
+          <span>Categoria</span>
+          <select value={categoryFilter} onChange={(e) => handleCategoryChange(e.target.value as "ALL" | ItemCategory)}>
+            {CATEGORY_OPTIONS.map((category) => (
+              <option key={category} value={category}>{category === "ALL" ? "Todas" : category}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       <main className={styles.content}>
         <Table<UserItem>
-          data={cosmetics}
+          data={items}
           columns={columns}
           renderActions={(item) => (
             <>
-              <button className={styles.actionButton} onClick={() => { setSelectedCosmetic(item); setIsModalOpen(true); }}>
+              <button className={styles.actionButton} onClick={() => { setSelectedItem(item); setIsModalOpen(true); }}>
                 Detalhes
               </button>
               <button
@@ -145,31 +202,31 @@ export function CosmeticsPage() {
         />
       </main>
 
-      <CosmeticDetailsInfo
-        isOpen={ísModalOpen}
-        cosmetic={selectedCosmetic}
+      <ItemDetailsInfo
+        isOpen={isModalOpen}
+        item={selectedItem}
         onClose={() => {
           setIsModalOpen(false);
-          setSelectedCosmetic(null);
+          setSelectedItem(null);
         }}
       />
 
-      <CreateCosmeticPopup
+      <CreateItemPopup
         isOpen={isCreateOpen}
         onClose={() => {
           setIsCreateOpen(false);
-          fetchCosmetics();
+          fetchItems();
         }}
       />
 
-      <EditCosmeticPopup
+      <EditItemPopup
         isOpen={isEditOpen}
-        cosmetic={selectedCosmetic}
+        item={selectedItem}
         onClose={() => {
           setIsEditOpen(false);
-          setSelectedCosmetic(null);
+          setSelectedItem(null);
         }}
-        onSuccess={fetchCosmetics}
+        onSuccess={fetchItems}
       />
     </div>
   );

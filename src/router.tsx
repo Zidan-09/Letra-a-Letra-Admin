@@ -6,7 +6,7 @@ import { AdminLayout } from "./layout/AdminLayout";
 import { DashboardPage } from "./pages/dashboard/Dashboard";
 import { AdminsPage } from "./pages/admins/Admins";
 import { GamesPage } from "./pages/games/Games";
-import { CosmeticsPage } from "./pages/cosmetics/Cosmetics";
+import { ItemsPage } from "./pages/items/Items";
 import { LevelsPage } from "./pages/levels/Levels";
 import { OffersPage } from "./pages/offers/Offers";
 import { UsersPage } from "./pages/users/Users";
@@ -58,8 +58,8 @@ export const router = createBrowserRouter([
                         element: <AdminsPage />
                     },
                     {
-                        path: "cosmetics",
-                        element: <CosmeticsPage />
+                        path: "items",
+                        element: <ItemsPage />
                     },
                     {
                         path: "offers",

@@ -64,6 +64,34 @@
   padding: 0;
 }
 
+.filters {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filterField select {
+  background: #141821;
+  border: 1px solid rgba(255,255,255,.08);
+  color: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
 /* ==========================================================================
    Estilizações de Elementos das Células da Tabela
    ========================================================================== */
@@ -74,7 +102,7 @@
   font-size: 0.85rem;
 }
 
-.cosmeticName {
+.itemName {
   color: #f8fafc;
   font-weight: 600;
 }
