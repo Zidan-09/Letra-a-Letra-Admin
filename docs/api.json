@@ -1402,12 +1402,75 @@
         }
       }
     },
+    "/user/{userId}/items": {
+      "get": {
+        "tags": [
+          "Inventory"
+        ],
+        "operationId": "handle_39",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "equipped",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseGetUserItemsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/username/{username}": {
       "get": {
         "tags": [
           "User"
         ],
-        "operationId": "handle_39",
+        "operationId": "handle_40",
         "parameters": [
           {
             "name": "username",
@@ -1446,7 +1509,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_40",
+        "operationId": "handle_41",
         "parameters": [
           {
             "name": "pageable",
@@ -1476,7 +1539,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_41",
+        "operationId": "handle_42",
         "responses": {
           "200": {
             "description": "OK",
@@ -1496,7 +1559,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_42",
+        "operationId": "handle_43",
         "parameters": [
           {
             "name": "kind",
@@ -1550,7 +1613,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_43",
+        "operationId": "handle_44",
         "parameters": [
           {
             "name": "pageable",
@@ -1580,7 +1643,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_44",
+        "operationId": "handle_45",
         "parameters": [
           {
             "name": "transactionId",
@@ -1611,7 +1674,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_45",
+        "operationId": "handle_46",
         "parameters": [
           {
             "name": "userId",
@@ -1650,7 +1713,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_46",
+        "operationId": "handle_47",
         "parameters": [
           {
             "name": "username",
@@ -1688,7 +1751,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_47",
+        "operationId": "handle_48",
         "parameters": [
           {
             "name": "ticketId",
@@ -1719,7 +1782,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_48",
+        "operationId": "handle_49",
         "parameters": [
           {
             "name": "pageable",
@@ -1749,7 +1812,7 @@
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_49",
+        "operationId": "handle_50",
         "responses": {
           "200": {
             "description": "OK",
@@ -1769,7 +1832,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_50",
+        "operationId": "handle_51",
         "parameters": [
           {
             "name": "offerId",
@@ -1798,7 +1861,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_51",
+        "operationId": "handle_52",
         "parameters": [
           {
             "name": "offerId",
@@ -1829,7 +1892,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_52",
+        "operationId": "handle_53",
         "parameters": [
           {
             "name": "value",
@@ -1860,7 +1923,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_53",
+        "operationId": "handle_54",
         "parameters": [
           {
             "name": "pageable",
@@ -1951,7 +2014,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_54",
+        "operationId": "handle_55",
         "parameters": [
           {
             "name": "pageable",
@@ -1981,7 +2044,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_55",
+        "operationId": "handle_56",
         "parameters": [
           {
             "name": "pageable",
@@ -2011,7 +2074,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_56",
+        "operationId": "handle_57",
         "responses": {
           "200": {
             "description": "OK",
@@ -2031,7 +2094,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_57",
+        "operationId": "handle_58",
         "responses": {
           "200": {
             "description": "OK",
@@ -2051,7 +2114,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_58",
+        "operationId": "handle_59",
         "parameters": [
           {
             "name": "status",
@@ -2116,7 +2179,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_59",
+        "operationId": "handle_60",
         "parameters": [
           {
             "name": "username",
@@ -2154,7 +2217,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_60",
+        "operationId": "handle_61",
         "responses": {
           "200": {
             "description": "OK",
@@ -2434,7 +2497,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_61",
+        "operationId": "handle_62",
         "parameters": [
           {
             "name": "email",
@@ -2465,7 +2528,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_62",
+        "operationId": "handle_63",
         "parameters": [
           {
             "name": "targetUserId",
@@ -2672,7 +2735,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_63",
+        "operationId": "handle_64",
         "parameters": [
           {
             "name": "userId",
@@ -2788,7 +2851,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_64",
+        "operationId": "handle_65",
         "parameters": [
           {
             "name": "type",
@@ -2873,7 +2936,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_65",
+        "operationId": "handle_66",
         "parameters": [
           {
             "name": "itemId",
@@ -4721,6 +4784,88 @@
           }
         }
       },
+      "GetUserItemsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserItemResponse"
+            }
+          }
+        }
+      },
+      "SuccessResponseGetUserItemsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GetUserItemsResponse"
+          }
+        }
+      },
+      "UserItemResponse": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "COSMETIC",
+              "CONSUMABLE"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "FRAME",
+              "EMOTE",
+              "BOARD_SKIN",
+              "CELL_SKIN",
+              "XP_BOOST"
+            ]
+          },
+          "contexts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PROFILE",
+                "MATCH"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "equipped": {
+            "type": "boolean"
+          },
+          "acquiredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assetPath": {
+            "type": "string"
+          }
+        }
+      },
       "PageResponseTransactionResponse": {
         "type": "object",
         "properties": {
@@ -4850,88 +4995,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/GetMyProfileResponse"
-          }
-        }
-      },
-      "GetUserItemsResponse": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserItemResponse"
-            }
-          }
-        }
-      },
-      "SuccessResponseGetUserItemsResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "$ref": "#/components/schemas/GetUserItemsResponse"
-          }
-        }
-      },
-      "UserItemResponse": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string",
-            "enum": [
-              "COSMETIC",
-              "CONSUMABLE"
-            ]
-          },
-          "category": {
-            "type": "string",
-            "enum": [
-              "AVATAR",
-              "BANNER",
-              "FRAME",
-              "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST"
-            ]
-          },
-          "contexts": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "PROFILE",
-                "MATCH"
-              ]
-            },
-            "uniqueItems": true
-          },
-          "quantity": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "equipped": {
-            "type": "boolean"
-          },
-          "acquiredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "assetPath": {
-            "type": "string"
           }
         }
       },
