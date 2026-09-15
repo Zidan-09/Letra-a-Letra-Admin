@@ -39,7 +39,7 @@ export function RewardInput({
         setResults([]);
 
         onChange({
-            rewardType: "COSMETIC",
+            rewardType: "ITEM",
             quantity: 1,
             rewardReference: cosmetic.id
         });
@@ -70,11 +70,11 @@ export function RewardInput({
                 >
                     <option value="COIN">Moedas</option>
                     <option value="GEMS">Gemas</option>
-                    <option value="COSMETIC">Cosmético</option>
+                    <option value="ITEM">Item</option>
                 </select>
             </div>
 
-            {value.rewardType !== "COSMETIC" && (
+            {value.rewardType !== "ITEM" && (
                 <div className={styles.formGroup}>
                     <label>Quantidade</label>
 
@@ -95,7 +95,7 @@ export function RewardInput({
                 </div>
             )}
 
-            {value.rewardType === "COSMETIC" && (
+            {value.rewardType === "ITEM" && (
                 <div className={styles.formGroup}>
                     <label>Cosmético</label>
 
@@ -106,7 +106,7 @@ export function RewardInput({
                             setSearch(value);
 
                             onChange({
-                                rewardType: "COSMETIC",
+                                rewardType: "ITEM",
                                 quantity: 1,
                                 rewardReference: ""
                             });

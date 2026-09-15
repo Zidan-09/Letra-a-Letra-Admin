@@ -179,8 +179,8 @@ export function OfferDetailsModal({
                                                         rewardType: reward.reward.type,
                                                         quantity: reward.reward.amount,
                                                         rewardReference:
-                                                            reward.reward.type === "COSMETIC"
-                                                                ? reward.reward.cosmetic.id
+                                                            reward.reward.type === "ITEM"
+                                                                ? reward.reward.definitionId ?? ""
                                                                 : ""
                                                     }}
                                                 />

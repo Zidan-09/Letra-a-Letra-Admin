@@ -19,7 +19,7 @@ export function RewardEditor({
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleCreateReward = (reward: CreateReward) => {
-        if (reward.rewardType !== "COSMETIC") {
+        if (reward.rewardType !== "ITEM") {
             const index = value.findIndex(
                 r => r.rewardType === reward.rewardType
             );

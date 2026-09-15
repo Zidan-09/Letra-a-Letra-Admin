@@ -1,4 +1,3 @@
-import type { Cosmetic } from "../pages/cosmetics/lib/Cosmetic";
 import type { RewardType } from "./shared";
 
 export type CreateReward = {
@@ -7,7 +6,7 @@ export type CreateReward = {
     quantity: number;
 }
 
-export type Reward = RewardCoin | RewardGem | RewardCosmetic;
+export type Reward = RewardCoin | RewardGem | RewardItem;
 
 type RewardCoin = {
     type: "COIN";
@@ -19,16 +18,16 @@ type RewardGem = {
     amount: number;
 }
 
-type RewardCosmetic = {
-    type: "COSMETIC";
-    amount: 1;
-    cosmetic: Cosmetic;
+type RewardItem = {
+    type: "ITEM";
+    amount: number;
+    definitionId?: string;
 }
 
 export function convertReward(reward: Reward): CreateReward {
     return {
         rewardType: reward.type,
-        rewardReference: reward.type === "COSMETIC" ? reward.cosmetic.id : "",
+        rewardReference: reward.type === "ITEM" ? reward.definitionId ?? "" : "",
         quantity: reward.amount ?? 1
     }
 }

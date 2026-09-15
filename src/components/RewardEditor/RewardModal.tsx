@@ -58,13 +58,13 @@ export function RewardModal({
             return;
         }
 
-        if (rewardType === "COSMETIC" && rewardReference.trim() === "") {
+        if (rewardType === "ITEM" && rewardReference.trim() === "") {
             return;
         }
 
         onCreate({
             rewardType,
-            quantity: rewardType !== "COSMETIC" ? amount : 1,
+            quantity: rewardType !== "ITEM" ? amount : 1,
             rewardReference
         });
 
@@ -136,8 +136,8 @@ export function RewardModal({
                                 Gemas
                             </option>
 
-                            <option value="COSMETIC">
-                                Cosmético
+                            <option value="ITEM">
+                                Item
                             </option>
 
                         </select>
@@ -145,7 +145,7 @@ export function RewardModal({
                     </div>
 
                     {
-                        rewardType !== "COSMETIC" && (
+                        rewardType !== "ITEM" && (
                             <div className={styles.section}>
 
                                 <label className={styles.label}>
@@ -167,7 +167,7 @@ export function RewardModal({
                     }
 
                     {
-                        rewardType === "COSMETIC" && (
+                        rewardType === "ITEM" && (
 
                             <div className={styles.section}>
 

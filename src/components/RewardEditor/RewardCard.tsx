@@ -20,7 +20,7 @@ export function RewardCard({
             case "GEMS":
                 return "💎";
 
-            case "COSMETIC":
+            case "ITEM":
                 return "🎨";
         }
     };
@@ -33,8 +33,8 @@ export function RewardCard({
             case "GEMS":
                 return "Gemas";
 
-            case "COSMETIC":
-                return "Cosmético";
+            case "ITEM":
+                return "Item";
         }
     };
 
@@ -46,7 +46,7 @@ export function RewardCard({
             case "GEMS":
                 return `${reward.quantity} gemas`;
 
-            case "COSMETIC":
+            case "ITEM":
                 return reward.rewardReference;
         }
     };
