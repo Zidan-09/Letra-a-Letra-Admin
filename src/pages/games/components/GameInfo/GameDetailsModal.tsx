@@ -7,23 +7,29 @@ interface GameDetailsModalProps {
   onClose: () => void;
 }
 
-export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
-  if (!game) return null;
+function formatDateTime(value: string): string {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleString("pt-BR");
+}
 
+export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
   useEffect(() => {
+    if (!game) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [game, onClose]);
 
-  const hasMatches = game.matches && game.matches.length > 0;
+  if (!game) return null;
 
-  const positionsEntries: [string | number, string][] = game.positions
-    ? game.positions instanceof Map
-      ? Array.from(game.positions.entries())
-      : Object.entries(game.positions as Record<string, string>)
+  const hasMatches = (game.matches?.length ?? 0) > 0;
+
+  const positionsEntries: [string, string][] = game.positions
+    ? Object.entries(game.positions as Record<string, string>)
     : [];
 
   const getStatusClass = (status: string) => {
@@ -62,18 +68,21 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
 
           {hasMatches ? (
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>Histórico de Partidas ({game.matches.length})</h3>
+              <h3 className={styles.sectionTitle}>Histórico de Partidas ({game.matches?.length ?? 0})</h3>
               <div className={styles.matchesList}>
-                {game.matches.map((match, index) => (
+                {game.matches.map((match, index) => {
+                  const spectators = Array.isArray(match.spectators) ? match.spectators : [];
+                  const players = Array.isArray(match.players) ? match.players : [];
+                  return (
                   <div key={index} className={styles.matchCard}>
                     <div className={styles.matchHeader}>
                       <span>Partida #{index + 1}</span>
                       <time className={styles.matchDate}>
-                        {new Date(match.finishedAt).toLocaleString("pt-BR")}
+                        {formatDateTime(match.finishedAt)}
                       </time>
                     </div>
                     <ul className={styles.playersList}>
-                      {match.players?.map((player) => (
+                      {players.map((player) => (
                         <li
                           key={player.id}
                           className={`${styles.playerRow} ${player.winner ? styles.winnerRow : ""}`}
@@ -86,8 +95,23 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
                         </li>
                       ))}
                     </ul>
+                    {spectators.length > 0 && (
+                      <>
+                        <div className={styles.spectatorsContainer}>
+                          <span className={styles.cosmeticsLabel}>Espectadores ({spectators.length}):</span>
+                          <ul className={styles.playersList}>
+                            {spectators.map((spectator) => (
+                              <li key={spectator.id} className={styles.playerRow}>
+                                <span className={styles.playerName}>{spectator.nickname}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
           ) : (

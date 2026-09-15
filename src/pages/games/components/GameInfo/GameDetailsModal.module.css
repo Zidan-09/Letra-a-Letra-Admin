@@ -187,6 +187,12 @@
   border-radius: 4px;
 }
 
+.spectatorsContainer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
 .positionsList {
   display: flex;
   flex-wrap: wrap;

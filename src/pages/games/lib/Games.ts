@@ -11,7 +11,7 @@ type InventoryItem = {
     name: string;
     type: CosmeticType;
     equipped: boolean;
-    unlockedAt: Date
+    unlockedAt: string;
 }
 
 type Participant = {
@@ -28,20 +28,26 @@ export type Game = {
     type: GameType;
     status: GameStatus;
     participants: Participant[];
-    positions: Map<number, string>;
+    positions: Record<string, string>;
     matches: MatchHistory[];
 }
 
-type Player = {
+type PlayerHistory = {
     id: string;
     nickname: string;
     score: number;
     winner: boolean;
 }
 
+export type SpectatorHistory = {
+    id: string;
+    nickname: string;
+}
+
 type MatchHistory = {
-    finishedAt: Date;
-    players: Player[];
+    finishedAt: string;
+    players: PlayerHistory[];
+    spectators: SpectatorHistory[];
 }
 
 export class GamesRequests {
@@ -55,10 +61,10 @@ export class GamesRequests {
                 "Authorization": `Bearer ${token}`
             }
         });
-        
-        if (!res.ok) throw new Error();
 
-        const response = await res.json();
+        const response: HttpResponse<GetBody<Game>> = await res.json();
+
+        if (!res.ok) throw new Error(response.message || "Erro ao carregar a lista de partidas.");
 
         return response.data;
     }
@@ -74,9 +80,9 @@ export class GamesRequests {
             }
         });
 
-        if (!res.ok) throw new Error();
-
         const response: HttpResponse<GetBody<Game>> = await res.json();
+
+        if (!res.ok) throw new Error(response.message || "Erro ao carregar a lista de partidas.");
 
         return response.data;
     }

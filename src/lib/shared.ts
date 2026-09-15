@@ -1,7 +1,7 @@
 export type GetBody<T> = {
     content: T[];
-    first: number;
-    last: number;
+    first: boolean;
+    last: boolean;
     page: number;
     size: number;
     totalElements: number;

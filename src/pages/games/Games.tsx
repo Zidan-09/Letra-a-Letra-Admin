@@ -28,11 +28,12 @@ export function GamesPage() {
         ? await GamesRequests.getGames(page, 5)
         : await GamesRequests.getActiveGames(page, 5);
 
-      setGames(data.content);
-      setTotalPages(data.totalPages);
+      setGames(data.content ?? []);
+      setTotalPages(data.totalPages ?? 1);
       
     } catch (e) {
-      notify.error("Erro ao carregar a lista de partidas.");
+      const message = e instanceof Error && e.message ? e.message : "Erro ao carregar a lista de partidas.";
+      notify.error(message);
     } finally {
       setTimeout(() => setRotating(false), 500);
     }
@@ -45,7 +46,7 @@ export function GamesPage() {
 
   useEffect(() => {
     fetchGames();
-  }, [page, showAll, games]);
+  }, [page, showAll]);
 
   const columns: Column<Game>[] = [
     {
@@ -62,7 +63,7 @@ export function GamesPage() {
       render: (item) => (
         <div className={styles.participantsContainer}>
           <span className={styles.participantCount}>
-            {showAll ? item.matches.length || 0 : item.participants?.length || 0} {showAll ? "partida(as)" : "jogador(es)"}
+            {showAll ? item.matches?.length || 0 : item.participants?.length || 0} {showAll ? "partida(as)" : "jogador(es)"}
           </span>
           {item.participants && item.participants.length > 0 && (
             <span className={styles.participantList}>

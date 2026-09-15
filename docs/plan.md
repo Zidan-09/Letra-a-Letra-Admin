@@ -1,583 +1,500 @@
-# Plano de Implementação — Auditoria
+# Plano de Atualização — Seção de Jogos (Games)
 
-> **Documento de planejamento técnico.** Nenhuma linha de código foi alterada neste projeto para gerar este plano.
+> **Documento de planejamento técnico.** Nenhuma linha de código foi alterada para gerar este plano.
 >
-> Convenção usada em todo o documento:
-> - **[ENCONTRADO]** — fato verificado no código ou em `docs/api.json`, com referência ao arquivo/local.
-> - **[DECISÃO]** — decisão de implementação recomendada, fundamentada nos padrões existentes.
-> - **[LACUNA]** — informação necessária que não está disponível na API nem no código; não deve ser inventada.
+> Convenção:
+> - **[ENCONTRADO]** — fato verificado em `docs/api.json` ou no código, com referência `arquivo:linha`.
+> - **[DECISÃO]** — recomendação de implementação fundamentada nos padrões existentes.
+> - **[LACUNA / AMBIGUIDADE]** — informação ausente ou contraditória; não inventar comportamento.
 
 ---
 
-## 1. Objetivo
+## 1. Contexto
 
-Consumir a nova funcionalidade de **auditoria de negócio** da API Letra a Letra (tag `Audit` em `docs/api.json`) dentro do painel administrativo:
+### 1.1 Motivação
+A API do projeto Letra a Letra (`docs/api.json`, OpenAPI 3.1.0, `servers[0].url = http://localhost:8080`) sofreu alteração no contrato da funcionalidade de **Jogos (tag `Game`)**. O frontend administrativo em `src/pages/games/` precisa ser adaptado para consumir o novo contrato sem refatoração desnecessária, mantendo os padrões já estabelecidos no projeto (fetch nativo, classes estáticas `*Requests`, CSS Modules, `Table<T>`, modais de detalhe).
 
-1. Adicionar a seção **"Auditoria"** ao sidebar.
-2. Criar a rota `/admin/audit` e uma página de consulta completa (listagem paginada, filtros, ordenação por direção, detalhes do evento).
-3. A interface deve parecer **nativa** do painel, reutilizando os componentes, padrões visuais e convenções já existentes.
+### 1.2 Mudança de contrato tratada
+Comparando `origin/develop:docs/api.json` com `HEAD`/`working dir:docs/api.json` (`git diff origin/develop -- docs/api.json` e `git diff HEAD -- docs/api.json`):
+
+* **Única diferença estrutural verificada em `docs/api.json:5141-5161` e `5237-5250`**: o schema `MatchHistoryResponse` ganhou o campo `spectators` e foi introduzido o novo schema `SpectatorHistoryResponse`.
+* Nenhum endpoint foi adicionado/removido/renomeado em `paths`; todos os schemas `GameResponse`, `ParticipantResponse`, `InventoryItem`, `PlayerHistoryResponse`, `PageResponseGameResponse` permanecem idênticos ao `origin/develop`.
+
+O planejamento abaixo trata **(a)** a atualização obrigatória do campo novo e **(b)** todas as divergências latentes já existentes entre o contrato atual da API e o modelo que o frontend esperava — mesmo que essas divergências não venham do diff recente — para garantir consumo correto e futuro-prova.
 
 ---
 
-## 2. Contexto Atual
+## 2. Análise do Contrato
 
-### 2.1 Stack [ENCONTRADO]
+Fonte: `docs/api.json` (5668 linhas, tag `Game`).
 
-| Item | Valor | Fonte |
+### 2.1 Endpoints de Jogos relevantes
+
+| Path | Método | OperationId | Uso no Admin | Parâmetros | Response envelope |
+|---|---|---|---|---|---|
+| `/game` | GET | `handle_56` (`docs/api.json:1891`) | Listar todas as partidas (histórico completo) — usado por `GamesRequests.getGames` (`src/pages/games/lib/Games.ts:48`) | `pageable` (objeto `Pageable` com `page:int32>=0`, `size:int32>=1`, `sort:string[]` opcional) | `SuccessResponsePageResponseGameResponse` → `PageResponseGameResponse` |
+| `/game/active` | GET | `handle_57` (`docs/api.json:1982`) | Listar partidas ativas — usado por `GamesRequests.getActiveGames` (`src/pages/games/lib/Games.ts:66`) | idem | idem |
+| `/game/public` | GET | `getGames` (`docs/api.json:1921`) | Público — **não usado** pelo admin | `pageable` | idem |
+| `/game/code/{code}` | GET | `getGameByCode` (`docs/api.json:1951`) | Busca por código — **não usado** pelo admin | `code:string (minLength 1)` path | `SuccessResponseFindByCodeResponse` → `FindByCodeResponse { gameId:string }` |
+| `/admin/logs/game*` | GET | `findDates`, `findGames`, `findFiles`, `download` | Logs — não faz parte da seção Jogos, mas reutiliza termo `gameId` | vários | `string[]` / `binary` |
+
+**Observação:** Apenas `/game` e `/game/active` são consumidos hoje. O plano **não** deve integrar `/game/public` ou `/game/code/{code}` a menos que requisito explícito seja adicionado — manter escopo.
+
+### 2.2 Schemas — contrato que o frontend deverá consumir
+
+#### `GameResponse` (`docs/api.json:5067`)
+```
+gameId: string
+gameName: string
+type: enum "CUSTOM" | "MATCHMAKING" | "RANKING"
+status: enum "WAITING" | "RUNNING" | "CLOSED" | "CANCELED"
+participants: ParticipantResponse[]
+positions: object< string, string >  // additionalProperties string — mapa slot->playerId
+matches: MatchHistoryResponse[]
+```
+Todos os campos aparecem sem `required` explícito no schema (OpenAPI permite ausência). O frontend deve tratar como possivelmente ausente.
+
+#### `ParticipantResponse` (`docs/api.json:5195`)
+```
+id: string
+nickname: string
+cosmeticsEquipped: InventoryItem[]
+role: enum "PLAYER" | "SPECTATOR"
+isConnected: boolean
+```
+
+#### `InventoryItem` (`docs/api.json:5113`)
+```
+cosmeticId: string (uuid)
+name: string
+type: enum "AVATAR"|"BANNER"|"EMOTE"|"FRAME"
+equipped: boolean
+unlockedAt: string date-time
+```
+
+#### `MatchHistoryResponse` (`docs/api.json:5141`) — **schema alterado**
+```
+finishedAt: string date-time
+players: PlayerHistoryResponse[]
+spectators: SpectatorHistoryResponse[]   // <-- CAMPO NOVO (docs/api.json:5154)
+```
+
+#### `PlayerHistoryResponse` (`docs/api.json:5222`)
+```
+id: string
+nickname: string
+score: int32
+winner: boolean
+```
+
+#### `SpectatorHistoryResponse` (`docs/api.json:5240`) — **schema novo**
+```
+id: string
+nickname: string
+```
+
+#### `PageResponseGameResponse` (`docs/api.json:5162`)
+```
+content: GameResponse[]
+page: int32
+size: int32
+totalElements: int64
+totalPages: int32
+first: boolean
+last: boolean
+```
+
+#### `SuccessResponsePageResponseGameResponse` (`docs/api.json:5251`)
+```
+success: boolean
+data: PageResponseGameResponse
+```
+
+#### `Pageable` (`docs/api.json:4450`)
+```
+page: int32 >=0
+size: int32 >=1
+sort: string[] (opcional)
+```
+
+#### Envelope HTTP
+O código assume `HttpResponse<T> { success:boolean, code:string, message:string, data:T }` (`src/lib/config.ts:4`). O `api.json` documenta apenas `success`+`data` no schema de sucesso; `code`/`message` são convenção do backend já usada em outros services (`src/pages/users/lib/Users.ts:83` lê `response.message` em erro). Manter esse envelope.
+
+### 2.3 Paginação, filtros, ordenação
+* **Paginação:** `page`/`size` via `Pageable`. O frontend hoje usa `?page=${page}&size=${size}` (`Games.ts:51`, `Games.ts:69`) — compatível com Spring Data que expande `Pageable` para esses query params. Sem `sort` no uso atual.
+* **Filtros:** Nenhum filtro de query para `/game` ou `/game/active` além de paginação. O toggle `showAll` do frontend (`Games.tsx:13`, `Games.tsx:27`) apenas alterna entre os dois endpoints.
+* **Ordenação:** Não há parâmetro de ordenação customizado nos endpoints de Game. Não propor ordenação local sem necessidade.
+
+---
+
+## 3. Diferenças Encontradas
+
+### 3.1 Campo novo obrigatório na análise
+
+| # | Local | Contrato antigo esperado pelo frontend | Novo contrato (`docs/api.json`) | Impacto |
+|---|---|---|---|---|
+| D1 | `MatchHistoryResponse.spectators` (`docs/api.json:5154`) | **Inexistente** no código. `src/pages/games/lib/Games.ts:42-45` define `type MatchHistory = { finishedAt: Date; players: Player[] }` — sem `spectators`. `GameDetailsModal.tsx:67-91` itera apenas `match.players`. | Novo campo `spectators: SpectatorHistoryResponse[]` (objetos `{id,nickname}`). Diff verificado em `git diff HEAD -- docs/api.json:5150-5161`. | **Adição.** Se ignorado, espectadores que assistiram uma partida concluída ficam invisíveis na UI; desatualizado com contrato. Risco de dados perdidos no audit. Tipo local precisa ser estendido. |
+
+### 3.2 Divergências latentes (frontend já desalinhado do contrato atual, independentemente do diff recente)
+
+| # | Local | O que o frontend faz hoje | O que a API entrega | Severidade |
+|---|---|---|---|---|
+| D2 | `Game.positions` | Tipado como `Map<number,string>` (`Games.ts:31`) e tratado com fallback para `Object.entries` (`GameDetailsModal.tsx:23-27`). | `positions: object<additionalProperties:string>` (`GameResponse.positions`, `docs/api.json:5099`). JSON nunca é `Map`; `JSON.parse` produz plain object. Além disso, chaves são `string` (ex.: `"1":"uuid"`), não `number`. | **Tipo alterado / mapeamento.** O tipo `Map` é incorreto para desserialização direta; pode quebrar se alguém usar `positions.get()`. O fallback ameniza exibição, mas tipo e conversão de datas/espectadores continuam errados. |
+| D3 | `InventoryItem.unlockedAt` / `MatchHistory.finishedAt` | `InventoryItem.unlockedAt: Date` (`Games.ts:14`), `MatchHistory.finishedAt: Date` (`Games.ts:42`). | Ambos são `string date-time` (`InventoryItem:5135`, `MatchHistoryResponse:5144`). | **Tipo alterado (Date ↔ string).** `fetch(...).json()` retorna string; sem conversão, `new Date(...)` em `GameDetailsModal.tsx:72` funciona por coerção, mas tipo mente. Inconsistente com padrão de outras features que mantêm string e convertem só na renderização. |
+| D4 | `Game` campos opcionais | TypeScript marca todos como obrigatórios (`Game.ts:25-33`). Acesso usa `item.gameName \|\| "Partida sem nome"` (`Games.tsx:55`, `GameDetailsModal.tsx:44`) mas sem null-safety completo. | Schema sem `required` — todos os campos podem vir ausentes/`null`/`[]`. | **Obrigatoriedade.** Assumir obrigatório esconde bugs de render se API omitir `participants`, `matches`, `positions`. |
+| D5 | `GetBody` / `PageResponse` booleans | `src/lib/shared.ts:1-9` define `first:number; last:number`. `Games.ts:79` tipa `HttpResponse<GetBody<Game>>` com esse `GetBody`. | `PageResponseGameResponse` (`docs/api.json:5187`) define `first:boolean`, `last:boolean`. | **Tipo alterado (number ↔ boolean).** Inconsistência pré-existente (mesma lacuna do plan de Auditoria). Não quebra o uso atual porque `Games.tsx` ignora `first/last` e usa só `totalPages`, mas deve ser corrigido para evitar futuros usos errados. |
+| D6 | `GamesRequests.getGames` sem tipagem | `getGames` (`Games.ts:48`) faz `await res.json()` sem tipar e retorna `response.data` any-like. `getActiveGames` tipa corretamente `HttpResponse<GetBody<Game>>` (`Games.ts:79`). | Ambos retornam `SuccessResponsePageResponseGameResponse`. | **Inconsistência de padrão.** Viola padrão usado em `Users.ts:81`, `Levels.ts:39`, `Offers.ts:58`, `Transactions` etc. Dificulta validação de `content`/`totalPages`. |
+| D7 | Paginação — uso de `totalPages` vs `first/last` | Frontend só usa `totalPages` (`Games.tsx:32`). | API fornece `page`, `size`, `totalElements`, `totalPages`, `first`, `last`. | Não é divergência, mas oportunidade de seguir padrão: `Transactions.tsx:29`, `Users.tsx:28` também ignoram `first/last`. Manter, mas documentar. |
+| D8 | Tratamento de erro / `res.ok` | `getGames` faz `if(!res.ok) throw new Error()` sem ler `response.message`; `getActiveGames` similar. | Outras features (ex.: `Users.ts:83-84`, `Cosmetic.ts:43-45`) leem `response.message` e repassam para `notify`. | **Comportamento inconsistente.** Deve unificar com padrão de ler `message` quando `!res.ok`. |
+
+### 3.3 O que **NÃO** mudou (e não deve ser inventado)
+* **Campos renomeados:** Nenhum. `gameId`, `gameName`, `type`, `status`, `participants`, `positions`, `matches` mantêm mesmos nomes em `GameResponse`.
+* **Campos removidos:** Nenhum.
+* **Enums/Status:** Inalterados. `type` continua `CUSTOM|MATCHMAKING|RANKING`, `status` continua `WAITING|RUNNING|CLOSED|CANCELED`, `role` continua `PLAYER|SPECTATOR`.
+* **Parâmetros de query/path:** Inalterados (`pageable` para ambos GET).
+* **Request bodies:** Não aplicável (endpoints de Game são apenas GET).
+* Nenhum campo `gameId` virou `id` ou vice-versa — o `ParticipantResponse.id` é `id` (sem renome), distinto de `GameResponse.gameId`.
+
+---
+
+## 4. Arquivos Afetados
+
+Lista fechada — nenhum outro arquivo deve ser alterado.
+
+| Arquivo | Criar/Modificar | O que deve mudar (exato) |
 |---|---|---|
-| Framework | React 19 + TypeScript ~6.0 | `package.json` |
-| Build | Vite 8 (`tsc -b && vite build`) | `package.json` |
-| Roteamento | `react-router-dom` v7 (`createBrowserRouter`) | `src/router.tsx` |
-| HTTP | `fetch` nativo (axios está instalado mas **nunca é importado**) | ex.: `src/pages/transactions/lib/Transaction.ts:40` |
-| Ícones | `lucide-react` | `src/components/Sidebar/Sidebar.tsx:2-12` |
-| Estado global | Contextos próprios (auth, profile, realtime) — sem Redux/React Query/Zustand | `src/main.tsx:16-25` |
-| Estilo | CSS Modules por página/componente + `src/global.css` com design tokens (`:root`) | `src/global.css:37-68` |
-| Toasts | Hook próprio `useNotification` (success/warning/error) | `src/hooks/notification/useNotification.tsx` |
-| Testes | **Nenhuma infraestrutura de teste** (sem vitest/jest/RTL; nenhum arquivo `*.test.*` ou `*.spec.*`) | `package.json`, glob no repo |
+| `src/pages/games/lib/Games.ts` | **Modificar** | (a) Revisar todos os `type`/`interface`: alinhar com `docs/api.json`. (b) Adicionar `SpectatorHistory = { id:string; nickname:string }` e estender `MatchHistory` com `spectators: SpectatorHistory[]`. (c) Corrigir `InventoryItem.unlockedAt` e `MatchHistory.finishedAt` para `string` (ou manter string no modelo e converter na UI) — seguir padrão de `Audit.ts:46-70` e `Tickets.ts:7-20` que mantêm `string`. (d) Corrigir `Game.positions` para `Record<string,string> \| Map<number,string>` ou apenas `Record<string,string>` com helper de conversão. (e) Corrigir `GameStatus`/`GameType` para unions idênticas ao enum da API. (f) Tipar `getGames` com `HttpResponse<PageResponseGameResponse>` (ou alias `GetBody` corrigido). (g) Opcional: extrair `PageResponseGameResponse` / `GetBody` booleano correto ou criar tipo local `GamePage`. (h) Uniformizar tratamento de erro: ler `response.message` quando `!res.ok` e relançar `Error(message)`. |
+| `src/pages/games/Games.tsx` | **Modificar** | (a) Corrigir `useEffect` dependency bug (`src/pages/games/Games.tsx:48` inclui `games` causando loop infinito) — deve depender apenas de `[page, showAll]` (ou incluir `fetchGames` memoizado). (b) Ajustar colunas para lidar com `spectators` se necessário (contagem não muda; coluna atual usa `matches.length` vs `participants.length` — manter). (c) Garantir que `fetchGames` lide com resposta tipada nova e com `positions` como objeto. (d) Se `InventoryItem.unlockedAt` virar string, nenhum impacto direto aqui. (e) Melhorar empty/loading/error states já existentes: manter `notify.error` mas propagar mensagem da API. |
+| `src/pages/games/components/GameInfo/GameDetailsModal.tsx` | **Modificar** | (a) Estender render de `matches` para exibir `spectators`. Hoje `GameDetailsModal.tsx:63-91` mostra só `match.players`. Novo bloco deve listar `match.spectators` quando presente, com fallback quando array ausente/vazio. (b) Atualizar helper `positionsEntries` para tratar `Record<string,string>` (já há fallback, mas simplificar). (c) Ajustar tipos importados (`Game`, `MatchHistory`) para novos campos. (d) Garantir que `finishedAt` string seja convertida com `new Date(match.finishedAt).toLocaleString("pt-BR")` já existente (`GameDetailsModal.tsx:72`). (e) Adicionar null-safety para `participants`, `matches`, `spectators` (optional chaining já parcialmente usado). |
+| `src/pages/games/components/GameInfo/GameDetailsModal.module.css` | **Modificar** (se necessário) | Adicionar estilos para nova seção de espectadores (reutilizar tokens de `GameDetailsModal.module.css:211-265` — ex.: `.spectatorsList`, `.spectatorBadge`). Não criar novos tokens; usar `--primary`, `#a5b4fc`, `#1e2533` já existentes. Se a lista puder reutilizar `.participantsGrid` / `.cosmeticBadges`, alteração pode ser mínima. |
+| `src/lib/shared.ts` | **Avaliar, possivelmente modificar** | `GetBody<T>` (`src/lib/shared.ts:1-9`) define `first:number; last:number` mas API retorna `boolean`. **Decisão recomendada:** corrigir para `first:boolean; last:boolean` e ajustar imports que usam `GetBody` (Levels, Offers, Users, Transactions, Cosmetics, Games). Alternativa conservadora: criar tipo local `GamePage` em `Games.ts` sem tocar `shared.ts` — ver seção 7. Registrar a inconsistência; não propagar `number` para novos códigos. |
+| `src/pages/audit/lib/Audit.ts` (referência, não alterar) | **Referência** | Serve como padrão correto para paginação com `first:boolean; last:boolean` e para tratamento de `string date-time` sem converter para `Date` no modelo. |
+| `src/pages/transactions/lib/Transaction.ts` (referência) | **Referência** | Padrão de `fetch` com `Authorization: Bearer ${localStorage.getItem("token")}` e `HttpResponse` — replicar em Games. |
+| `docs/plan.md` | **Criar/Atualizar** | Este arquivo. |
 
-### 2.2 Organização de features [ENCONTRADO]
-
-Cada feature vive em `src/pages/<feature>/` com esta forma canônica (ex. transações):
-
-```
-src/pages/transactions/
-├── Transactions.tsx                  # página (estado local + fetch + render)
-├── Transactions.module.css           # estilos da página
-├── lib/
-│   └── Transaction.ts                # types + classe estática XxxRequests (fetch)
-└── components/
-    └── TransactionInfo/
-        ├── TransactionDetailsModal.tsx      # modal de detalhes
-        └── TransactionDetailsModal.module.css
-```
-
-Páginas existentes seguindo esse padrão: `users`, `transactions`, `games`, `admins`, `cosmetics`, `offers`, `levels`, `logs`. A nova feature deve seguir exatamente o mesmo formato.
-
-### 2.3 Padrão de página de listagem [ENCONTRADO]
-
-Todas as páginas de listagem seguem o mesmo esqueleto (referência principal: `src/pages/transactions/Transactions.tsx`):
-
-- `<header>` com `.titleGroup` (`h1` + subtítulo descritivo) e `.headerButtons`/`.actions` (botão refresh com ícone girando + SearchBar).
-- `<Table<T>>` genérico (`src/components/Table/Table.tsx`) recebendo `data`, `columns` (`Column<T>[]` com `header` + `render`), `renderActions`, `page`, `totalPages`, `nextPage`, `prevPage`.
-- Paginação client-side simples: botões "Anterior"/"Próxima" + número da página (`Table.tsx:64-84`). Sem seletor de tamanho de página.
-- Tamanho de página usado pelas listagens: **8** (`Users.tsx:28`, `Transactions.tsx:29`); Games usa **5** (`Games.tsx:28`).
-- Erros tratados com `notify.error("Erro ao carregar ...")`.
-- Empty state da tabela: linha única "Nenhum registro encontrado." (`Table.tsx:35-40`).
-- Loading: apenas animação de rotação no botão refresh (`rotating` + `setTimeout(500ms)`); não existe skeleton/spinner genérico. A página Logs usa um texto "Carregando..." (`Logs.tsx:510-512`).
-- Detalhes via **modal** (não drawer, não página separada): overlay escuro + caixa central, fecha com Esc/clique no overlay/botão ×.
-- Filtros atuais são mínimos: SearchBar (texto + Enter) e, no Games, um par de botões toggle (`filterGroup`/`filterButton`/`filterActive` em `Games.module.css:46-75`). **Não há selects de filtro em páginas de listagem ainda** (selects só aparecem em popups/forms, ex.: `RewardInput.tsx:60`), e **nenhuma persistência de filtros na URL** (estado local puro).
+**Arquivos que NÃO devem ser alterados** (fora de escopo desta task, mesmo que contenham similar gap): `src/lib/config.ts`, `src/components/Table/Table.tsx`, `src/router.tsx`, demais features (`users`, `offers`, `levels`, `cosmetics`).
 
 ---
 
-## 3. Análise da API
+## 5. Plano de Implementação
 
-Fonte oficial: `docs/api.json` (OpenAPI). Tag relevante: `"Audit"` — *"Rotas administrativas de consulta da auditoria de negócio"*.
+Sequência recomendada, passo a passo, para que outro agente implemente sem ambiguidade.
 
-### 3.1 Endpoints [ENCONTRADO]
+### Passo 0 — Preparação e verificação
+1. Ler `docs/api.json` e confirmar `GameResponse`, `MatchHistoryResponse`, `SpectatorHistoryResponse` (`docs/api.json:5067-5161`, `5240`).
+2. Rodar `git diff origin/develop -- docs/api.json` para confirmar diff mínimo; não assumir mudanças ocultas.
+3. Garantir `npm install` e `npm run typecheck` antes de começar (precisa passar ao final).
 
-#### `GET /admin/audit` — busca geral paginada
-Query parameters (**todos opcionais**):
+### Passo 1 — Atualizar `src/pages/games/lib/Games.ts`
 
-| Param | Tipo | Observações |
-|---|---|---|
-| `targetUserId` | string uuid | usuário alvo do evento |
-| `actorId` | string uuid | quem executou |
-| `eventType` | enum | `WALLET_CREDITED`, `WALLET_DEBITED`, `COSMETIC_ACQUIRED`, `COSMETIC_REVOKED`, `COSMETIC_EQUIPPED`, `COSMETIC_UNEQUIPPED`, `MATCH_STARTED`, `MATCH_ENDED`, `ROOM_CLOSED_INACTIVITY`, `PLAYER_REMOVED_INACTIVITY`, `MATCHMAKING_PAIRED`, `CATALOG_CHANGED`, `COMMAND_FAILED` |
-| `category` | enum | `ECONOMY`, `INVENTORY`, `GAME`, `ACCOUNT`, `ADMINISTRATION`, `OPERATION` |
-| `outcome` | enum | `SUCCESS`, `FAILURE` |
-| `resourceType` | enum | `WALLET`, `INVENTORY_ITEM`, `COSMETIC`, `OFFER`, `LEVEL`, `USER`, `MATCH`, `ROOM` |
-| `resourceId` | string | livre |
-| `from` / `to` | date-time | período |
-| `requestId` | string | livre |
-| `operationId` | string uuid | |
-| `correlationId` | string | |
-| `transactionId` | string uuid | |
-| `page` | int32, default **0** | |
-| `size` | int32, default **20** | |
-| `direction` | string, default **"DESC"** | único parâmetro de ordenação; **[LACUNA]** não existe parâmetro de propriedade de ordenação documentada (presuma ordenação fixa por data do evento; validar em runtime) |
-
-#### `GET /admin/audit/user/{userId}` — eventos de um usuário alvo
-- Path: `userId` (uuid, obrigatório).
-- Query aceitas: `eventType`, `category`, `from`, `to`, `page`, `size`.
-- **Não aceita** `direction` nem os demais filtros do endpoint geral. **[ENCONTRADO]** — contrato assimétrico; registrar.
-
-#### `GET /admin/audit/resource/{type}/{id}` — eventos de um recurso
-- Path: `type` (string), `id` (string) — ambos obrigatórios.
-- Query aceitas: `targetUserId`, `from`, `to`, `page`, `size`.
-
-### 3.2 Response envelope [ENCONTRADO]
-
-```
-SuccessResponsePageResponseAuditEventResponse
-├─ success: boolean
-└─ data: PageResponseAuditEventResponse
-   ├─ content: AuditEventResponse[]
-   ├─ page: int32          # índice atual (0-based)
-   ├─ size: int32
-   ├─ totalElements: int64
-   ├─ totalPages: int32
-   ├─ first: boolean       # ← boolean!
-   └─ last: boolean        # ← boolean!
-```
-
-### 3.3 Schema `AuditEventResponse` [ENCONTRADO]
-
-| Campo | Tipo | Uso recomendado |
-|---|---|---|
-| `eventId` | uuid | chave/ID exibido em mono |
-| `occurredAt` | date-time | coluna temporal + filtro |
-| `category` | string | badge |
-| `eventType` | string | badge/título |
-| `outcome` | string | badge SUCCESS/FAILURE |
-| `failureReason` | string | só quando FAILURE |
-| `actorType` | string | secundário |
-| `actorId` | uuid | secundário (mono) |
-| `actorName` | string | coluna "Ator" |
-| `targetUserId` | uuid | coluna "Alvo"/filtro |
-| `resourceType` | string | badge |
-| `resourceId` | string | mono |
-| `beforeState` | object (map) | **só no detalhe**, JSON |
-| `afterState` | object (map) | **só no detalhe**, JSON |
-| `delta` | object (map) | **só no detalhe**, JSON |
-| `reasonCode` | string | detalhe |
-| `requestId` | string | detalhe (mono) |
-| `operationId` | uuid | detalhe (mono) |
-| `correlationId` | string | detalhe (mono) |
-| `sourceType` / `sourceDetail` | string | detalhe |
-| `transactionId` | uuid | detalhe (mono) |
-| `metadata` | object (map) | **só no detalhe**, JSON |
-
-Observações:
-- No schema, `category`, `eventType`, `outcome` e `resourceType` vêm como `string` simples (os enums estão garantidos apenas nos query params). **[DECISÃO]** tipar no frontend como unions derivadas dos enums dos query params e tratar valor desconhecido com fallback ("—").
-- **[LACUNA]** `api.json` documenta somente a resposta 200 para os três endpoints; **não existe schema de erro** nos componentes OpenAPI. O frontend assume envelope `{ success, code, message, data }` (`src/lib/config.ts:16-21`), coerente com o envelope de sucesso, mas o payload real de erro não pode ser confirmado pelo documento.
-- **[LACUNA]** `api.json` não define `securitySchemes`. O comportamento real do painel envia `Authorization: Bearer <token>` do `localStorage.token` em todas as chamadas (ex.: `Transaction.ts:38-45`); a auditoria deve seguir isso.
-
-### 3.4 Consistência API × código existente [ENCONTRADO]
-
-Inconsistências pré-existentes entre o frontend e a API (a auditoria **não** deve herdar esses erros):
-
-1. `GetBody` em `src/lib/shared.ts:1-9` tipa `first: number; last: number`, mas a API retorna **boolean** (todas as `PageResponse*` do api.json). Para auditoria, criar tipo próprio com `boolean`.
-2. `TransactionReason` em `src/pages/transactions/lib/Transaction.ts:8-14` omite `ADMIN_REVOKE` presente no enum da API. Serve de alerta: **gerar os tipos de auditoria diretamente de `docs/api.json`**, não copiar de tipos vizinhos.
-3. O servidor ativo em `src/lib/config.ts:13` é `http://localhost:8080`, igual ao `servers[0].url` do `api.json`. OK.
-
----
-
-## 4. Arquitetura Atual do Painel
-
-### 4.1 Camadas [ENCONTRADO]
-
-1. **Roteamento** — `src/router.tsx`: rotas públicas (`/`, `/ativar-conta`, `/redefinir-senha`) e área protegida `/admin` → `ProtectedLayout` (checa token) → `AdminLayout` (Sidebar + Header + `<Outlet/>`) → páginas.
-2. **Serviços** — classes estáticas `XxxRequests` por feature em `src/pages/<feature>/lib/*.ts`; sem camada compartilhada de cliente HTTP além das constantes `HTTPS`/`HttpResponse` de `src/lib/config.ts`.
-3. **Autenticação** — token e id em `localStorage` (`AuthProvider.tsx:10-34`); guard por presença de token (`ProtectedLayout.tsx:7-9`). **Não há controle de permissões por item de sidebar** — todos os admins logados veem tudo.
-4. **UI compartilhada** — `Table`, `SearchBar`, `Header`, `Sidebar`, `Notification`, `RewardEditor` (específico de recompensas).
-5. **Notificações** — `useNotification().notify.{success,warning,error}` com auto-dismiss de 3s.
-6. **Datas** — sempre `new Date(valor)` + `toLocaleDateString("pt-BR")`/`toLocaleTimeString("pt-BR")` (ex.: `TransactionDetailsModal.tsx:131`). Sem dayjs/date-fns/luxon.
-
-### 4.2 Design tokens [ENCONTRADO] (`src/global.css:37-68`)
-
-- Cores: `--primary #6366f1` (+ hover `#4f46e5`, light `rgba(99,102,241,.15)`), backgrounds `#0b0e14` / panel `rgba(20,24,33,.85)` / card `#1e2533` / hover `#242c3e`; texto `#f8fafc`/`#94a3b8`/`#64748b`; bordas `rgba(255,255,255,.05)` e `#334155`.
-- Radius: 8/12/16px; sombras `--shadow`, `--shadow-primary`; transição `.2s ease`; `--sidebar-width: 280px`; `--header-height: 72px`.
-- Tipografia: Inter; IDs/códigos em `'JetBrains Mono'/'Fira Code', monospace` (`Transactions.module.css:93`).
-- Verde sucesso `#10b981` e vermelho `#cf2323`/`#ef4444` para crédito/débito e estados (`Transactions.module.css:113-119`, `GameDetailsModal.module.css:116-119`).
-- Badges existentes: pill `rgba(99,102,241,.15)` + texto `#a5b4fc` + borda `rgba(99,102,241,.25)` (`TransactionDetailsModal.module.css:213-222`) e badges de status com bolinha colorida (`Games.module.css:119-136`).
-- Botões secundários: fundo `#1e2533`, borda `#334155`, texto `#94a3b8`, hover borda `#6366f1` (`Table.module.css:69-85`).
-
-**Nenhum novo token visual deve ser criado.** A página de Auditoria usará exatamente esses valores.
-
----
-
-## 5. Integração com a API
-
-### 5.1 Camada de serviço [DECISÃO]
-
-Criar `src/pages/audit/lib/Audit.ts` contendo **tipos + classe estática `AuditRequests`**, replicando o padrão de `src/pages/transactions/lib/Transaction.ts`:
-
-- `fetch` nativo contra `${HTTPS}/admin/audit...`;
-- header `Authorization: Bearer ${localStorage.getItem("token")}` e `Content-Type: application/json`;
-- `if (!res.ok) throw new Error()` (o catch da página usa `notify.error`, igual às demais páginas);
-- retorno de `response.data` tipado.
-
-Métodos previstos:
-
+**1.1 Tipos:**
 ```ts
-static getEvents(filters: AuditFilters, page: number, size: number): Promise<AuditPage>
-static getEventsByUser(userId: string, filters, page, size): Promise<AuditPage>
-static getEventsByResource(type: string, id: string, filters, page, size): Promise<AuditPage>
+// Alinhar com docs/api.json:5067, 5195, 5113, 5141, 5222, 5240
+type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
+export type GameStatus = "WAITING" | "RUNNING" | "CLOSED" | "CANCELED";
+type Role = "PLAYER" | "SPECTATOR";
+type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
+
+// [DECISÃO] Manter unlockedAt/finishedAt como string date-time, converter só na render.
+// Justificativa: padrão de Audit.ts:46 (occurredAt:string) e Tickets.ts:19 (createdAt:string).
+type InventoryItem = {
+  cosmeticId: string;
+  name: string;
+  type: CosmeticType;
+  equipped: boolean;
+  unlockedAt: string; // era Date — [D3]
+}
+
+type Participant = {
+  id: string;
+  nickname: string;
+  cosmeticsEquipped: InventoryItem[];
+  role: Role;
+  isConnected: boolean;
+}
+
+type PlayerHistory = { id:string; nickname:string; score:number; winner:boolean; }
+type SpectatorHistory = { id:string; nickname:string; } // NOVO — [D1]
+
+type MatchHistory = {
+  finishedAt: string; // era Date — [D3]
+  players: PlayerHistory[];
+  spectators: SpectatorHistory[]; // NOVO — [D1] — tratar como opcional no consumo (?? [])
+}
+
+// [DECISÃO] positions como Record<string,string> — JSON puro; helper converte se precisar de Map
+export type Game = {
+  gameId: string;
+  gameName: string;
+  type: GameType;
+  status: GameStatus;
+  participants: Participant[];
+  positions: Record<string,string>; // era Map<number,string> — [D2]
+  matches: MatchHistory[];
+}
+
+// Tipo de paginação alinhado com PageResponseGameResponse (docs/api.json:5162)
+type GamePage = {
+  content: Game[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean; // era number em shared.ts — [D5]
+  last: boolean;
+}
+```
+*Alternativa:* Se preferir não tocar `shared.ts`, definir `GamePage` localmente e usar `HttpResponse<GamePage>` nos métodos.
+
+**1.2 Services:**
+```ts
+export class GamesRequests {
+  static async getGames(page:number,size:number): Promise<GamePage> {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/game?page=${page}&size=${size}`, {
+      method:"GET",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${token}` }
+    });
+    const response: HttpResponse<GamePage> = await res.json();
+    if (!res.ok) throw new Error(response.message || "Erro ao carregar partidas.");
+    return response.data;
+  }
+  static async getActiveGames(page:number,size:number): Promise<GamePage> {
+    // idem para /game/active
+  }
+}
+```
+*Pontos:* (a) Tipar ambos métodos; (b) Ler `response.message` em erro — padrão `Users.ts:83-84`; (c) Não injetar `sort`.
+
+**1.3 Helpers (opcional):**
+* Função `parsePositions(pos: Record<string,string>): Map<number,string> | null` se alguma lógica futura precisar de Map; caso contrário, usar `Object.entries` direto na UI.
+* Funções `formatDateTime(value:string)` idênticas a `Audit.ts:208-211` e `Tickets.ts:112-116` para conversão local.
+
+### Passo 2 — Corrigir `src/pages/games/Games.tsx`
+
+**2.1 Corrigir `useEffect`:**
+```ts
+// ANTES (bug): useEffect(() => { fetchGames(); }, [page, showAll, games]);
+// DEPOIS:
+useEffect(() => { fetchGames(); }, [page, showAll]); // remover `games`
+```
+Justificativa: `games` como dep causa loop infinito; padrão correto em `Users.tsx:40-44`, `Levels.tsx:48-50`, `Offers.tsx:61-63` depende só de `page` (e filtros).
+
+**2.2 Tipagem da resposta:**
+* `fetchGames` já recebe `data: GamePage`; extrair `data.content` e `data.totalPages` como hoje (`Games.tsx:31`).
+
+**2.3 Tratamento de erro:**
+* `catch (e)` exibir `notify.error((e as Error).message || "Erro ao carregar a lista de partidas.")` — alinha com `AuditRequests` que relança `Error()` com message.
+
+**2.4 Colunas e render:**
+* Nenhuma mudança estrutural nas colunas (`Games.tsx:50-89`) — manter `matches.length` vs `participants.length` conforme `showAll`.
+* Se `Game.positions` virar `Record<string,string>`, nenhuma coluna usa `positions` diretamente; sem impacto.
+
+### Passo 3 — Atualizar `src/pages/games/components/GameInfo/GameDetailsModal.tsx`
+
+**3.1 Tipos:**
+* Importar `SpectatorHistory` se necessário; garantir que `game: Game | null` reflita novo `Game`.
+
+**3.2 Render de `matches`:**
+Adicionar bloco condicional após lista de `players`:
+
+```tsx
+// Dentro de matchCard, após <ul className={styles.playersList}>
+{match.spectators && match.spectators.length > 0 && (
+  <>
+    <span className={styles.cosmeticsLabel}>Espectadores ({match.spectators.length}):</span>
+    <ul className={styles.playersList}>
+      {match.spectators.map((s) => (
+        <li key={s.id} className={styles.playerRow}>
+          <span className={styles.playerName}>{s.nickname}</span>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+// Fallback: se !match.spectators ou vazio, não renderiza seção — evita quebra com dados antigos sem campo
 ```
 
-### 5.2 Querystring [DECISÃO]
+* Usar optional chaining e default `match.spectators ?? []` para compatibilidade com payloads antigos/cache.
+* Reutilizar `.playersList`/`.playerRow` ou criar `.spectatorsList` com mesmo estilo.
 
-Construtor de query params que **ignora valores vazios/null/undefined** (`URLSearchParams` + append condicional). Datas convertidas de `datetime-local` (local) para ISO UTC com `new Date(v).toISOString()` antes de enviar como `from`/`to`.
+**3.3 Render de `positions`:**
+Simplificar `positionsEntries`:
+```ts
+const positionsEntries = game.positions ? Object.entries(game.positions) : [];
+// remover branch `instanceof Map` se tipo for só Record; manter fallback defensivo por 1 versão se quiser
+```
 
-### 5.3 Tipos [DECISÃO]
+**3.4 Datas:**
+* `finishedAt` já converte com `new Date(match.finishedAt).toLocaleString("pt-BR")` (`GameDetailsModal.tsx:72`) — continua válido pois agora é `string` no tipo; nenhum ajuste se tipo mudar de `Date` para `string` (chamar `new Date(string)` continua correto). Se mantido `Date`, precisaria `match.finishedAt instanceof Date ? ... : new Date(...)`.
 
-Definir no mesmo arquivo:
+**3.5 Null-safety:**
+* Envolver `game.matches?.length`, `game.participants?.length`, `match.players?.length` com `?? 0` e `|| []` — já parcialmente feito.
 
-- `AuditEventType`, `AuditCategory`, `AuditOutcome`, `AuditResourceType` — union types copiados **literalmente** dos enums de `docs/api.json` (seção 3.1);
-- `AuditEvent` — espelho de `AuditEventResponse` (seção 3.3), com `beforeState/afterState/delta/metadata: Record<string, unknown> | null`;
-- `AuditPage` — `{ content: AuditEvent[]; page: number; size: number; totalElements: number; totalPages: number; first: boolean; last: boolean }` (**com `first/last: boolean`**, corrigindo a inconsistência de `GetBody`);
-- `AuditFilters` — objeto com todos os filtros opcionais;
-- Mapas de humanização PT-BR (`eventTypeLabel`, `categoryLabel`, `outcomeLabel`, `resourceTypeLabel`) + helper `formatEnum(value)` fallback `value.replaceAll("_", " ")` (padrão já usado em `TransactionDetailsModal.tsx:55`).
+### Passo 4 — Atualizar `src/pages/games/components/GameInfo/GameDetailsModal.module.css`
 
-### 5.4 Cache/mutations [ENCONTRADO]
+* Se escolher reutilizar estilos existentes, nenhuma mudança.
+* Se criar seção dedicada, adicionar (exemplo baseado em `GameDetailsModal.module.css:162-188`):
 
-O projeto **não possui cache de dados nem camada de mutations** (sem React Query etc.) — cada página refaz o fetch em mudanças de estado. A Auditoria segue o mesmo modelo: fetch direto em `useEffect` + função `refresh()` manual. Nada de cache deve ser introduzido nesta etapa.
+```css
+.spectatorsContainer { margin-top: 8px; }
+.spectatorBadge {
+  font-size: 0.75rem;
+  background: rgba(165,180,252,0.1);
+  color: #a5b4fc;
+  border: 1px solid rgba(165,180,252,0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+```
+Usar tokens já existentes (`#a5b4fc`, `#1e2533`, `rgba(165,180,252,0.1)`).
+
+### Passo 5 — Revisar `src/lib/shared.ts` (opcional, mas recomendado)
+
+**[DECISÃO]** Corrigir `GetBody`:
+```ts
+export type GetBody<T> = {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean; // era number
+  last: boolean;  // era number
+}
+```
+*Impacto:* `Levels.ts:39`, `Offers.ts:58`, `Users.ts:81`, `Transactions`, `Cosmetics`, `Audit` já esperam `boolean` da API mas estão tipados como `number`; a correção alinha. Verificar se `npm run typecheck` ou `npm run build` quebra em algum arquivo — ajustar call-sites se alguém comparava `first === 0`.
+
+*Alternativa conservadora:* não tocar `shared.ts` e usar `GamePage` local — evita regressão em outras features. Documentar escolha no PR.
+
+### Passo 6 — Validação cruzada
+
+1. `npm run typecheck` deve passar.
+2. `npm run build` (`tsc -b && vite build`) deve passar.
+3. Verificar que nenhum import quebrou (`GamesRequests`, `Game`).
+4. Testar manualmente cenários da seção 8.
 
 ---
 
-## 6. Navegação e Sidebar
+## 6. Impactos na UI
 
-### 6.1 Como o sidebar funciona [ENCONTRADO] (`src/components/Sidebar/Sidebar.tsx`)
-
-- Array plano `items = [{ label, to, icon }]`, renderizado com `NavLink`;
-- active state via `isActive` → classe `.active` (fundo `rgba(99,102,241,.15)` + borda esquerda primária, `Sidebar.module.css:76-81`);
-- labels em PT-BR, ícones lucide `size={20}`;
-- sem agrupamentos, sem permissões, sem expansão/recolhimento; responsividade tratada pelo grid global (`.layout` em `global.css:70-76`).
-
-### 6.2 Decisões [DECISÃO]
-
-| Item | Decisão | Fundamentação |
-|---|---|---|
-| Posição | **Após "Logs"** (último item) | Agrupa as duas ferramentas de investigação (Logs e Auditoria) ao final, sem mexer na ordem existente |
-| Label | **"Auditoria"** | PT-BR, consistente com "Usuários", "Transações", "Níveis" |
-| Ícone | **`History`** (relógio com seta circular) | Conotação de trilha temporal de eventos; não conflita com `ScrollText` (Logs) nem com ícones já usados; presente no lucide-react instalado |
-| Rota | **`/admin/audit`** | Segue convenção singular/plural curta das rotas existentes (`/admin/users`, `/admin/logs`) |
-| Active state | Automático via `NavLink isActive` | Padrão existente; nenhuma mudança necessária |
-
-Alterações:
-
-1. `src/components/Sidebar/Sidebar.tsx` — importar `History` e adicionar item `{ label: "Auditoria", to: "/admin/audit", icon: History }` após "Logs".
-2. `src/router.tsx` — importar `AuditPage` e adicionar `{ path: "audit", element: <AuditPage /> }` como último filho de `AdminLayout` (após `logs`), espelhando a ordem do sidebar.
-
-Breadcrumb: o painel não usa breadcrumbs em páginas de listagem (só na exploração de arquivos de Logs). Não criar breadcrumb. **[DECISÃO]**
-
----
-
-## 7. Página de Auditoria
-
-Arquivo: `src/pages/audit/Audit.tsx` (+ `Audit.module.css`).
-
-### 7.1 Estrutura geral [DECISÃO] (espelha `Transactions.tsx:107-156`)
-
-```
-<div .container>
-  <header .header>
-    <div .titleGroup>
-      <h1>Auditoria</h1>
-      <p>Investigue os eventos de negócio registrados pelo sistema.</p>   ← tom dos subtítulos existentes
-    </div>
-    <div .headerButtons>
-      <button .refresh><RotateCcw/></button>      ← refresh manual, mesma animação rotating
-    </div>
-  </header>
-
-  <section .filters>                              ← NOVO bloco local à página (ver §8)
-    selects (Categoria, Evento, Recurso, Resultado)
-    período (de/até - datetime-local)
-    identificador (SearchBar reutilizada: targetUserId/actorId/resourceId)
-    [Filtros avançados] (colapsável): requestId, operationId, correlationId, transactionId
-    <button .clearButton>Limpar filtros</button>
-  </section>
-
-  <main .content>
-    <Table<AuditEvent> ... />                     ← componente compartilhado
-  </main>
-
-  <AuditDetailsModal ... />                       ← modal de detalhes
-</div>
-```
-
-Título/subtítulo, container `max-width: 1200px` centralizado, padding `40px`, gradiente de fundo idêntico aos das outras páginas (`Transactions.module.css:1-19`) — copiar a estrutura do módulo CSS de Transações e ajustar apenas as classes novas de filtro.
-
-### 7.2 Colunas prioritárias da tabela [DECISÃO]
-
-Payload tem 23 campos; a tabela mostra o mínimo para varredura/investigação (padrão "ID / Nome" empilhado já usado em Users/Transactions/Games):
-
-| Coluna | Conteúdo | Render |
-|---|---|---|
-| **Evento** | `eventType` (badge colorido por categoria) + `eventId` em mono pequeno abaixo | padrão `.info` de `Transactions.tsx:49-56` |
-| **Categoria** | badge `category` | pill `#a5b4fc` (`referenceBadge` do modal de transações) |
-| **Ator** | `actorName ?? actorType` + `actorId` truncado em mono | padrão ID/Nome |
-| **Alvo** | `targetUserId` truncado em mono (tooltip full via `title`) | mono + tooltip |
-| **Recurso** | `resourceType` badge + `resourceId` truncado | badge + mono |
-| **Resultado** | badge ● `SUCCESS` verde `#10b981` / ● `FAILURE` vermelho, com `title={failureReason}` | padrão de badges do Games (`Games.tsx:77-88`) |
-| **Data/Hora** | `occurredAt` formatado pt-BR | `toLocaleString` |
-| **Ações** | botão "Detalhes" | `renderActions` |
-
-Identificadores longos (uuids): truncar com CSS (`max-width` + `text-overflow: ellipsis`) e expor valor completo no `title` e no modal — técnica já usada em `participantList` (`Games.module.css:109-116`) e `code` do modal de transações.
-
-### 7.3 Interações extras úteis [DECISÃO]
-
-- Clicar em `targetUserId` de uma linha → aplica filtro `targetUserId` (refina a investigação usando o endpoint/filtro correto).
-- No modal, botão "Ver histórico do recurso" quando `resourceType`+`resourceId` existem → chama `getEventsByResource`. Ambos são baratos porque os endpoints já existem; implementar como ações secundárias (links/botões discretos), sem navegação para outra página.
-
----
-
-## 8. Filtros
-
-Estado local `filters` (objeto único) + `setPage(0)` a cada mudança (mesma regra de `Games.tsx:41-44`). Sem persistência em URL — **o projeto não persiste nenhum filtro na URL hoje**; introduzir isso aqui criaria dois padrões distintos. **[DECISÃO]** seguir o padrão local; limitação registrada em §22.
-
-| Filtro | Input | Valor enviado | Comportamento |
+| Área | Situação atual | Alteração necessária | Justificativa |
 |---|---|---|---|
-| Categoria | select 1 opção default "Todas" | `category` (enum ou ausente) | reset de página; combina com tudo |
-| Evento | select | `eventType` | idem; opções completas do enum (13) |
-| Resultado | select (Todos/Sucesso/Falha) | `outcome` | idem |
-| Tipo de recurso | select | `resourceType` | idem |
-| Período (De / Até) | dois `datetime-local` | `from` / `to` em ISO UTC | valida `from <= to` no submit; vazio = não envia |
-| Usuário alvo | `SearchBar` (texto) | `targetUserId` | dispara no Enter/busca (padrão `trigger="default"`); valida UUID antes de enviar (inválido ⇒ `notify.warning`) |
-| Ator | `SearchBar` (texto) | `actorId` | idem |
-| ID do recurso | input texto curto | `resourceId` | enviado junto com o select de recurso |
-| requestId / operationId / correlationId / transactionId | inputs de texto na área **"Filtros avançados"** (colapsável, fechada por padrão) | campos homônimos | Enter aplica; UUID validado quando aplicável |
+| **Tabela principal (`Games.tsx:50-89`)** | Mostra ID/Nome, Partidas/Participantes, Status. | **Nenhuma mudança visual obrigatória.** Coluna “Partidas” conta `matches.length` — não precisa incluir spectators na contagem. | Spectators pertencem ao histórico de cada match, não à lista resumida. |
+| **Modal — Histórico de Partidas (`GameDetailsModal.tsx:63-91`)** | Cada `matchCard` lista só `players`. | **Adicionar sub-seção de Espectadores** dentro de cada `matchCard`, abaixo de jogadores, com título “Espectadores (N)” e lista de nicknames. Se `spectators` vazio/ausente, ocultar seção. | Novo contrato exige visibilidade; espectadores podem ser relevantes para auditoria/suporte. |
+| **Modal — Participantes (`GameDetailsModal.tsx:93-127`)** | Lista `participants` com `nickname`, `role`, `isConnected`, `cosmeticsEquipped`. | **Nenhuma mudança.** `ParticipantResponse` não mudou. | — |
+| **Modal — Posições (`GameDetailsModal.tsx:129-141`)** | Exibe `Slot X: playerId`. | **Ajuste invisível:** `positions` continua objeto; apenas tipo muda. UI já usa `Object.entries` fallback, então render permanece idêntico. | Correção de tipo não afeta pixel. |
+| **Datas** | `finishedAt` formatada com `toLocaleString("pt-BR")`. | **Nenhuma mudança visual;** apenas tipo de `Date`→`string` no modelo. Formatação idêntica. | — |
+| **Estados de loading/erro/vazio** | `Table` mostra “Nenhum registro encontrado.” (`Table.tsx:35-40`); refresh com animação `rotating` (`Games.tsx:106`); `notify.error` em catch. | **Manter.** Garantir que erro com `spectators` ausente não quebre modal (fallback `?? []`). | — |
+| **Estilos** | Dark theme `#0b0e14`, badges `STATUS` com cores (`Games.module.css:119-136`). | **Reutilizar** `.playerRow`, `.matchCard`, ou adicionar `.spectatorBadge` com mesmos tokens. Nenhum novo token. | Consistência com `Audit`, `Transactions`, `Tickets`. |
 
-Diretrizes:
-
-- **Sem debounce**: o projeto não usa debounce em lugar algum; inputs textuais aplicam no Enter (comportamento do `SearchBar`, `SearchBar.tsx:38-42`) e selects aplicam imediatamente. **[DECISÃO]** manter.
-- **Limpar filtros**: botão "Limpar filtros" reseta `filters` + `search terms` + volta à página 0 e refetch.
-- **Interação com paginação**: qualquer mudança de filtro ⇒ `page=0`; troca de página mantém filtros.
-- Origem das opções: **estáticas**, dos enums do `docs/api.json` (não há endpoint de metadados). **[ENCONTRADO]**
-- Estilização dos selects: seguir o estilo dos selects já existentes nos formulários (ex.: `RewardInput.tsx:60`, `EditCosmeticPopup.tsx:112`), com cores do design system; CSS novo fica confinado em `Audit.module.css`.
-
-Endpoint usado pela busca geral: **sempre `GET /admin/audit`** com query params. Os endpoints `/admin/audit/user/{userId}` e `/admin/audit/resource/{type}/{id}` ficam expostos no service para uso pelos atalhos de refinamento (§7.3) — nota: esses dois endpoints aceitam menos filtros; ao usá-los, enviar apenas os suportados. **[ENCONTRADO]**
+**Resumo:** Impacto visual mínimo e localizado — apenas nova lista dentro do `matchCard`. Nenhuma mudança de layout global, rota ou sidebar.
 
 ---
 
-## 9. Listagem e Tabela
+## 7. Compatibilidade e Tratamento de Erros
 
-- Reutilizar `Table<T>` (`src/components/Table/Table.tsx`) sem modificá-lo — ele já cobre: colunas customizadas, `renderActions`, empty state ("Nenhum registro encontrado."), paginação Anterior/Próxima, overflow-x horizontal (`tableContainer`, `Table.module.css:7-15`).
-- `key` das linhas: a tabela usa índice como key (`Table.tsx:42-43`); **não alterar o componente** nesta etapa (risco baixo pois a lista é substituída inteira a cada fetch), mas usar `item.eventId` como dado estável onde possível nas células.
-- Ordenação: **não há header clicável** no componente Table e a API não expõe campo de sort. **[DECISÃO]** oferecer apenas o toggle de direção "Mais recentes ⇄ Mais antigas" (par de botões `filterGroup`/`filterActive` do Games) que envia `direction=DESC|ASC` apenas no endpoint geral. Mudança de direção ⇒ `page=0`.
+### 7.1 Campos opcionais / retrocompatibilidade
 
----
+* **`spectators` pode estar ausente** em payloads em cache, em respostas antigas do backend antes do deploy, ou se o backend omitir quando vazio. **Tratar como opcional:** `match.spectators ?? []`, `Array.isArray(match.spectators) ? match.spectators : []`. Nunca assumir `undefined` como erro.
+* **`participants`, `matches`, `positions`** — schema sem `required`; usar `game.participants ?? []`, `game.matches ?? []`, `game.positions ?? {}` e optional chaining em todo acesso.
+* **`gameName` pode ser vazio** — já tratado com `|| "Partida sem nome"` (`Games.tsx:55`, `GameDetailsModal.tsx:44`); manter.
 
-## 10. Paginação e Ordenação
+### 7.2 Tipos e conversão
 
-Parâmetros [ENCONTRADO]: `page` (0-based, default 0), `size` (default 20), `direction` (default DESC, só no endpoint geral). Metadados: `totalElements`, `totalPages`, `first`, `last`.
+* **`unlockedAt` / `finishedAt` como string:** Sempre converter na render com `new Date(string).toLocaleString("pt-BR")` ou `toLocaleDateString`. Validar `isNaN(date.getTime())` antes de exibir; fallback para `"—"` se inválido (padrão de `Offers` com `getRemainingTime`).
+* **`positions` como objeto:** Nunca chamar `positions.get()` sem checar `instanceof Map`; após correção, usar só `Object.entries`.
+* **Enums desconhecidos:** Se `type`/`status`/`role` vier com valor novo não documentado, renderizar fallback `formatEnumValue` (ex.: `Audit.ts:184-186` faz `value.replaceAll("_"," ")`). Para `status`, `getStatusClass` deve ter `default` para `statusFinished` (`GameDetailsModal.tsx:29-36` já tem).
+* **`cosmeticsEquipped` vazio:** Já tratado com `p.cosmeticsEquipped && p.cosmeticsEquipped.length > 0` (`GameDetailsModal.tsx:109`); manter.
 
-Decisões [DECISÃO]:
+### 7.3 Erros da API
 
-| Aspecto | Decisão |
-|---|---|
-| Tamanho de página | `size=8`, alinhado a Users/Transações (`Users.tsx:28`, `Transactions.tsx:29`) |
-| Página inicial | `0` |
-| Troca de filtros/direção | reset para `0` |
-| Página fora do range (ex.: resultado encolheu) | após fetch, se `content.length === 0 && page > 0`, refetch automático com `page = totalPages - 1` (clamp ≥ 0) |
-| Total de registros | exibir `totalElements` junto ao paginador (texto discreto `#64748b`), melhoria local sem tocar no `Table` (renderizado acima dele na página) |
-| Loading na troca de página | flag `loading` desabilita os botões via estado da própria página (o `Table` já desabilita pelos limites `page===0`/`last`) |
-| Preservação de filtros | mantidos em estado durante toda a sessão da página |
+* **Envelope de erro não documentado em `api.json`:** Nenhum `securitySchemes` nem schema de erro. O projeto assume `HttpResponse` com `code`/`message` (`shared.ts`, `Users.ts:83`). **Recomendação:** Sempre fazer `const response: HttpResponse<...> = await res.json()` mesmo quando `!res.ok` e lançar `new Error(response.message || "Erro desconhecido")`. Capturar no `catch` e chamar `notify.error(message)`. Isso alinha com `Cosmetic.ts:43-50` e `Tickets.ts:61`.
+* **Paginação fora do range:** Se `page >= totalPages`, API retorna `content:[]` e `totalPages` correto; UI deve exibir empty state (“Nenhum registro encontrado.”) e desabilitar “Próxima” (`Table.tsx:79`). Não precisa tratamento extra.
+* **Token ausente/expirado:** `Authorization: Bearer ${token}` com `token=null` envia `Bearer null` — backend retorna 401; `fetch` cai em `!res.ok`; exibir `notify.error`. Não mudar lógica de auth (`ProtectedLayout.tsx:7`).
 
----
+### 7.4 LACUNAS / AMBIGUIDADES registradas
 
-## 11. Visualização de Detalhes
-
-Modal `src/pages/audit/components/AuditDetailsModal/AuditDetailsModal.tsx` — clone estrutural do `TransactionDetailsModal` (`isOpen`/`entity`/`onClose`, Esc para fechar, overlay click-to-close, footer com "Fechar").
-
-Distribuição das informações [DECISÃO]:
-
-**Header**
-- Badge "AUDITORIA" (`.typeBadge`), título = eventType humanizado, sublinha `eventId` em mono.
-
-**Coluna esquerda — "Informações Gerais"** (`infoGrid` 2×N):
-- Data/Hora (`occurredAt` pt-BR completo), Categoria (badge), Resultado (badge colorido), Motivo da falha (`failureReason`, só se FAILURE), Ator (nome + `actorType` + id em `<code>`), Usuário alvo (id em `<code>`), Recurso (tipo badge + id `<code>`), `reasonCode`.
-
-**Coluna direita — "Rastreamento"** (cards `infoCard` com linhas `referenceItem`):
-- `requestId`, `correlationId`, `operationId`, `transactionId`, `sourceType`, `sourceDetail` — ids em `<code>` scrollável (padrão `.referenceItem code`, `TransactionDetailsModal.module.css:194-211`).
-
-**Rodapé do corpo — "Alterações de Estado" (largura total)**:
-- Seções **Antes** (`beforeState`), **Depois** (`afterState`), **Delta** (`delta`), **Metadados** (`metadata`).
-- Cada seção renderiza `<pre>{JSON.stringify(obj, null, 2)}</pre>` em container scrollável (`max-height` ~300px, scrollbar estilizada global), com botão "Copiar" (`navigator.clipboard.writeText` + `notify.success`).
-- Seções com valor `null`/`{}` são ocultadas.
-- Precedente visual: viewer `<pre>` dos logs (`Logs.tsx:606-608`) + cards escuros `#141821`.
-
-Strings muito longas: `word-break: break-word` nos strongs e `overflow-x: auto` nos blocos `<pre>`/`<code>` (ambos já presentes nos CSS citados).
-
----
-
-## 12. Estados da Interface
-
-| Estado | Tratamento [DECISÃO] | Base [ENCONTRADO] |
+| # | Lacuna | Recomendação |
 |---|---|---|
-| Loading inicial/troca | flag `loading`; enquanto ativa, texto discreto sobre a área da tabela ("Carregando eventos...") e refresh desabilitado | `Logs.tsx:508-512` |
-| Refresh manual | ícone `RotateCcw` gira por 500ms; guarda `rotating` evita fetch concorrente | `Transactions.tsx:21-39` |
-| Erro | `notify.error("Erro ao carregar os registros de auditoria.")`; tabela permanece com último conteúdo/empty | `Transactions.tsx:34-35` |
-| Empty | linha padrão do `Table` ("Nenhum registro encontrado.") — o componente não suporta mensagem customizada e **não deve ser alterado** nesta etapa | `Table.tsx:35-40` |
-| Filtro inválido (UUID malformado) | `notify.warning` e não dispara request | padrão de avisos existente |
-| Sucesso pontual (copiar, atalhos) | `notify.success` | `Transactions.tsx:97` |
+| L1 | `MatchHistoryResponse.spectators` não declara `required` nem `minItems`; não se sabe se API sempre envia array vazio ou omite campo quando sem espectadores. | Tratar como opcional e fallback para `[]`. Validar em runtime com `Array.isArray`. |
+| L2 | `InventoryItem` em `ParticipantResponse` é `$ref: InventoryItem` com `unlockedAt:date-time`, mas `InventoryItemResponse` (usado em Users/Transactions) não tem `unlockedAt`. São schemas distintos mas semanticamente semelhantes — não confundir. | Manter `InventoryItem` para Games separado; não reutilizar `ItemInventory` de Users (`Users.ts:32-37`). |
+| L3 | `Pageable.sort` nunca usado; não há ordenação definida para Games. | Não enviar `sort`; manter `?page=&size=` simples. |
+| L4 | `api.json` não documenta códigos de erro nem `securitySchemes`; comportamento real depende de `localStorage.token`. | Seguir padrão existente de `Authorization: Bearer` e `HttpResponse.message`. Não assumir refresh token. |
+| L5 | `success:boolean` no `SuccessResponse*` vs `HttpResponse.success` — `code/message` não aparecem nos schemas de sucesso, mas são usados em erro. | Manter `HttpResponse` com `code,message` como tipo ampliado; aceitar que `api.json` só documenta 200. |
 
 ---
 
-## 13. UX e Design
+## 8. Testes e Validação
 
-Checklist de fidelidade visual (todos [ENCONTRADO], aplicar como especificado):
+### 8.1 Cenários normais (happy path)
 
-- Fundo da página: gradiente radial escuro idêntico (`Transactions.module.css:1-11`).
-- Cards/painéis: `#1e2533`/`#141821` com borda `rgba(255,255,255,.05)` e radius `12px`.
-- Inputs/selects: mesmos esquemas dos popups existentes; foco com borda `--primary`.
-- Botões: secundário `#1e2533`/`#334155`→hover `#6366f1`; ativo de filtro `.filterActive` (`#1e2533` + `#a5b4fc`).
-- Badges: pill indigo para categoria/recurso; verde `#10b981` sucesso; vermelho falha (tom `#ef4444` do hover danger / `#cf2323` débito — usar `#ef4444` por consistência com `btnDanger`).
-- Tipografia: Inter; h1 2.24rem gradiente branco→`#a5b4fc` (`.titleGroup h1`); mono JetBrains para ids.
-- Espaçamentos: header margin-bottom 32px, paddings 16–24px, gap 8–14px conforme módulos de referência.
-- Hover de linha: `rgba(99,102,241,.03)` (já no `Table.module.css:45-47`).
-- Ícones lucide 17–20px inline, herdados do padrão atual.
+| Cenário | Passos | Expectativa |
+|---|---|---|
+| T1 — Listar todas as partidas | Abrir `/admin/games`, clicar “Todas as Partidas” (`showAll=true` → `GET /game?page=0&size=5`). | Tabela preenche com `content`, `page` e `totalPages` corretos; coluna mostra “X partida(as)”. |
+| T2 — Listar partidas ativas | Clicar “Em Andamento” (`showAll=false` → `GET /game/active?page=0&size=5`). | Tabela mostra participantes; coluna “X jogador(es)” e lista de nicknames (`Games.tsx:65-70`). |
+| T3 — Paginação | Navegar “Próxima”/“Anterior” (`Table.tsx:64-84`). | `page` incrementa, `GET` com novo `page`; botão desabilita em `page===0` e `page+1===totalPages`. |
+| T4 — Modal sem histórico | Clicar “Detalhes” em jogo com `matches:[]` e `participants:[...]`. | Modal exibe “Participantes (N)” e “Posições da Sala” se houver; não exibe “Histórico de Partidas”. |
+| T5 — Modal com histórico (players) | Jogo com `matches:[{finishedAt,players:[...]}]`. | Modal exibe “Histórico de Partidas (N)”, cada `matchCard` com `players` e `score`, vencedor com `🏆` e `winnerRow` (`GameDetailsModal.tsx:79-87`). `finishedAt` formatado pt-BR. |
+| T6 — Modal com histórico (players+spectators) — **novo** | Jogo com `matches:[{finishedAt,players:[...], spectators:[{id,nickname},{...}]}]`. | Em cada `matchCard`, abaixo de jogadores, seção “Espectadores (M)” lista nicknames; se `spectators:[]`, seção oculta. Dados vêm de `MatchHistoryResponse.spectators` (`docs/api.json:5154`). |
+| T7 — Posições da sala | Jogo com `positions:{"1":"uuid1","2":"uuid2"}`. | Modal exibe “Slot 1: uuid1”, etc. (`GameDetailsModal.tsx:133-136`). Funciona tanto se `positions` for objeto quanto (defensivo) se vier Map. |
 
-Proibições: sem novas fontes, sem biblioteca de UI, sem dark/light toggle (o painel é dark-only), sem redesign do `Table`.
+### 8.2 Estados vazios
 
----
-
-## 14. Responsividade
-
-Base atual [ENCONTRADO]:
-
-- Layout: grid `260px 1fr`; sidebar fixo (não há versão hamburguer/mobile no código — em telas pequenas o layout simplesmente comprime; `@media` encontradas apenas em nível de página).
-- Quebras usadas nas páginas/modais: `900px` (modal 1 coluna) e `768px`/`640px` (headers empilham, grids 1 coluna) (`Transactions.module.css:159-173`, `TransactionDetailsModal.module.css:257-280`).
-
-Decisões [DECISÃO]:
-
-- `≤ 1024px`: filtros em wrap (flex-wrap, gap 8px); selects com largura flexível.
-- `≤ 768px`: header empilha (título acima, ações abaixo) — igual media query de `Transactions.module.css:159-168`; filtros em coluna; tabela mantém scroll horizontal nativo do `.tableContainer` (estratégia do projeto para tabelas largas — não criar card-list mobile).
-- Modal: herdar breakpoints do modal de transações (grid 1 coluna ≤900px; infoGrid 1 coluna ≤640px).
-- Paginação e botões: mantêm-se centralizados; sem alteração.
-
----
-
-## 15. Segurança e Dados Sensíveis
-
-Análise do schema `AuditEventResponse` [ENCONTRADO]: não há campos de senha/token/header de autenticação; payloads são estados de negócio (carteira, inventário, partidas) e identificadores técnicos.
-
-- **Exibir normalmente:** categorias, tipos, nomes de ator, ids, timestamps, outcome, reasonCode, source*, delta.
-- **Atenção:** `beforeState/afterState/metadata` podem conter saldo financeiro e dados de conta do jogador. Isso é coerente com o que o painel já exibe (Transações mostra saldos e emails de usuários — `Users.tsx` coluna Email), portanto **liberado para admin autenticado**. **[DECISÃO]**
-- **[LACUNA]** Não é possível verificar, a partir de `docs/api.json`, se a API sanitiza payloads antes de indexar a auditoria (ex.: se algum `metadata` embutirá credenciais de comandos que falharam — `COMMAND_FAILED`). Risco registrado; mitigação no frontend: nunca interpretar esses objetos como HTML (React escapa por padrão), não logá-los no console, e reavaliar mascaramento caso a equipe de API confirme presença de segredos.
-- Token JWT: permanece apenas em `localStorage`/header, como no resto do app; nunca renderizado.
-- Clipboard: copiar apenas o JSON do objeto específico clicado, nunca o registro inteiro automaticamente.
-
----
-
-## 16. Performance
-
-- **Server-side first**: paginação, filtros e direção são resolvidos pela API (`page/size/direction` + filtros) — o frontend nunca carrega "tudo". [ENCONTRADO no contrato]
-- Payload controlado: `size=8`; objetos grandes (`beforeState` etc.) só chegam dentro das linhas da página corrente — volume pequeno e já limitado pela paginação.
-- Sem polling/realtime: atualização sob demanda (refresh manual). **[DECISÃO]** — o caso de uso é investigação, não monitoramento ao vivo; o websocket existente (`RealtimeProvider`) não deve ser acoplado.
-- Evitar requests duplicados: guarda `rotating`/`loading` já existente no padrão das páginas.
-- Debounce desnecessário: inputs discretos (selects) e submits explícitos.
-- Renderização: colunas com strings curtas/truncadas; JSON pesado renderizado **somente** no modal aberto.
-- Refetch on filter change apenas quando o filtro realmente muda (setState com objeto novo dispara `useEffect([filters, page])` — garantir comparação por execução de fetch no effect dependendo de `page` e de uma versão serializada dos filtros para evitar loops).
-
----
-
-## 17. Compatibilidade com o Código Existente
-
-Pontos tocados (todos aditivos, nada quebrado):
-
-1. `src/router.tsx` — 1 import + 1 rota nova. Nenhuma rota existente muda.
-2. `src/components/Sidebar/Sidebar.tsx` — 1 import de ícone + 1 item no array. Nenhuma mudança de markup/CSS.
-3. Nenhuma alteração em `Table`, `SearchBar`, `Header`, contexts, hooks, `global.css` ou services existentes.
-4. A inconsistência de `GetBody.first/last` (§3.4) **não será corrigida globalmente** nesta etapa (risco de afetar páginas existentes); a Auditoria usa seu próprio tipo `AuditPage` com `boolean`. Correção global sugerida como follow-up separado.
-
----
-
-## 18. Estrutura de Arquivos
-
-### Criar
-
-| Arquivo | Responsabilidade |
+| Cenário | Expectativa |
 |---|---|
-| `src/pages/audit/lib/Audit.ts` | Types (`AuditEvent`, `AuditPage`, enums/humanizadores, `AuditFilters`) + classe `AuditRequests` com os 3 métodos (§5). Única dependência: `HTTPS`/`HttpResponse` de `src/lib/config.ts`. |
-| `src/pages/audit/Audit.tsx` | Página: estado (`events`, `filters`, `advancedFilters`, `direction`, `page`, `totalPages`, `totalElements`, `loading`, `rotating`, `selectedEvent`), fetch em `useEffect`, handlers de filtros/paginação, montagem de colunas, composição de `Table`, `SearchBar`, filtros e modal. |
-| `src/pages/audit/Audit.module.css` | Estilos da página: base copiada de `Transactions.module.css` (container/header/titleGroup/refresh/actionButton/rotating + media queries) + novos `.filters`, `.filterField`, `.advancedToggle`, `.totalInfo`, `.badges` de célula. |
-| `src/pages/audit/components/AuditDetailsModal/AuditDetailsModal.tsx` | Modal de detalhes (§11), incluindo seções JSON com copiar. |
-| `src/pages/audit/components/AuditDetailsModal/AuditDetailsModal.module.css` | Estilos derivados de `TransactionDetailsModal.module.css` + `.jsonBlock`, `.jsonHeader`, `.copyButton`. |
+| E1 — `content:[]` na listagem | `Table` mostra linha única “Nenhum registro encontrado.” (`Table.tsx:35-40`), paginação com `totalPages=0`, botões desabilitados. |
+| E2 — Jogo sem participantes e sem matches | Modal: “Nenhum participante registrado no momento.” (`GameDetailsModal.tsx:125`), sem “Posições da Sala”. |
+| E3 — Match com `players:[]` e `spectators:[]` | Modal: `matchCard` com header e data, mas listas vazias sem quebrar layout; seção espectadores oculta. |
 
-### Modificar
+### 8.3 Loading
 
-| Arquivo | Alteração |
+| Cenário | Expectativa |
 |---|---|
-| `src/router.tsx` | Import de `AuditPage`; rota `{ path: "audit", element: <AuditPage /> }` após `logs` (linhas 71-73). |
-| `src/components/Sidebar/Sidebar.tsx` | Import de `History` do lucide-react; item `Auditoria` após "Logs" no array `items` (linhas 57-61). |
+| L1 — Refresh | Clicar ícone `RotateCcw` (`Games.tsx:104-109`) dispara `fetchGames`, ícone ganha `styles.rotating` por 500ms (`Games.module.css:165`), bloqueia reentrância via `rotating` flag (`Games.tsx:22-23`). |
+| L2 — Troca de filtro `showAll` | `setShowAll` reseta `page=0` (`Games.tsx:42-44`) e `useEffect` refaz `fetchGames` com endpoint correto. |
 
-### Não criar / não remover
+### 8.4 Erros
 
-Nada mais. Não há arquivo a remover; não criar componentes genéricos novos (SelectFilter, JsonViewer etc.) nesta primeira versão — os elementos ficam locais à página seguindo o grau de extração atual do projeto. **[DECISÃO]**
+| Cenário | Expectativa |
+|---|---|
+| Er1 — `GET /game` retorna 401/403/500 | `catch` chama `notify.error("Erro ao carregar a lista de partidas.")` ou `notify.error(message)` se `response.message` disponível; tabela permanece com dado anterior ou vazio, sem crash. |
+| Er2 — Campo `spectators` malformado (ex.: `null` ao invés de array) | UI usa `Array.isArray(match.spectators) ? match.spectators : []`; não quebra, apenas oculta seção. |
+| Er3 — `finishedAt` inválido | `new Date(invalido)` resulta `Invalid Date`; exibir fallback `"—"` ou string original; não lançar. |
+| Er4 — `positions` ausente/null | `positionsEntries` resulta `[]`; seção “Posições da Sala” não renderiza (condicional `positionsEntries.length>0`). |
+| Er5 — Token ausente | `Authorization: Bearer null` → 401 → `notify.error`; usuário permanece na página mas pode ser redirecionado por `ProtectedLayout` ao fazer logout. |
 
----
+### 8.5 Validações técnicas
 
-## 19. Testes
-
-**[ENCONTRADO]** O projeto **não possui nenhuma infraestrutura de testes** (sem runner, sem configs, zero arquivos de teste). Não existe convenção local a seguir.
-
-Plano honesto, em duas partes:
-
-**Parte 1 — Validação manual (obrigatória, sem novas dependências)** — checklist executável ao final da implementação (detalhado em §21).
-
-**Parte 2 — Testes automatizados (opcional, requer decisão de adicionar tooling)**: caso aprovado, instalar `vitest` + `@testing-library/react` + `jsdom` (devDependencies) e escrever:
-
-- *Unitários*: construtor de query params (ignora vazios; converte datas para ISO); humanizadores de enum; formatação de data; validador de UUID.
-- *Integração (página)*: render com mock de `fetch` — loading, listagem, empty, erro (toast), mudança de filtro reseta página, paginação, abertura do modal.
-- *E2E*: não há infra (nem Playwright/Cypress); não proponho criar nesta etapa.
-
-A Parte 2 só deve ser executada se o mantenedor aprovar explicitamente novas devDependencies (§22, risco 7).
+* `npm run typecheck` sem erros (tipos `Game`, `MatchHistory`, `SpectatorHistory`, `GamePage` corretos).
+* `npm run build` (`tsc -b && vite build`) sem erros.
+* `npm run lint` (se aplicável) sem novos warnings em `src/pages/games/*`.
+* Verificar que `src/lib/shared.ts` (se tocado) não quebrou `npm run typecheck` em outras features (`Levels`, `Offers`, `Users`, `Transactions`).
+* Testar com mocks: mockar `fetch` para `/game` retornando payload com e sem `spectators` e confirmar que modal não quebra.
 
 ---
 
-## 20. Sequência de Implementação
+## 9. Critérios de Conclusão
 
-Ordem segura, cada passo verificável isoladamente:
+A atualização será considerada concluída quando, cumulativamente:
 
-1. **Tipos e serviço** — `src/pages/audit/lib/Audit.ts`: enums/unions, mapas de label, `AuditEvent`, `AuditPage` (`first/last: boolean`), `AuditFilters`, `buildAuditQuery()` e classe `AuditRequests` (3 métodos). Compilar (`npm run build`).
-2. **Service smoke-test** — conferir contra `docs/api.json` cada param/field nome-por-nome.
-3. **Página mínima** — `Audit.tsx` + CSS base (clone de Transações): título, refresh, fetch sem filtros, `Table` com colunas básicas e paginação; rota em `router.tsx`.
-4. **Sidebar** — item "Auditoria" com ícone `History`; validar active state.
-5. **Filtros principais** — 4 selects + período + SearchBars (alvo/ator) + resourceId; reset de página; limpar filtros.
-6. **Filtros avançados** — colapsável com requestId/operationId/correlationId/transactionId + validação UUID.
-7. **Direção** — toggle DESC/ASC (endpoint geral).
-8. **Badges e células ricas** — cores por categoria/outcome, tooltips, truncamento.
-9. **Modal de detalhes** — estrutura, infoCards, rastreamento, blocos JSON + copiar; esconder seções vazias.
-10. **Estados de UI** — loading, erro (toasts), clamp de página, warnings de filtro inválido.
-11. **Responsividade** — media queries 1024/768 (página) e 900/640 (modal).
-12. **Validação final** — checklist do §21 + `npm run lint` + `npm run build`.
+- [ ] **Contrato consumido corretamente:** `docs/api.json:5141-5161` (`MatchHistoryResponse.spectators`) e `5240` (`SpectatorHistoryResponse`) estão tipados e renderizados; nenhum `// @ts-ignore` ou `any` para esses campos.
+- [ ] **`src/pages/games/lib/Games.ts` atualizado:** (a) tipos `Game`, `Participant`, `InventoryItem`, `MatchHistory`, `SpectatorHistory`, `PlayerHistory` refletem `docs/api.json`; (b) `positions` corrigido para `Record<string,string>` (ou wrapper seguro); (c) `unlockedAt`/`finishedAt` tratados como `string` date-time; (d) `getGames` e `getActiveGames` tipados com `HttpResponse<GamePage>` e tratamento de erro unificado (lê `response.message`).
+- [ ] **`src/pages/games/Games.tsx` corrigido:** `useEffect` sem `games` na dep list; `fetchGames` consome novo tipo; sem regressão em paginação/filtros/refresh.
+- [ ] **`src/pages/games/components/GameInfo/GameDetailsModal.tsx` exibe espectadores:** Para cada `match`, lista `spectators` quando presente, com fallback seguro para `undefined`/`null`/`[]`; `positions` usa `Object.entries` sem assumir `Map`; datas formatadas pt-BR.
+- [ ] **`src/pages/games/components/GameInfo/GameDetailsModal.module.css` reutiliza tokens** (se alterado) sem novos valores hard-coded.
+- [ ] **`src/lib/shared.ts` (se tocado) corrigido:** `first`/`last` como `boolean` e `npm run typecheck` passa em todo o projeto; caso não tocado, `GamePage` local tipa `boolean` corretamente.
+- [ ] **Compatibilidade:** Payloads sem `spectators` (legado/cache) não quebram UI; campos opcionais tratados com `?? []`/`?.`.
+- [ ] **UI validada:** Cenários T1-T7, E1-E3, L1-L2, Er1-Er5 descritos na seção 8 foram testados manualmente ou com mocks e comportam-se como especificado.
+- [ ] **Qualidade:** `npm run typecheck` e `npm run build` passam; nenhum `console.log` residual; seguir padrões de `Audit.ts`, `Tickets.ts`, `Transactions.tsx` para estilo e mensagens.
+- [ ] **Sem escopo extra:** Nenhum arquivo fora da lista da seção 4 foi modificado; nenhum endpoint novo foi inventado; `docs/api.json` não foi alterado.
 
 ---
 
-## 21. Critérios de Aceitação
+## Apêndice — Referências Cruzadas
 
-- [ ] Item **"Auditoria"** aparece no sidebar após "Logs", com ícone coerente, e destaca-se corretamente quando ativo.
-- [ ] Rota `/admin/audit` renderiza a página; rota protegida (redirect para `/` sem token); rota inexistente continua redirecionando para `/admin`.
-- [ ] Requisições saem para `GET /admin/audit` com `Authorization: Bearer` e **somente** os parâmetros preenchidos; nomes idênticos ao `docs/api.json`.
-- [ ] Listagem paginada server-side (`page/size`), botões Anterior/Próxima habilitam/desabilitam conforme limites; `totalElements` visível.
-- [ ] Cada filtro (categoria, evento, resultado, recurso, período, alvo, ator, resourceId, avançados) refina os resultados; mudança de filtro volta à página 0; "Limpar filtros" restaura o estado inicial.
-- [ ] Toggle de direção alterna DESC/ASC e refaz a consulta (endpoint geral).
-- [ ] "Detalhes" abre modal com todas as seções do §11; Esc/overlay/× fecham; blocos JSON formatados com botão copiar funcional; seções nulas ocultas.
-- [ ] Atalhos: clicar em usuário-alvo filtra por ele; "histórico do recurso" consulta `/admin/audit/resource/{type}/{id}`.
-- [ ] Loading visível durante fetch; erros mostram toast e não quebram a página; lista vazia mostra o empty state padrão.
-- [ ] Datas exibidas em pt-BR; filtros de período enviam ISO UTC.
-- [ ] Responsivo: filtros empilham e tabela faz scroll horizontal em telas estreitas; modal colapsa para 1 coluna.
-- [ ] Nenhum dado sensível além do já exposto pelo painel é revelado; nenhum payload é renderizado como HTML/logado.
-- [ ] `npm run lint` e `npm run build` passam sem erros/warnings novos.
-- [ ] Checklist manual de testes (§19 Parte 1) executado integralmente.
+* **Padrão de service:** `src/pages/users/lib/Users.ts:69-86` (getUsers com `HttpResponse<GetBody<User>>`, erro com `response.message`), `src/pages/transactions/lib/Transaction.ts`, `src/pages/audit/lib/Audit.ts:244-321` (booleans `first/last`, `string` date-time, `URLSearchParams`).
+* **Padrão de página:** `src/pages/transactions/Transactions.tsx`, `src/pages/users/Users.tsx`, `src/pages/levels/Levels.tsx` (header, Table, paginação, notify).
+* **Padrão de modal:** `src/pages/games/components/GameInfo/GameDetailsModal.tsx` (overlay, Esc, click stopPropagation) e `src/pages/transactions/components/TransactionInfo/TransactionDetailsModal.tsx`.
+* **Tokens visuais:** `src/global.css:37-68`, `src/pages/games/Games.module.css:46-75`, `src/pages/games/components/GameInfo/GameDetailsModal.module.css:211-295`.
 
----
-
-## 22. Riscos e Pontos de Atenção
-
-1. **Sem schema de erro na API** [LACUNA] — `docs/api.json` documenta só 200 para os endpoints de audit. O tratamento assume `!res.ok → throw` (padrão do app) e ignora o corpo do erro. Se a API retornar 4xx com envelope diferente, a UI ainda funciona (toast genérico).
-2. **Ordenação ambígua** [LACUNA] — `direction` sem `property` documentada; assumiu-se ordenação por `occurredAt`. Validar em runtime; se o backend ordenar por outro campo, remover o toggle em vez de adivinhar.
-3. **Assimetria dos endpoints** [ENCONTRADO] — `/user/{userId}` e `/resource/{type}/{id}` aceitam poucos filtros e **não** aceitam `direction`. Os atalhos devem filtrar a lista de params enviáveis por endpoint.
-4. **`GetBody.first/last` numérico vs boolean** [ENCONTRADO] — não reutilizar `GetBody` para auditoria (usar `AuditPage`); correção global fica como follow-up.
-5. **Sanitização de payloads pela API** [LACUNA] — impossível confirmar via documento; risco de segredos em `metadata` de `COMMAND_FAILED`. Monitorar; frontend não agrava (escapa HTML, não loga).
-6. **Enums em evolução** — se a API adicionou novos `eventType/category`, o select estático fica desatualizado. Mitigação: renderizar valores desconhecidos com fallback humanizado em vez de quebrar.
-7. **Ausência de testes automatizados** [ENCONTRADO] — cobertura dependerá de decisão de adicionar Vitest/RTL (dependências novas); até lá, apenas checklist manual.
-8. **Sem persistência de filtros na URL** [DECISÃO consciente] — recarregar a página perde o contexto de investigação. Registrar como melhoria futura transversal (afetaria todas as páginas).
-9. **`axios` instalado e não usado** [ENCONTRADO] — não iniciar uso agora; não remover (fora de escopo).
-10. **Chave de linha por índice no `Table`** [ENCONTRADO] — aceitável no padrão atual (lista substituída integralmente); não alterar o componente compartilhado nesta feature.
-11. **Timezone** [ENCONTRADO] — API retorna date-time ISO; painel converte com `new Date()` e exibe no timezone do navegador em pt-BR (padrão de `TransactionDetailsModal.tsx:131`). Filtros `datetime-local` são locais → `toISOString()` (UTC) ao enviar. Cuidado com meia-noite/limites inclusivos do `to` — enviar fim-do-dia `23:59:59.999` quando o usuário escolher só a data? **[DECISÃO]** `datetime-local` inclui horário, então enviar o valor literal escolhido; documentar no placeholder que é horário local.
-
----
-
-## 23. Checklist Final
-
-- [ ] `docs/api.json` relido durante a implementação antes de codar cada método de `AuditRequests`
-- [ ] Tipos gerados exclusivamente do contrato (sem copiar de `GetBody`)
-- [ ] 5 novos arquivos criados, 2 modificados (§18) — nada mais
-- [ ] Nenhum componente compartilhado alterado
-- [ ] Tokens visuais exclusivamente de `global.css`/módulos de referência
-- [ ] Lint + build limpos
-- [ ] Critérios de aceitação (§21) todos marcados
-- [ ] Riscos 1–3 revalidados contra o backend real após primeiro teste integrado
