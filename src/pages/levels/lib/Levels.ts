@@ -1,6 +1,6 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
+import { apiFetch } from "../../../lib/http";
 import type { Reward, CreateReward } from "../../../lib/Rewards";
-import type { GetBody } from "../../../lib/shared";
+import type { PageResponse } from "../../../lib/shared";
 
 type LevelReward = {
     levelRewardId: string;
@@ -24,98 +24,38 @@ type FindBody = {
 
 export class LevelsRequests {
     static async getLevels(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/level?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<PageResponse<Level>>(`/level?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<GetBody<Level>> = await res.json();
-
-        return response.data;
     }
 
     static async findLevelByValue(value: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/level/value/${value}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<FindBody>(`/level/value/${value}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
     }
 
     static async findLevelById(id: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/level/${id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<FindBody>(`/level/${encodeURIComponent(id)}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
     }
 
     static async createLevel(level: CreateRequest) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/level`, {
+        const body = await apiFetch<FindBody>("/level", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ...level
-            })
+            body: level
         });
 
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<Level> = await res.json();
-
-        return response.data;
+        return body.level;
     }
 
     static async updateLevel(level: CreateRequest, levelId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/level/${levelId}`, {
+        const body = await apiFetch<FindBody>(`/level/${encodeURIComponent(levelId)}`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ...level
-            })
+            body: level
         });
 
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<Level> = await res.json();
-
-        return response.data;
+        return body.level;
     }
 }

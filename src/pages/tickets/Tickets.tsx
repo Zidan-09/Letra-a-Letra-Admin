@@ -35,7 +35,6 @@ export function TicketsPage() {
     const [search, setSearch] = useState("");
 
     const [filters, setFilters] = useState<TicketFilters>({});
-    const [direction, setDirection] = useState<"DESC" | "ASC">("DESC");
 
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -57,8 +56,7 @@ export function TicketsPage() {
             const currentFilters: TicketFilters = {
                 ...filters,
                 page,
-                size: PAGE_SIZE,
-                direction
+                size: PAGE_SIZE
             };
 
             const data = await TicketRequests.getTickets(currentFilters);
@@ -82,7 +80,7 @@ export function TicketsPage() {
         if (search.trim()) return;
 
         fetchTickets();
-    }, [page, filters, direction, refreshTick, search]);
+    }, [page, filters, refreshTick, search]);
 
     const applyFilter = (patch: Partial<TicketFilters>) => {
         setFilters(prev => ({ ...prev, ...patch }));
@@ -97,13 +95,6 @@ export function TicketsPage() {
         fetchTickets();
 
         setTimeout(() => setRotating(false), 500);
-    };
-
-    const handleDirectionChange = (next: "DESC" | "ASC") => {
-        if (next === direction) return;
-
-        setDirection(next);
-        setPage(0);
     };
 
     const handleStatusChange = (value: TicketStatus | "") => {
@@ -279,21 +270,6 @@ export function TicketsPage() {
                                 </select>
                             </label> 
 
-                            <label className={styles.field}>
-                                <span className={styles.fieldLabel}>Ordem</span>
-                                <select
-                                    className={styles.select}
-                                    value={direction}
-                                    onChange={(e) => handleDirectionChange(e.target.value as any)}
-                                >
-                                    <option key="ASC" value={"ASC"}>
-                                        Mais Recentes
-                                    </option>
-                                    <option key="DESC" value={"DESC"}>
-                                        Mais Antigas
-                                    </option>
-                                </select>
-                            </label> 
                         </div>
                     </section>
                 </aside>

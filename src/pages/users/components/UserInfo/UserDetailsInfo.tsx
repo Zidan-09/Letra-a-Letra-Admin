@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserRequests, type User, type BanType, type ItemInventory, type RevokeWallet, COSMETIC_TYPES } from "../../lib/Users";
+import { UserRequests, type User, type BanType, type UserItem, type RevokeWallet, ITEM_CATEGORIES } from "../../lib/Users";
 import { useNotification } from "../../../../hooks/notification/useNotification";
 import { Shield, ShieldAlert, Gift, User as UserIcon, AlertTriangle, Shirt, Trash2, Wallet } from "lucide-react";
 import type { CreateReward } from "../../../../lib/Rewards";
@@ -34,9 +34,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         rewardReference: ""
     });
 
-    const [inventory, setInventory] = useState<ItemInventory[]>([]);
-    const [page, setPage] = useState<number>(0);
-    const [totalPages, setTotalPages] = useState<number>(1);
+    const [inventory, setInventory] = useState<UserItem[]>([]);
 
     const [canDelete, setCanDelete] = useState(false);
 
@@ -55,10 +53,13 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
     const fetchInventory = async () => {
         if (!user) return;
 
-        const data = await UserRequests.getUserInventory(user.userId, page, 5);
-        
-        setInventory(data.content);
-        setTotalPages(data.totalPages);
+        try {
+            const items = await UserRequests.getUserInventory(user.userId);
+
+            setInventory(items);
+        } catch {
+            notify.error("Erro ao carregar o inventário do usuário.");
+        }
     }
 
     useEffect(() => {
@@ -94,7 +95,7 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         }
     }
 
-    const isBanned = Boolean(user.banInfo && user.banInfo.type);
+    const isBanned = Boolean(user.banInfo && user.banInfo.banned);
 
     const handleBan = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -151,16 +152,16 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         }
     }
 
-    const handleDelete = async (item: ItemInventory) => {
+    const handleDelete = async (item: UserItem) => {
         try {
-            await UserRequests.revokeUserCosmetic(user.userId, item.cosmeticId);
+            await UserRequests.revokeUserItem(item.itemId);
 
-            notify.success(`O cosmético ${item.name} foi removido do inventário do usuário`);
+            notify.success(`O item ${item.name} foi removido do inventário do usuário`);
 
             fetchInventory();
 
         } catch (e) {
-            notify.error(`Erro ao remover o cosmético ${item.name} do usuário`)
+            notify.error(`Erro ao remover o item ${item.name} do usuário`)
         }
     }
 
@@ -181,22 +182,28 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
         }
     };
 
-    const columns: Column<ItemInventory>[] = [
+    const columns: Column<UserItem>[] = [
         {
-            header: "Nome do Cosmético",
+            header: "Nome do Item",
             render: (item) => (
                 <div className={styles.info}>
                     <strong className={styles.cosmeticName}>{item.name || "Nome inválido"}</strong>
-                    <span className={styles.cosmeticId}>{item.cosmeticId}</span>
+                    <span className={styles.cosmeticId}>{item.itemId}</span>
                 </div>
             )
         },
         {
-            header: "Tipo",
+            header: "Categoria",
             render: (item) => (
-                <span className={`${styles.badge} ${styles[item.type.toLowerCase()] || styles.defaultBadge}`}>
-                {item.type}
+                <span className={styles.badge}>
+                {item.category}
                 </span>
+            ),
+        },
+        {
+            header: "Quantidade",
+            render: (item) => (
+                <span>x{item.quantity}</span>
             ),
         },
         {
@@ -342,12 +349,12 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                 <h3 className={styles.sectionTitle}>Cosméticos Equipados</h3>
 
                                 <div className={styles.infoCosmeticGrid}>
-                                    {COSMETIC_TYPES.map((type) => {
-                                        const equipped = user.equipped.find(item => item.type === type);
+                                    {ITEM_CATEGORIES.map((category) => {
+                                        const equipped = user.equipped.find(item => item.category === category);
 
                                         return (
-                                            <div key={type} className={styles.infoCard}>
-                                                <span className={styles.infoLabel}>{type}</span>
+                                            <div key={category} className={styles.infoCard}>
+                                                <span className={styles.infoLabel}>{category}</span>
 
                                                 {equipped ? (
                                                     <strong>{equipped.name}</strong>
@@ -479,10 +486,10 @@ export function UserDetailsInfo({ user, onClose, onUserUpdated }: UserDetailsInf
                                         </button>
                                     </>
                                 )}
-                                page={page}
-                                totalPages={totalPages}
-                                nextPage={() => setPage(prev => prev + 1)}
-                                prevPage={() => setPage(prev => Math.max(0, prev - 1))}
+                                page={0}
+                                totalPages={1}
+                                nextPage={() => {}}
+                                prevPage={() => {}}
                             />
                         </div>
                     )}

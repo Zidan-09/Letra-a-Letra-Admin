@@ -1,20 +1,23 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
-import type { GetBody } from "../../../lib/shared";
+import { apiFetch } from "../../../lib/http";
+import type { PageResponse } from "../../../lib/shared";
 import type { CreateReward } from "../../../lib/Rewards";
 import type { CoinType } from "../../offers/lib/Offers";
+import type { ItemCategory, ItemKind } from "../../cosmetics/lib/Cosmetic";
 
-export const COSMETIC_TYPES = [
+export const ITEM_CATEGORIES: ItemCategory[] = [
     "AVATAR",
     "BANNER",
-    "EMOTE",
     "FRAME",
-] as const;
-
-export type CosmeticType = typeof COSMETIC_TYPES[number];
+    "EMOTE",
+    "BOARD_SKIN",
+    "CELL_SKIN",
+    "XP_BOOST"
+];
 
 export type BanType = "PERMANENT" | "TEMPORARY";
 
 type BanInfo = {
+    banned: boolean;
     type: BanType | null;
     reason: string | null;
     expiresAt: string | null;
@@ -29,11 +32,28 @@ type UserStats = {
     rankingPoints: number;
 }
 
-export type ItemInventory = {
-    cosmeticId: string;
+export type InventoryItem = {
+    itemId: string;
     name: string;
-    type: CosmeticType;
+    kind: ItemKind;
+    category: ItemCategory;
+    context: "PROFILE" | "MATCH";
+    quantity: number;
     equipped: boolean;
+    assetPath: string;
+}
+
+export type UserItem = {
+    itemId: string;
+    name: string;
+    kind: ItemKind;
+    category: ItemCategory;
+    contexts: ("PROFILE" | "MATCH")[];
+    quantity: number;
+    equipped: boolean;
+    acquiredAt: string;
+    expiresAt: string | null;
+    assetPath: string;
 }
 
 type Wallet = {
@@ -47,12 +67,8 @@ export type User = {
     email: string;
     banInfo: BanInfo;
     stats: UserStats;
-    equipped: ItemInventory[];
+    equipped: InventoryItem[];
     wallet: Wallet;
-}
-
-type FindBody = {
-    user: User;
 }
 
 type BanUserRequest = {
@@ -66,146 +82,61 @@ export type RevokeWallet = {
     amount: number;
 }
 
+type UserItemsBody = {
+    items: UserItem[];
+}
+
 export class UserRequests {
     static async getUsers(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<PageResponse<User>>(`/user?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        const response: HttpResponse<GetBody<User>> = await res.json();
-
-        if (!res.ok) throw new Error(response.message);
-
-        return response.data;
     }
 
-    static async findUserByUsername(username: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/username/${username}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async findUserByUsername(username: string, page = 0, size = 8) {
+        return apiFetch<PageResponse<User>>(`/user/username/${encodeURIComponent(username)}?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
     }
 
-    static async getUserInventory(userId: string, page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/inventory?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async getUserInventory(userId: string) {
+        const body = await apiFetch<UserItemsBody>(`/user/${encodeURIComponent(userId)}/items`, {
+            method: "GET"
         });
 
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<GetBody<ItemInventory>> = await res.json();
-
-        return response.data;
+        return body.items;
     }
 
     static async banUser(userId: string, body: BanUserRequest) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/ban`, {
+        await apiFetch<Record<string, never>>(`/user/${encodeURIComponent(userId)}/ban`, {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
+            body
         });
-
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
     }
 
     static async unbanUser(userId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/unban`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        await apiFetch<Record<string, never>>(`/user/${encodeURIComponent(userId)}/unban`, {
+            method: "PATCH"
         });
-
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
     }
 
     static async grantReward(userId: string, reward: CreateReward) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/grant-reward`, {
+        await apiFetch<Record<string, never>>(`/user/${encodeURIComponent(userId)}/grant-reward`, {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(reward)
+            body: reward
         });
-
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
     }
 
-    static async revokeUserCosmetic(userId: string, cosmeticId: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/inventory/${cosmeticId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async revokeUserItem(itemId: string) {
+        await apiFetch<Record<string, never>>(`/user/items/${encodeURIComponent(itemId)}`, {
+            method: "DELETE"
         });
-
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
     }
 
     static async revokeUserWallet(userId: string, remove: RevokeWallet) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${userId}/wallet/revoke`, {
+        await apiFetch<Record<string, never>>(`/user/${encodeURIComponent(userId)}/wallet/revoke`, {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(remove)
+            body: remove
         });
-
-        if (!res.ok) {
-            const response: HttpResponse<null> = await res.json();
-            throw new Error(response.message);
-        }
     }
 }

@@ -45,7 +45,7 @@ export function CreateLevelPopup({ isOpen, onClose }: CreateLevelPopupProps) {
 
             onClose();
         } catch (err) {
-            notify.error("Erro ao cadastrar Level");
+            notify.error(err instanceof Error ? err.message : "Erro ao cadastrar Level");
         } finally {
             setLoading(false);
         }

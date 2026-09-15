@@ -17,6 +17,7 @@ export type ApiFetchOptions = {
     body?: unknown;
     auth?: boolean;
     headers?: HeadersInit;
+    response?: "json" | "text";
 };
 
 function handleUnauthorized(): void {
@@ -72,6 +73,11 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     if (!text) {
         if (res.ok) return {} as T;
         throw new HttpError(res.status, statusCode(res.status), statusMessage(res.status, ""));
+    }
+
+    if (options.response === "text") {
+        if (!res.ok) throw new HttpError(res.status, statusCode(res.status), statusMessage(res.status, text.slice(0, 300)));
+        return text as T;
     }
 
     let payload: unknown;

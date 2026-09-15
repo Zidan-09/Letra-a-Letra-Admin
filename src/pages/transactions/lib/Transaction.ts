@@ -1,14 +1,15 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
-import type { GetBody } from "../../../lib/shared";
+import { apiFetch } from "../../../lib/http";
+import type { PageResponse } from "../../../lib/shared";
 
 type CoinType = "SOFT" | "HARD" | "REAL";
 
 type OperationType = "CREDIT" | "DEBIT";
 
-type TransactionReason = 
+export type TransactionReason =
     "SHOP_PURCHASE" |
     "LEVEL_UP" |
     "ADMIN_GIVE" |
+    "ADMIN_REVOKE" |
     "REFUND" |
     "DAILY_REWARD" |
     "RANKING_REWARD";
@@ -26,7 +27,7 @@ export type Transaction = {
     referenceId: string;
     referenceType: string;
     referenceName: string
-    transactionDate: Date
+    transactionDate: string
 }
 
 type FindBody = {
@@ -35,74 +36,26 @@ type FindBody = {
 
 export class TransactionRequests {
     static async getTransactions(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/transaction?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<PageResponse<Transaction>>(`/transaction?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<GetBody<Transaction>> = await res.json();
-
-        return response.data;
     }
 
     static async findTransactionById(transactionId: string) {
-        const token = localStorage.getItem("token");
-        
-            const res = await fetch(`${API_URL}/transaction/${transactionId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-    
-            if (!res.ok) throw new Error();
-    
-            const response: HttpResponse<FindBody> = await res.json();
-    
-            return response.data;
+        return apiFetch<FindBody>(`/transaction/${encodeURIComponent(transactionId)}`, {
+            method: "GET"
+        });
     }
 
-    static async findTransactionByUserId(userId: string) {
-        const token = localStorage.getItem("token");
-        
-        const res = await fetch(`${API_URL}/transaction/user/${userId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+    static async findTransactionByUserId(userId: string, page: number, size: number) {
+        return apiFetch<PageResponse<Transaction>>(`/transaction/user/${encodeURIComponent(userId)}?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
     }
 
     static async findTransactionsByNickname(nickname: string, page: number, size: number) {
-        const token = localStorage.getItem("token");
-        
-        const res = await fetch(`${API_URL}/transaction/user/username/${nickname}?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<PageResponse<Transaction>>(`/transaction/user/username/${encodeURIComponent(nickname)}?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<GetBody<Transaction>> = await res.json();
-
-        return response.data;
     }
 }

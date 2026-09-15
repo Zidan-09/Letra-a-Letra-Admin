@@ -1,23 +1,23 @@
-import { API_URL, type HttpResponse } from "../../../lib/config";
-import type { GetBody } from "../../../lib/shared";
+import { apiFetch } from "../../../lib/http";
+import type { PageResponse } from "../../../lib/shared";
 
-export type Key = 
-"USER" | 
-"LOGS" | 
-"ADMIN" | 
-"COSMETIC" | 
-"GAME" | 
-"LEVELS" | 
-"OFFERS" | 
+export type Key =
+"USER" |
+"LOGS" |
+"ADMIN" |
+"COSMETIC" |
+"GAME" |
+"LEVELS" |
+"OFFERS" |
 "TRANSACTIONS" |
-"AUDIT" | 
+"AUDIT" |
 "TICKET";
 
-export type Action = 
-"VIEW" | 
-"CREATE" | 
-"EDIT" | 
-"DELETE" | 
+export type Action =
+"VIEW" |
+"CREATE" |
+"EDIT" |
+"DELETE" |
 "TOGGLE";
 
 type Permission = {
@@ -51,79 +51,35 @@ type UpdateAdmin = {
 
 export class AdminRequests {
     static async getAdmins(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/admin?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<PageResponse<Admin>>(`/admin?page=${page}&size=${size}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<GetBody<Admin>> = await res.json();
-
-        return response.data;
     }
 
     static async findAdminByEmail(email: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/admin/email/${email}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        return apiFetch<FindBody>(`/admin/email/${encodeURIComponent(email)}`, {
+            method: "GET"
         });
-
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
     }
 
     static async registerAdmin(admin: RegisterAdmin) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/admin`, {
+        const body = await apiFetch<FindBody>("/admin", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ...admin
-            })
+            body: admin
         });
 
-        if (!res.ok) throw new Error();
+        return body.admin;
     }
 
     static async removeAdmin(id: string) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/admin/${id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+        const body = await apiFetch<FindBody>(`/admin/${encodeURIComponent(id)}`, {
+            method: "DELETE"
         });
 
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
+        return body.admin;
     }
 
     static async updateAdmin(admin: Admin) {
-        const token = localStorage.getItem("token");
-
         const updateData: UpdateAdmin = {
             name: admin.username,
             email: admin.email,
@@ -131,21 +87,11 @@ export class AdminRequests {
             permissions: admin.permissions
         }
 
-        const res = await fetch(`${API_URL}/admin/${admin.id}`, {
+        const body = await apiFetch<FindBody>(`/admin/${encodeURIComponent(admin.id)}`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ...updateData
-            })
+            body: updateData
         });
 
-        if (!res.ok) throw new Error();
-
-        const response: HttpResponse<FindBody> = await res.json();
-
-        return response.data;
+        return body.admin;
     }
 }

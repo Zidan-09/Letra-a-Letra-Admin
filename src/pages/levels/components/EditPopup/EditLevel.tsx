@@ -52,7 +52,7 @@ export function EditLevelPopup({ isOpen, level, onClose, onSuccess }: EditLevelP
             if (onSuccess) onSuccess();
             onClose();
         } catch (err) {
-            notify.error("Erro ao atualizar Level");
+            notify.error(err instanceof Error ? err.message : "Erro ao atualizar Level");
         } finally {
             setLoading(false);
         }

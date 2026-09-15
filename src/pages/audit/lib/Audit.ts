@@ -1,4 +1,4 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
+import { apiFetch } from "../../../lib/http";
 
 export type AuditEventType =
     | "WALLET_CREDITED"
@@ -7,6 +7,12 @@ export type AuditEventType =
     | "COSMETIC_REVOKED"
     | "COSMETIC_EQUIPPED"
     | "COSMETIC_UNEQUIPPED"
+    | "ITEM_ACQUIRED"
+    | "ITEM_REMOVED"
+    | "ITEM_EQUIPPED"
+    | "ITEM_UNEQUIPPED"
+    | "ITEM_CONSUMED"
+    | "ITEM_QUANTITY_CHANGED"
     | "MATCH_STARTED"
     | "MATCH_ENDED"
     | "ROOM_CLOSED_INACTIVITY"
@@ -102,6 +108,12 @@ export const AUDIT_EVENT_TYPE_OPTIONS: AuditEventType[] = [
     "COSMETIC_REVOKED",
     "COSMETIC_EQUIPPED",
     "COSMETIC_UNEQUIPPED",
+    "ITEM_ACQUIRED",
+    "ITEM_REMOVED",
+    "ITEM_EQUIPPED",
+    "ITEM_UNEQUIPPED",
+    "ITEM_CONSUMED",
+    "ITEM_QUANTITY_CHANGED",
     "MATCH_STARTED",
     "MATCH_ENDED",
     "ROOM_CLOSED_INACTIVITY",
@@ -143,6 +155,12 @@ const eventTypeLabels: Record<AuditEventType, string> = {
     COSMETIC_REVOKED: "Cosmético revogado",
     COSMETIC_EQUIPPED: "Cosmético equipado",
     COSMETIC_UNEQUIPPED: "Cosmético desequipado",
+    ITEM_ACQUIRED: "Item adquirido",
+    ITEM_REMOVED: "Item removido",
+    ITEM_EQUIPPED: "Item equipado",
+    ITEM_UNEQUIPPED: "Item desequipado",
+    ITEM_CONSUMED: "Item consumido",
+    ITEM_QUANTITY_CHANGED: "Quantidade de item alterada",
     MATCH_STARTED: "Partida iniciada",
     MATCH_ENDED: "Partida encerrada",
     ROOM_CLOSED_INACTIVITY: "Sala fechada por inatividade",
@@ -241,22 +259,10 @@ function appendDateRange(params: URLSearchParams, filters: AuditFilters) {
     }
 }
 
-async function requestAuditPage(url: string): Promise<AuditPage> {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
+async function requestAuditPage(path: string): Promise<AuditPage> {
+    return apiFetch<AuditPage>(path, {
+        method: "GET"
     });
-
-    if (!res.ok) throw new Error();
-
-    const response: HttpResponse<AuditPage> = await res.json();
-
-    return response.data;
 }
 
 export class AuditRequests {
@@ -283,7 +289,7 @@ export class AuditRequests {
         params.append("size", String(size));
         params.append("direction", direction);
 
-        return requestAuditPage(`${API_URL}/admin/audit?${params.toString()}`);
+        return requestAuditPage(`/admin/audit?${params.toString()}`);
     }
 
     static async getEventsByUser(userId: string, filters: AuditFilters, page: number, size: number) {
@@ -299,7 +305,7 @@ export class AuditRequests {
         params.append("page", String(page));
         params.append("size", String(size));
 
-        return requestAuditPage(`${API_URL}/admin/audit/user/${encodeURIComponent(userId)}?${params.toString()}`);
+        return requestAuditPage(`/admin/audit/user/${encodeURIComponent(userId)}?${params.toString()}`);
     }
 
     static async getEventsByResource(resourceType: string, resourceId: string, filters: AuditFilters, page: number, size: number) {
@@ -315,7 +321,7 @@ export class AuditRequests {
         params.append("size", String(size));
 
         return requestAuditPage(
-            `${API_URL}/admin/audit/resource/${encodeURIComponent(resourceType)}/${encodeURIComponent(resourceId)}?${params.toString()}`
+            `/admin/audit/resource/${encodeURIComponent(resourceType)}/${encodeURIComponent(resourceId)}?${params.toString()}`
         );
     }
 }

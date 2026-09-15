@@ -1,4 +1,4 @@
-export function getRemainingTime(expiresAt: Date): string {
+export function getRemainingTime(expiresAt: Date | string): string {
   const diff = new Date(expiresAt).getTime() - Date.now();
 
   if (diff <= 0) {

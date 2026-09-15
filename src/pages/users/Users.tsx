@@ -71,11 +71,16 @@ export function UsersPage() {
 
     const handleSearchUser = async () => {
         try {
-            const data = await UserRequests.findUserByUsername(search);
+            const data = await UserRequests.findUserByUsername(search, 0, 8);
+
+            if (data.content.length === 0) {
+                notify.error(`Usuário ${search} não foi encontrado`);
+                return;
+            }
 
             notify.success(`Usuário ${search} encontrado com sucesso!`);
 
-            setSelectedUser(data.user);
+            setSelectedUser(data.content[0]);
 
         } catch {
             notify.error(`Usuário ${search} não foi encontrado`);

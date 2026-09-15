@@ -1,23 +1,24 @@
-import { type HttpResponse, API_URL } from "../../../lib/config";
-import type { GetBody } from "../../../lib/shared";
+import { apiFetch } from "../../../lib/http";
+import type { PageResponse } from "../../../lib/shared";
+import { HttpError } from "../../../lib/http";
 
 type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
 export type GameStatus = "WAITING" | "RUNNING" | "CLOSED" | "CANCELED";
 type Role = "PLAYER" | "SPECTATOR";
-type CosmeticType = "AVATAR" | "BANNER" | "EMOTE" | "FRAME";
+type ItemCategory = "AVATAR" | "BANNER" | "FRAME" | "EMOTE" | "BOARD_SKIN" | "CELL_SKIN" | "XP_BOOST";
 
-type InventoryItem = {
-    cosmeticId: string;
+type EquippedCosmetic = {
+    itemId: string;
     name: string;
-    type: CosmeticType;
+    category: ItemCategory;
     equipped: boolean;
-    unlockedAt: string;
+    assetPath: string;
 }
 
 type Participant = {
     id: string;
     nickname: string;
-    cosmeticsEquipped: InventoryItem[];
+    cosmeticsEquipped: EquippedCosmetic[];
     role: Role;
     isConnected: boolean;
 }
@@ -52,38 +53,24 @@ type MatchHistory = {
 
 export class GamesRequests {
     static async getGames(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/game?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const response: HttpResponse<GetBody<Game>> = await res.json();
-
-        if (!res.ok) throw new Error(response.message || "Erro ao carregar a lista de partidas.");
-
-        return response.data;
+        try {
+            return await apiFetch<PageResponse<Game>>(`/game?page=${page}&size=${size}`, {
+                method: "GET"
+            });
+        } catch (err) {
+            if (err instanceof HttpError) throw new Error(err.message || "Erro ao carregar a lista de partidas.", { cause: err });
+            throw err;
+        }
     }
 
     static async getActiveGames(page: number, size: number) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/game/active?page=${page}&size=${size}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const response: HttpResponse<GetBody<Game>> = await res.json();
-
-        if (!res.ok) throw new Error(response.message || "Erro ao carregar a lista de partidas.");
-
-        return response.data;
+        try {
+            return await apiFetch<PageResponse<Game>>(`/game/active?page=${page}&size=${size}`, {
+                method: "GET"
+            });
+        } catch (err) {
+            if (err instanceof HttpError) throw new Error(err.message || "Erro ao carregar a lista de partidas.", { cause: err });
+            throw err;
+        }
     }
 }

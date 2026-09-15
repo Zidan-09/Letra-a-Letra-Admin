@@ -66,7 +66,7 @@ export function CreateOfferPopup({
 
             onClose();
         } catch (err) {
-            notify.error("Erro ao cadastrar oferta");
+            notify.error(err instanceof Error ? err.message : "Erro ao cadastrar oferta");
         } finally {
             setLoading(false);
         }

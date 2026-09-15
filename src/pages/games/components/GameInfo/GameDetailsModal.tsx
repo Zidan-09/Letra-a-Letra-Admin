@@ -135,8 +135,8 @@ export function GameDetailsModal({ game, onClose }: GameDetailsModalProps) {
                             <span className={styles.cosmeticsLabel}>Cosméticos Equipados:</span>
                             <div className={styles.cosmeticBadges}>
                               {p.cosmeticsEquipped.map((item) => (
-                                <span key={item.cosmeticId} className={styles.cosmeticBadge}>
-                                  {item.type}: <strong>{item.name}</strong>
+                                <span key={item.itemId} className={styles.cosmeticBadge}>
+                                  {item.category}: <strong>{item.name}</strong>
                                 </span>
                               ))}
                             </div>

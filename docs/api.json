@@ -229,13 +229,24 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateItemDefinitionRequest"
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "$ref": "#/components/schemas/UpdateItemDefinitionRequest"
+                  },
+                  "asset": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "item"
+                ]
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -814,13 +825,24 @@
         "operationId": "handle_22",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateItemDefinitionRequest"
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "$ref": "#/components/schemas/CreateItemDefinitionRequest"
+                  },
+                  "asset": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "item"
+                ]
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -3155,6 +3177,9 @@
           "email": {
             "type": "string"
           },
+          "isSuper": {
+            "type": "boolean"
+          },
           "permissions": {
             "type": "array",
             "items": {
@@ -3223,10 +3248,10 @@
           "name": {
             "type": "string"
           },
-          "assetPath": {
-            "type": "string"
-          },
           "available": {
+            "type": "boolean"
+          },
+          "isNewAsset": {
             "type": "boolean"
           }
         }
@@ -4320,9 +4345,6 @@
           },
           "effect": {
             "$ref": "#/components/schemas/ItemEffectRequest"
-          },
-          "assetPath": {
-            "type": "string"
           }
         },
         "required": [
