@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
-import { ItemRequests, type UserItem } from "../../pages/items/lib/Item";
+import { ItemRequests, type ItemDefinition } from "../../pages/items/lib/Item";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
 import styles from "./RewardModal.module.css";
@@ -22,7 +22,7 @@ export function RewardModal({
     const [quantity, setQuantity] = useState("1");
     const [rewardReference, setRewardReference] = useState("");
 
-    const [results, setResults] = useState<UserItem[]>([]);
+    const [results, setResults] = useState<ItemDefinition[]>([]);
     const [_, setSelectedItem] = useState(false);
 
     const [search, setSearch] = useState("");
@@ -73,11 +73,11 @@ export function RewardModal({
 
     const handleSearchItem = async () => {
         try {
-            const items = await ItemRequests.listItems();
+            const page = await ItemRequests.listDefinitions(0, 20, { available: true });
             const term = search.trim().toLowerCase();
 
             setResults(
-                items.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
+                page.content.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
             );
 
         } catch {
@@ -86,7 +86,7 @@ export function RewardModal({
         }
     }
 
-    const handleSelectItem = (item: UserItem) => {
+    const handleSelectItem = (item: ItemDefinition) => {
         setSearch(item.name);
         setRewardReference(item.itemId);
         setResults([]);
@@ -207,7 +207,7 @@ export function RewardModal({
                                                             {item.category}
                                                         </span>
                                                         <span className={styles.statusActive}>
-                                                             ● x{item.quantity}
+                                                             ● {item.kind}
                                                         </span>
                                                     </button>
                                                 ))

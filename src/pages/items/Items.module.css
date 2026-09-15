@@ -102,6 +102,18 @@
   font-size: 0.85rem;
 }
 
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.itemId {
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
 .itemName {
   color: #f8fafc;
   font-weight: 600;

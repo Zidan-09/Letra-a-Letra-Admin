@@ -65,6 +65,10 @@
       "description": "Rotas do inventário genérico de itens do usuário"
     },
     {
+      "name": "Items",
+      "description": "Rotas do catálogo de itens"
+    },
+    {
       "name": "Admin",
       "description": "Rotas relacionadas a parte de administração"
     }
@@ -211,11 +215,40 @@
       }
     },
     "/admin/items/{itemId}": {
-      "put": {
+      "get": {
         "tags": [
-          "Inventory"
+          "Items"
         ],
         "operationId": "handle_4",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Items"
+        ],
+        "operationId": "handle_5",
         "parameters": [
           {
             "name": "itemId",
@@ -260,6 +293,35 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Items"
+        ],
+        "operationId": "handle_6",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/user": {
@@ -267,7 +329,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_5",
+        "operationId": "handle_7",
         "parameters": [
           {
             "name": "pageable",
@@ -295,7 +357,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_6",
+        "operationId": "handle_8",
         "requestBody": {
           "content": {
             "application/json": {
@@ -325,7 +387,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_7",
+        "operationId": "handle_9",
         "parameters": [
           {
             "name": "itemId",
@@ -366,7 +428,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_8",
+        "operationId": "handle_10",
         "parameters": [
           {
             "name": "itemId",
@@ -407,7 +469,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_9",
+        "operationId": "handle_11",
         "requestBody": {
           "content": {
             "application/json": {
@@ -437,7 +499,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_10",
+        "operationId": "handle_12",
         "requestBody": {
           "content": {
             "application/json": {
@@ -467,7 +529,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_11",
+        "operationId": "handle_13",
         "requestBody": {
           "content": {
             "application/json": {
@@ -497,7 +559,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_12",
+        "operationId": "handle_14",
         "requestBody": {
           "content": {
             "application/json": {
@@ -527,7 +589,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_13",
+        "operationId": "handle_15",
         "requestBody": {
           "content": {
             "application/json": {
@@ -557,7 +619,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_14",
+        "operationId": "handle_16",
         "requestBody": {
           "content": {
             "application/json": {
@@ -587,7 +649,7 @@
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_15",
+        "operationId": "handle_17",
         "parameters": [
           {
             "name": "offerId",
@@ -618,7 +680,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_16",
+        "operationId": "handle_18",
         "parameters": [
           {
             "name": "pageable",
@@ -676,7 +738,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_17",
+        "operationId": "handle_19",
         "parameters": [
           {
             "name": "pageable",
@@ -704,7 +766,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_18",
+        "operationId": "handle_20",
         "requestBody": {
           "content": {
             "application/json": {
@@ -734,7 +796,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_19",
+        "operationId": "handle_21",
         "requestBody": {
           "content": {
             "application/json": {
@@ -764,7 +826,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_20",
+        "operationId": "handle_22",
         "parameters": [
           {
             "name": "pageable",
@@ -792,7 +854,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_21",
+        "operationId": "handle_23",
         "requestBody": {
           "content": {
             "application/json": {
@@ -818,11 +880,63 @@
       }
     },
     "/admin/items": {
+      "get": {
+        "tags": [
+          "Items"
+        ],
+        "operationId": "handle_24",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "available",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponsePageResponseItemDefinitionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
-          "Inventory"
+          "Items"
         ],
-        "operationId": "handle_22",
+        "operationId": "handle_25",
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -863,7 +977,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_23",
+        "operationId": "handle_26",
         "requestBody": {
           "content": {
             "application/json": {
@@ -893,7 +1007,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_24",
+        "operationId": "handle_27",
         "requestBody": {
           "content": {
             "application/json": {
@@ -923,7 +1037,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_25",
+        "operationId": "handle_28",
         "requestBody": {
           "content": {
             "application/json": {
@@ -953,7 +1067,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_26",
+        "operationId": "handle_29",
         "requestBody": {
           "content": {
             "application/json": {
@@ -983,7 +1097,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_27",
+        "operationId": "handle_30",
         "parameters": [
           {
             "name": "userId",
@@ -1024,7 +1138,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_28",
+        "operationId": "handle_31",
         "parameters": [
           {
             "name": "userId",
@@ -1055,7 +1169,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_29",
+        "operationId": "handle_32",
         "parameters": [
           {
             "name": "userId",
@@ -1096,7 +1210,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_30",
+        "operationId": "handle_33",
         "parameters": [
           {
             "name": "userId",
@@ -1137,7 +1251,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_31",
+        "operationId": "handle_34",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1167,7 +1281,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_32",
+        "operationId": "handle_35",
         "parameters": [
           {
             "name": "offerId",
@@ -1229,7 +1343,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_33",
+        "operationId": "handle_36",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1259,7 +1373,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_34",
+        "operationId": "handle_37",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1289,7 +1403,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_35",
+        "operationId": "handle_38",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1319,7 +1433,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_36",
+        "operationId": "handle_39",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1349,7 +1463,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_37",
+        "operationId": "handle_40",
         "parameters": [
           {
             "name": "ticketId",
@@ -1389,7 +1503,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_38",
+        "operationId": "handle_41",
         "parameters": [
           {
             "name": "token",
@@ -1429,7 +1543,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_39",
+        "operationId": "handle_42",
         "parameters": [
           {
             "name": "userId",
@@ -1492,7 +1606,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_40",
+        "operationId": "handle_43",
         "parameters": [
           {
             "name": "username",
@@ -1531,7 +1645,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_41",
+        "operationId": "handle_44",
         "parameters": [
           {
             "name": "pageable",
@@ -1561,7 +1675,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_42",
+        "operationId": "handle_45",
         "responses": {
           "200": {
             "description": "OK",
@@ -1581,7 +1695,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_43",
+        "operationId": "handle_46",
         "parameters": [
           {
             "name": "kind",
@@ -1635,7 +1749,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_44",
+        "operationId": "handle_47",
         "parameters": [
           {
             "name": "pageable",
@@ -1665,7 +1779,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_45",
+        "operationId": "handle_48",
         "parameters": [
           {
             "name": "transactionId",
@@ -1696,7 +1810,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_46",
+        "operationId": "handle_49",
         "parameters": [
           {
             "name": "userId",
@@ -1735,7 +1849,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_47",
+        "operationId": "handle_50",
         "parameters": [
           {
             "name": "username",
@@ -1773,7 +1887,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_48",
+        "operationId": "handle_51",
         "parameters": [
           {
             "name": "ticketId",
@@ -1804,7 +1918,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_49",
+        "operationId": "handle_52",
         "parameters": [
           {
             "name": "pageable",
@@ -1834,7 +1948,7 @@
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_50",
+        "operationId": "handle_53",
         "responses": {
           "200": {
             "description": "OK",
@@ -1854,7 +1968,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_51",
+        "operationId": "handle_54",
         "parameters": [
           {
             "name": "offerId",
@@ -1883,7 +1997,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_52",
+        "operationId": "handle_55",
         "parameters": [
           {
             "name": "offerId",
@@ -1914,7 +2028,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_53",
+        "operationId": "handle_56",
         "parameters": [
           {
             "name": "value",
@@ -1945,7 +2059,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_54",
+        "operationId": "handle_57",
         "parameters": [
           {
             "name": "pageable",
@@ -2036,7 +2150,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_55",
+        "operationId": "handle_58",
         "parameters": [
           {
             "name": "pageable",
@@ -2066,7 +2180,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_56",
+        "operationId": "handle_59",
         "parameters": [
           {
             "name": "pageable",
@@ -2096,7 +2210,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_57",
+        "operationId": "handle_60",
         "responses": {
           "200": {
             "description": "OK",
@@ -2116,7 +2230,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_58",
+        "operationId": "handle_61",
         "responses": {
           "200": {
             "description": "OK",
@@ -2136,7 +2250,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_59",
+        "operationId": "handle_62",
         "parameters": [
           {
             "name": "status",
@@ -2201,7 +2315,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_60",
+        "operationId": "handle_63",
         "parameters": [
           {
             "name": "username",
@@ -2239,7 +2353,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_61",
+        "operationId": "handle_64",
         "responses": {
           "200": {
             "description": "OK",
@@ -2519,7 +2633,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_62",
+        "operationId": "handle_65",
         "parameters": [
           {
             "name": "email",
@@ -2550,7 +2664,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_63",
+        "operationId": "handle_66",
         "parameters": [
           {
             "name": "targetUserId",
@@ -2757,7 +2871,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_64",
+        "operationId": "handle_67",
         "parameters": [
           {
             "name": "userId",
@@ -2873,7 +2987,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_65",
+        "operationId": "handle_68",
         "parameters": [
           {
             "name": "type",
@@ -2958,7 +3072,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_66",
+        "operationId": "handle_69",
         "parameters": [
           {
             "name": "itemId",
@@ -3110,7 +3224,7 @@
               "USER",
               "LOGS",
               "ADMIN",
-              "COSMETIC",
+              "ITEMS",
               "GAME",
               "LEVELS",
               "OFFERS",
@@ -3198,7 +3312,7 @@
               "USER",
               "LOGS",
               "ADMIN",
-              "COSMETIC",
+              "ITEMS",
               "GAME",
               "LEVELS",
               "OFFERS",
@@ -5625,6 +5739,50 @@
           },
           "data": {
             "$ref": "#/components/schemas/GetMyAdminProfileResponse"
+          }
+        }
+      },
+      "PageResponseItemDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDefinitionResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SuccessResponsePageResponseItemDefinitionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResponseItemDefinitionResponse"
           }
         }
       },

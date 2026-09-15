@@ -3,7 +3,7 @@ import { useNotification } from "../../hooks/notification/useNotification";
 import { SearchBar } from "../Search/SearchBar";
 import {
     ItemRequests,
-    type UserItem
+    type ItemDefinition
 } from "../../pages/items/lib/Item";
 import type { CreateReward } from "../../lib/Rewards";
 import type { RewardType } from "../../lib/shared";
@@ -19,18 +19,18 @@ export function RewardInput({
     onChange
 }: RewardInputProps) {
 
-    const [results, setResults] = useState<UserItem[]>([]);
+    const [results, setResults] = useState<ItemDefinition[]>([]);
     const [search, setSearch] = useState("");
 
     const { notify } = useNotification();
 
     const handleSearchItem = async () => {
         try {
-            const items = await ItemRequests.listItems();
+            const page = await ItemRequests.listDefinitions(0, 20, { available: true });
             const term = search.trim().toLowerCase();
 
             setResults(
-                items.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
+                page.content.filter((item) => item.name.toLowerCase().includes(term)).slice(0, 3)
             );
         } catch {
             setResults([]);
@@ -38,7 +38,7 @@ export function RewardInput({
         }
     };
 
-    const handleSelectItem = (item: UserItem) => {
+    const handleSelectItem = (item: ItemDefinition) => {
         setSearch(item.name);
         setResults([]);
 
@@ -138,7 +138,7 @@ export function RewardInput({
                                     </span>
 
                                     <span className={styles.statusActive}>
-                                        ● x{item.quantity}
+                                        ● {item.kind}
                                     </span>
                                 </button>
                             ))}

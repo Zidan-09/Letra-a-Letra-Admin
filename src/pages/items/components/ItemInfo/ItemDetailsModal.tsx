@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import type { UserItem } from "../../lib/Item";
+import type { ItemDefinition } from "../../lib/Item";
 import styles from "./ItemDetailsModal.module.css";
 
 interface ItemDetailsInfoProps {
     isOpen: boolean;
-    item: UserItem | null;
+    item: ItemDefinition | null;
     onClose: () => void;
 }
 
@@ -104,10 +104,46 @@ export function ItemDetailsInfo({
 
                             <div className={styles.infoCard}>
                                 <span className={styles.infoLabel}>
-                                    Quantidade
+                                    Versão
                                 </span>
 
-                                <strong>{item.quantity}</strong>
+                                <strong>v{item.version}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Disponível
+                                </span>
+
+                                <strong>{item.available ? "Sim" : "Não"}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Empilhável
+                                </span>
+
+                                <strong>{item.stackable ? `Sim${item.maxStack ? ` (máx. ${item.maxStack})` : ""}` : "Não"}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Consumível
+                                </span>
+
+                                <strong>{item.consumable ? "Sim" : "Não"}</strong>
+                            </div>
+
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Efeito
+                                </span>
+
+                                <strong>
+                                    {item.effect
+                                        ? `${item.effect.type} (+${item.effect.magnitude}% por ${item.effect.durationMinutes}min)`
+                                        : "—"}
+                                </strong>
                             </div>
 
                             <div className={styles.infoCard}>

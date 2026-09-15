@@ -4,9 +4,12 @@ import { useProfile } from "../../hooks/profile/useProfile";
 import { Table, type Column } from "../../components/Table/Table";
 import { CreateItemPopup } from "./components/CreatePopup/CreateItemPopup";
 import { EditItemPopup } from "./components/EditPopup/EditItemPopup";
-import { type UserItem, type ItemKind, type ItemCategory, ItemRequests } from "./lib/Item";
+import { type ItemDefinition, type ItemKind, type ItemCategory, ItemRequests } from "./lib/Item";
 import styles from "./Items.module.css";
 import { ItemDetailsInfo } from "./components/ItemInfo/ItemDetailsModal";
+import { Trash2 } from "lucide-react";
+
+const PAGE_SIZE = 8;
 
 const KIND_OPTIONS: ("ALL" | ItemKind)[] = ["ALL", "COSMETIC", "CONSUMABLE"];
 
@@ -21,16 +24,23 @@ const CATEGORY_OPTIONS: ("ALL" | ItemCategory)[] = [
   "XP_BOOST"
 ];
 
+const AVAILABILITY_OPTIONS = ["ALL", "AVAILABLE", "UNAVAILABLE"] as const;
+
+type AvailabilityFilter = typeof AVAILABILITY_OPTIONS[number];
+
 export function ItemsPage() {
   const { notify } = useNotification();
   const { permissions } = useProfile();
 
-  const [items, setItems] = useState<UserItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<UserItem | null>(null);
-  const [availability, setAvailability] = useState<Record<string, boolean>>({});
+  const [items, setItems] = useState<ItemDefinition[]>([]);
+  const [selectedItem, setSelectedItem] = useState<ItemDefinition | null>(null);
+
+  const [page, setPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const [kindFilter, setKindFilter] = useState<"ALL" | ItemKind>("ALL");
   const [categoryFilter, setCategoryFilter] = useState<"ALL" | ItemCategory>("ALL");
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("ALL");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -40,6 +50,7 @@ export function ItemsPage() {
   const [canRegister, setCanRegister] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [canToggle, setCanToggle] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
 
   useEffect(() => {
       const permission = permissions.find(p => p.key === "ITEMS");
@@ -47,31 +58,42 @@ export function ItemsPage() {
       setCanRegister(permission?.actions.includes("CREATE") ?? false);
       setCanEdit(permission?.actions.includes("EDIT") ?? false);
       setCanToggle(permission?.actions.includes("TOGGLE") ?? false);
+      setCanDelete(permission?.actions.includes("DELETE") ?? false);
 
   }, [permissions]);
 
-  const fetchItems = async (kind: "ALL" | ItemKind = kindFilter, category: "ALL" | ItemCategory = categoryFilter) => {
+  const fetchItems = async (
+    nextPage: number = page,
+    kind: "ALL" | ItemKind = kindFilter,
+    category: "ALL" | ItemCategory = categoryFilter,
+    availability: AvailabilityFilter = availabilityFilter
+  ) => {
     try {
-        const data = await ItemRequests.listItems({
+        const data = await ItemRequests.listDefinitions(nextPage, PAGE_SIZE, {
           ...(kind !== "ALL" ? { kind } : {}),
-          ...(category !== "ALL" ? { category } : {})
+          ...(category !== "ALL" ? { category } : {}),
+          ...(availability !== "ALL" ? { available: availability === "AVAILABLE" } : {})
         });
-        setItems(data);
+        setItems(data.content);
+        setTotalPages(data.totalPages);
     } catch {
       notify.error("Erro ao carregar a lista de itens.");
     }
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    fetchItems(page);
+  }, [page]);
 
-  const isAvailable = (item: UserItem) => availability[item.itemId] ?? true;
-
-  const columns: Column<UserItem>[] = [
+  const columns: Column<ItemDefinition>[] = [
     {
       header: "Nome do Item",
-      render: (item) => <strong className={styles.itemName}>{item.name}</strong>,
+      render: (item) => (
+        <div className={styles.itemInfo}>
+          <strong className={styles.itemName}>{item.name}</strong>
+          <span className={styles.itemId}>{item.itemId}</span>
+        </div>
+      ),
     },
     {
       header: "Tipo",
@@ -90,33 +112,31 @@ export function ItemsPage() {
       ),
     },
     {
-      header: "Quantidade",
-      render: (item) => <span>{item.quantity}</span>,
+      header: "Versão",
+      render: (item) => <span>v{item.version}</span>,
     },
     {
       header: "Ativo",
-      render: (item) => {
-        const available = isAvailable(item);
-
-        return (
-          <span className={available ? styles.statusActive : styles.statusDisabled}>
-            ● {available ? "Ativo" : "Desativado"}
-          </span>
-        );
-      },
+      render: (item) => (
+        <span className={item.available ? styles.statusActive : styles.statusDisabled}>
+          ● {item.available ? "Ativo" : "Desativado"}
+        </span>
+      ),
     },
   ];
 
-  const handleOpenEdit = (item: UserItem) => {
+  const handleOpenEdit = (item: ItemDefinition) => {
     setSelectedItem(item);
     setIsEditOpen(true);
   };
 
-  const handleToggleStatus = async (item: UserItem) => {
+  const handleToggleStatus = async (item: ItemDefinition) => {
     try {
-      const updated = await ItemRequests.setAvailable(item.itemId, !isAvailable(item));
+      const updated = await ItemRequests.setAvailable(item.itemId, !item.available);
 
-      setAvailability((prev) => ({ ...prev, [item.itemId]: updated.available }));
+      setItems((prev) =>
+        prev.map((entry) => (entry.itemId === item.itemId ? updated : entry))
+      );
 
       notify.success(`Item ${updated.available ? "ativado" : "desativado"} com sucesso!`);
     } catch (err) {
@@ -124,14 +144,24 @@ export function ItemsPage() {
     }
   };
 
-  const handleKindChange = (kind: "ALL" | ItemKind) => {
-    setKindFilter(kind);
-    fetchItems(kind, categoryFilter);
+  const handleDeleteItem = async (item: ItemDefinition) => {
+    try {
+      await ItemRequests.deleteItem(item.itemId);
+
+      notify.success("Item excluído com sucesso!");
+
+      fetchItems(page);
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Não foi possível excluir o item.");
+    }
   };
 
-  const handleCategoryChange = (category: "ALL" | ItemCategory) => {
+  const applyFilters = (kind: "ALL" | ItemKind, category: "ALL" | ItemCategory, availability: AvailabilityFilter) => {
+    setKindFilter(kind);
     setCategoryFilter(category);
-    fetchItems(kindFilter, category);
+    setAvailabilityFilter(availability);
+    setPage(0);
+    fetchItems(0, kind, category, availability);
   };
 
   return (
@@ -139,7 +169,7 @@ export function ItemsPage() {
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <h1>Itens</h1>
-          <p>Gerencie, visualize e edite os itens ativos no sistema.</p>
+          <p>Gerencie, visualize e edite os itens do catálogo.</p>
         </div>
         <button
           className={`${styles.addButton} ${canRegister ? "" : styles.disabled}`}
@@ -153,7 +183,7 @@ export function ItemsPage() {
       <div className={styles.filters}>
         <label className={styles.filterField}>
           <span>Tipo</span>
-          <select value={kindFilter} onChange={(e) => handleKindChange(e.target.value as "ALL" | ItemKind)}>
+          <select value={kindFilter} onChange={(e) => applyFilters(e.target.value as "ALL" | ItemKind, categoryFilter, availabilityFilter)}>
             {KIND_OPTIONS.map((kind) => (
               <option key={kind} value={kind}>{kind === "ALL" ? "Todos" : kind}</option>
             ))}
@@ -162,16 +192,27 @@ export function ItemsPage() {
 
         <label className={styles.filterField}>
           <span>Categoria</span>
-          <select value={categoryFilter} onChange={(e) => handleCategoryChange(e.target.value as "ALL" | ItemCategory)}>
+          <select value={categoryFilter} onChange={(e) => applyFilters(kindFilter, e.target.value as "ALL" | ItemCategory, availabilityFilter)}>
             {CATEGORY_OPTIONS.map((category) => (
               <option key={category} value={category}>{category === "ALL" ? "Todas" : category}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className={styles.filterField}>
+          <span>Disponibilidade</span>
+          <select value={availabilityFilter} onChange={(e) => applyFilters(kindFilter, categoryFilter, e.target.value as AvailabilityFilter)}>
+            {AVAILABILITY_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option === "ALL" ? "Todos" : option === "AVAILABLE" ? "Disponíveis" : "Indisponíveis"}
+              </option>
             ))}
           </select>
         </label>
       </div>
 
       <main className={styles.content}>
-        <Table<UserItem>
+        <Table<ItemDefinition>
           data={items}
           columns={columns}
           renderActions={(item) => (
@@ -187,18 +228,26 @@ export function ItemsPage() {
                 Editar
               </button>
               <button
-                className={`${styles.actionButton} ${isAvailable(item) ? styles.btnDanger : styles.btnSuccess} ${canToggle ? "" : styles.disabled}`}
+                className={`${styles.actionButton} ${item.available ? styles.btnDanger : styles.btnSuccess} ${canToggle ? "" : styles.disabled}`}
                 onClick={() => handleToggleStatus(item)}
                 disabled={!canToggle}
               >
-                {isAvailable(item) ? "Desabilitar" : "Ativar"}
+                {item.available ? "Desabilitar" : "Ativar"}
+              </button>
+              <button
+                className={`${styles.actionButton} ${styles.deleteButton} ${canDelete ? "" : styles.disabled}`}
+                onClick={() => handleDeleteItem(item)}
+                disabled={!canDelete}
+                aria-label="Excluir item"
+              >
+                <Trash2 />
               </button>
             </>
           )}
-          page={0}
-          totalPages={1}
-          nextPage={() => {}}
-          prevPage={() => {}}
+          page={page}
+          totalPages={totalPages}
+          nextPage={() => setPage((prev) => prev + 1)}
+          prevPage={() => setPage((prev) => Math.max(0, prev - 1))}
         />
       </main>
 
@@ -215,7 +264,7 @@ export function ItemsPage() {
         isOpen={isCreateOpen}
         onClose={() => {
           setIsCreateOpen(false);
-          fetchItems();
+          fetchItems(page);
         }}
       />
 
@@ -226,7 +275,7 @@ export function ItemsPage() {
           setIsEditOpen(false);
           setSelectedItem(null);
         }}
-        onSuccess={fetchItems}
+        onSuccess={() => fetchItems(page)}
       />
     </div>
   );

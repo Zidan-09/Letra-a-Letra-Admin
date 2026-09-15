@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { ItemRequests, type UserItem } from "../../lib/Item";
+import { ItemRequests, type ItemDefinition } from "../../lib/Item";
 import styles from "./EditItem.module.css";
 
 interface EditItemPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  item: UserItem | null;
+  item: ItemDefinition | null;
   onSuccess?: () => void;
 }
 
@@ -28,6 +28,7 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
   useEffect(() => {
     if (item) {
       setName(item.name);
+      setAvailable(item.available);
       setAsset(null);
     }
   }, [item, isOpen]);

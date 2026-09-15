@@ -1,5 +1,6 @@
 import { API_URL, isSuccess } from "../../../lib/config";
-import { HttpError } from "../../../lib/http";
+import { apiFetch, HttpError } from "../../../lib/http";
+import type { PageResponse } from "../../../lib/shared";
 
 export type ItemKind = "COSMETIC" | "CONSUMABLE";
 
@@ -37,19 +38,6 @@ export type ItemDefinition = {
     available: boolean;
 };
 
-export type UserItem = {
-    itemId: string;
-    name: string;
-    kind: ItemKind;
-    category: ItemCategory;
-    contexts: ItemContext[];
-    quantity: number;
-    equipped: boolean;
-    acquiredAt: string;
-    expiresAt: string | null;
-    assetPath: string;
-};
-
 export type CreateItemRequest = {
     name: string;
     kind: ItemKind;
@@ -67,29 +55,11 @@ export type UpdateItemRequest = {
     isNewAsset: boolean;
 };
 
-export type ItemFilters = {
+export type ItemCatalogFilters = {
     kind?: string;
     category?: string;
-    context?: string;
-    equipped?: boolean;
+    available?: boolean;
 };
-
-type UserItemsBody = {
-    items: UserItem[];
-};
-
-function buildQuery(filters: ItemFilters): string {
-    const params = new URLSearchParams();
-
-    if (filters.kind) params.append("kind", filters.kind);
-    if (filters.category) params.append("category", filters.category);
-    if (filters.context) params.append("context", filters.context);
-    if (filters.equipped !== undefined) params.append("equipped", String(filters.equipped));
-
-    const query = params.toString();
-
-    return query ? `?${query}` : "";
-}
 
 function authHeaders(): HeadersInit {
     const token = localStorage.getItem("token");
@@ -119,32 +89,6 @@ async function parseItemDefinition(res: Response): Promise<ItemDefinition> {
     }
 
     if (isSuccess<ItemDefinition>(payload)) return payload.data;
-
-    throw new HttpError(res.status, "INVALID_RESPONSE", "Resposta inválida do servidor.");
-}
-
-async function parseUserItems(res: Response): Promise<UserItem[]> {
-    const text = await res.text();
-
-    if (!text) throw new HttpError(res.status, "INVALID_RESPONSE", "Resposta inválida do servidor.");
-
-    let payload: unknown;
-    try {
-        payload = JSON.parse(text);
-    } catch {
-        throw new HttpError(res.status, "INVALID_RESPONSE", "Resposta inválida do servidor.");
-    }
-
-    if (!res.ok) {
-        const record = payload as { code?: unknown; message?: unknown };
-        throw new HttpError(
-            res.status,
-            typeof record.code === "string" ? record.code : "REQUEST_FAILED",
-            typeof record.message === "string" ? record.message : "Erro na requisição."
-        );
-    }
-
-    if (isSuccess<UserItemsBody>(payload)) return payload.data.items;
 
     throw new HttpError(res.status, "INVALID_RESPONSE", "Resposta inválida do servidor.");
 }
@@ -184,31 +128,33 @@ export class ItemRequests {
         return ItemRequests.updateItem(itemId, { available, isNewAsset: false });
     }
 
-    static async listItems(filters: ItemFilters = {}) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/items${buildQuery(filters)}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {})
-            }
+    static async deleteItem(itemId: string) {
+        const body = await apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}`, {
+            method: "DELETE"
         });
 
-        return parseUserItems(res);
+        return body;
     }
 
-    static async getUserItems(userId: string, filters: ItemFilters = {}) {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${API_URL}/user/${encodeURIComponent(userId)}/items${buildQuery(filters)}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {})
-            }
+    static async getItem(itemId: string) {
+        const body = await apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}`, {
+            method: "GET"
         });
 
-        return parseUserItems(res);
+        return body;
+    }
+
+    static async listDefinitions(page: number, size: number, filters: ItemCatalogFilters = {}) {
+        const params = new URLSearchParams();
+
+        if (filters.kind) params.append("kind", filters.kind);
+        if (filters.category) params.append("category", filters.category);
+        if (filters.available !== undefined) params.append("available", String(filters.available));
+        params.append("page", String(page));
+        params.append("size", String(size));
+
+        return apiFetch<PageResponse<ItemDefinition>>(`/admin/items?${params.toString()}`, {
+            method: "GET"
+        });
     }
 }
