@@ -35,6 +35,8 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
 
   if (!isOpen || !item) return null;
 
+  const consumable = item.kind === "CONSUMABLE";
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAsset(e.target.files[0]);
@@ -91,40 +93,31 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
           />
         </div>
 
-        <div className={styles.inputgroup}>
-          <label>
+        {!consumable && (
+          <div className={styles.inputgroup}>
+            <span className={styles.label}>
+              Arquivo (Asset)
+            </span>
+            <label htmlFor="item-asset" className={`${styles.fileUploadLabel} ${item.category === "BANNER" ? styles.bannerFileLabel : ""}`}>
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className={styles.previewImage}
+                />
+              ) : (
+                <span>Selecionar imagem</span>
+              )}
+            </label>
             <input
-              type="checkbox"
-              checked={available}
-              onChange={(e) => setAvailable(e.target.checked)}
+              id="item-asset"
+              className={styles.fileInput}
+              type="file"
+              onChange={handleFileChange}
+              accept="image/*"
             />
-            Disponível
-          </label>
-        </div>
-
-        <div className={styles.inputgroup}>
-          <span className={styles.label}>
-            Arquivo (Asset)
-          </span>
-          <label htmlFor="item-asset" className={styles.fileUploadLabel}>
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            ) : (
-              <span>Selecionar imagem</span>
-            )}
-          </label>
-          <input
-            id="item-asset"
-            className={styles.fileInput}
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*"
-          />
-        </div>
+          </div>
+        )}
 
         <button type="submit" disabled={loading} className={`${styles.submit} ${loading ? styles.disabled : ""}`}>Salvar Alterações</button>
       </form>

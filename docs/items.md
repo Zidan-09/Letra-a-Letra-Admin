@@ -52,6 +52,7 @@ Autenticação via `Authorization: Bearer <token>` em todas as rotas abaixo.
 | `GET` | `/admin/items?kind=&category=&available=&page=&size=&sort=` | filtros opcionais + paginação Spring | página de `ItemDefinitionResponse` |
 | `GET` | `/admin/items/{itemId}` | — | `ItemDefinitionResponse` |
 | `PUT` | `/admin/items/{itemId}` (`multipart/form-data`) | parte `item`: `{ name?, available?, isNewAsset }` + `asset` opcional | `ItemDefinitionResponse` |
+| `PATCH` | `/admin/items/{itemId}/availability` | `{ "available": true }` — ativa/desativa **sem** incrementar `version` | `ItemDefinitionResponse` |
 | `DELETE` | `/admin/items/{itemId}` | — | `ItemDefinitionResponse` |
 
 ## 4. Criar item — exemplos de `multipart/form-data`
@@ -118,6 +119,10 @@ Consumível (troca de nickname):
   }
 }
 ```
+
+> Para apenas ativar/desativar um item, prefira `PATCH /admin/items/{itemId}/availability`
+> com `{ "available": false }`. Diferente do `PUT`, ele **não incrementa `version`**
+> (a rota de edição versiona a cada chamada). `available` é obrigatório.
 
 ## 5. Rotas — inventário (usuário autenticado)
 

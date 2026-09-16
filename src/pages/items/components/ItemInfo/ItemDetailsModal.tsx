@@ -29,6 +29,8 @@ export function ItemDetailsInfo({
 
     if (!item || !isOpen) return null;
 
+    const consumable = item.kind === "CONSUMABLE";
+
     return (
         <div
             className={styles.overlay}
@@ -154,21 +156,23 @@ export function ItemDetailsInfo({
                         </div>
                     </section>
 
-                    <section className={styles.section}>
-                        <h3 className={styles.sectionTitle}>
-                            Asset
-                        </h3>
+                    {!consumable && (
+                        <section className={styles.section}>
+                            <h3 className={styles.sectionTitle}>
+                                Asset
+                            </h3>
 
-                        <div className={styles.infoCard}>
-                            <span className={styles.infoLabel}>
-                                Caminho
-                            </span>
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Caminho
+                                </span>
 
-                            <strong className={styles.path}>
-                                {item.assetPath || "—"}
-                            </strong>
-                        </div>
-                    </section>
+                                <strong className={styles.path}>
+                                    {item.assetPath || "—"}
+                                </strong>
+                            </div>
+                        </section>
+                    )}
                 </div>
             </div>
         </div>

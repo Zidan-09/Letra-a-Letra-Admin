@@ -166,12 +166,14 @@
   color: #10b981;
   font-weight: 500;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .statusDisabled {
   color: #ef4444;
   font-weight: 500;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 /* ==========================================================================

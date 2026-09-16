@@ -46,6 +46,7 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
   const categories = consumable ? CONSUMABLE_CATEGORIES : COSMETIC_CATEGORIES;
   const effectType = CATEGORY_EFFECT_TYPE[category];
   const isNicknameChange = consumable && category === "CHANGE_NICKNAME";
+  const isBanner = category === "BANNER";
 
   const handleKindChange = (next: ItemKind) => {
     setKind(next);
@@ -213,23 +214,25 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
           </select>
         </div>
 
-        <div className={styles.inputgroup}>
-          <label htmlFor="item-context" className={styles.label}>
-            Contexto{consumable ? " (fixo: PROFILE)" : ""}
-          </label>
-          <select
-            id="item-context"
-            className={styles.select}
-            value={context}
-            onChange={(e) => setContext(e.target.value as ItemContext)}
-            disabled={consumable}
-            required
-          >
-            {CONTEXTS.map((value) => (
-              <option key={value} value={value}>{value}</option>
-            ))}
-          </select>
-        </div>
+        {!consumable && (
+          <div className={styles.inputgroup}>
+            <label htmlFor="item-context" className={styles.label}>
+              Contexto
+            </label>
+            <select
+              id="item-context"
+              className={styles.select}
+              value={context}
+              onChange={(e) => setContext(e.target.value as ItemContext)}
+              disabled={consumable}
+              required
+            >
+              {CONTEXTS.map((value) => (
+                <option key={value} value={value}>{value}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {consumable && !isNicknameChange && effectType && (
           <>
@@ -271,30 +274,32 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
           </div>
         )}
 
-        <div className={styles.inputgroup}>
-          <span className={styles.label}>
-            Arquivo (Asset){kind === "COSMETIC" ? " *" : ""}
-          </span>
-          <label htmlFor="item-asset" className={styles.fileUploadLabel}>
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            ) : (
-              <span>Selecionar imagem</span>
-            )}
-          </label>
-          <input
-            id="item-asset"
-            className={styles.fileInput}
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*"
-            required={kind === "COSMETIC"}
-          />
-        </div>
+        {!consumable && (
+          <div className={styles.inputgroup}>
+            <span className={styles.label}>
+              Arquivo (Asset) *
+            </span>
+            <label htmlFor="item-asset" className={`${styles.fileUploadLabel} ${isBanner ? styles.bannerFileLabel : ""}`}>
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className={styles.previewImage}
+                />
+              ) : (
+                <span>Selecionar imagem</span>
+              )}
+            </label>
+            <input
+              id="item-asset"
+              className={styles.fileInput}
+              type="file"
+              onChange={handleFileChange}
+              accept="image/*"
+              required={kind === "COSMETIC"}
+            />
+          </div>
+        )}
 
         <button type="submit" className={`${styles.submit} ${loading ? styles.disabled : ""}`} disabled={loading}>Cadastrar Item</button>
       </form>

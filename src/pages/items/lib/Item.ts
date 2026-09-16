@@ -105,6 +105,10 @@ export type UpdateItemRequest = {
     isNewAsset: boolean;
 };
 
+export type UpdateItemAvailabilityRequest = {
+    available: boolean;
+};
+
 export type ItemCatalogFilters = {
     kind?: string;
     category?: string;
@@ -176,7 +180,12 @@ export class ItemRequests {
     }
 
     static async setAvailable(itemId: string, available: boolean) {
-        return ItemRequests.updateItem(itemId, { available, isNewAsset: false });
+        const body: UpdateItemAvailabilityRequest = { available };
+
+        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}/availability`, {
+            method: "PATCH",
+            body
+        });
     }
 
     static async deleteItem(itemId: string) {
