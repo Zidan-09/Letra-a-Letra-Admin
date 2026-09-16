@@ -1,7 +1,16 @@
 import { useState, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { ItemRequests, type ItemCategory, type ItemContext, type ItemKind } from "../../lib/Item";
+import {
+  ItemRequests,
+  CATEGORY_EFFECT_TYPE,
+  CONSUMABLE_CATEGORIES,
+  COSMETIC_CATEGORIES,
+  type ItemCategory,
+  type ItemContext,
+  type ItemEffect,
+  type ItemKind,
+} from "../../lib/Item";
 import styles from "./CreateItem.module.css";
 
 interface CreateItemPopupProps {
@@ -10,21 +19,17 @@ interface CreateItemPopupProps {
 }
 
 const KINDS: ItemKind[] = ["COSMETIC", "CONSUMABLE"];
-const CATEGORIES: ItemCategory[] = ["AVATAR", "BANNER", "FRAME", "EMOTE", "BOARD_SKIN", "CELL_SKIN", "XP_BOOST"];
 const CONTEXTS: ItemContext[] = ["PROFILE", "MATCH"];
 
 export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
   const [name, setName] = useState<string>("");
   const [kind, setKind] = useState<ItemKind>("COSMETIC");
   const [category, setCategory] = useState<ItemCategory>("AVATAR");
-  const [contexts, setContexts] = useState<ItemContext[]>(["PROFILE"]);
-  const [stackable, setStackable] = useState(false);
-  const [maxStack, setMaxStack] = useState("1");
+  const [context, setContext] = useState<ItemContext>("PROFILE");
   const [asset, setAsset] = useState<File | null>(null);
 
-  const [hasEffect, setHasEffect] = useState(false);
-  const [magnitude, setMagnitude] = useState("1");
-  const [durationMinutes, setDurationMinutes] = useState("1");
+  const [magnitude, setMagnitude] = useState("50");
+  const [durationMinutes, setDurationMinutes] = useState("60");
 
   const [loading, setLoading] = useState(false);
 
@@ -38,11 +43,26 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
   if (!isOpen) return null;
 
   const consumable = kind === "CONSUMABLE";
+  const categories = consumable ? CONSUMABLE_CATEGORIES : COSMETIC_CATEGORIES;
+  const effectType = CATEGORY_EFFECT_TYPE[category];
+  const isNicknameChange = consumable && category === "CHANGE_NICKNAME";
 
-  const toggleContext = (context: ItemContext) => {
-    setContexts((prev) =>
-      prev.includes(context) ? prev.filter((c) => c !== context) : [...prev, context]
-    );
+  const handleKindChange = (next: ItemKind) => {
+    setKind(next);
+    if (next === "CONSUMABLE") {
+      setContext("PROFILE");
+      setCategory((prev) =>
+        (CONSUMABLE_CATEGORIES as ItemCategory[]).includes(prev) ? prev : "XP_BOOST"
+      );
+    } else {
+      setCategory((prev) =>
+        (COSMETIC_CATEGORIES as ItemCategory[]).includes(prev) ? prev : "AVATAR"
+      );
+    }
+  };
+
+  const handleCategoryChange = (next: ItemCategory) => {
+    setCategory(next);
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -51,67 +71,85 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
     }
   };
 
-  const handleKindChange = (next: ItemKind) => {
-    setKind(next);
-    if (next === "COSMETIC") setHasEffect(false);
-  };
-
   const handleClose = () => {
     onClose();
     setName("");
     setKind("COSMETIC");
     setCategory("AVATAR");
-    setContexts(["PROFILE"]);
-    setStackable(false);
-    setMaxStack("1");
+    setContext("PROFILE");
     setAsset(null);
-    setHasEffect(false);
-    setMagnitude("1");
-    setDurationMinutes("1");
-  }
+    setMagnitude("50");
+    setDurationMinutes("60");
+  };
+
+  const buildEffect = (): ItemEffect | null => {
+    if (!consumable) return null;
+    if (isNicknameChange) return { kind: "NICKNAME_CHANGE" };
+    if (!effectType) return null;
+    return {
+      kind: "PERCENTAGE_TIMED",
+      type: effectType,
+      magnitude: Number(magnitude) || 1,
+      durationMinutes: Number(durationMinutes) || 1,
+    };
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
     if (loading) return;
 
-    if (contexts.length === 0) {
-      notify.error("Selecione ao menos um contexto de aplicabilidade.");
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      notify.error("Informe o nome do item.");
       return;
     }
 
     if (kind === "COSMETIC" && !asset) {
-      notify.error("Por favor, selecione um arquivo de asset.");
+      notify.error("Cosmético exige imagem (asset) no cadastro.");
       return;
     }
 
-    if (hasEffect && !consumable) {
-      notify.error("Efeito só é permitido para itens consumíveis.");
+    if (consumable && context !== "PROFILE") {
+      notify.error("Consumível é sempre PROFILE — nunca MATCH.");
+      return;
+    }
+
+    if (consumable && !effectType && !isNicknameChange) {
+      notify.error("Efeito incompatível com a categoria.");
+      return;
+    }
+
+    if (consumable && !isNicknameChange) {
+      if (Number(magnitude) < 1 || Number(durationMinutes) < 1) {
+        notify.error("Magnitude e duração devem ser maiores que zero.");
+        return;
+      }
+    }
+
+    if (asset && asset.size > 5 * 1024 * 1024) {
+      notify.error("Imagem excede o limite de 5 MB.");
       return;
     }
 
     setLoading(true);
 
     try {
-      await ItemRequests.createItem({
-        name: name.trim(),
-        kind,
-        category,
-        applicability: contexts,
-        stackable,
-        maxStack: stackable ? Number(maxStack) || 1 : undefined,
-        consumable,
-        effect: hasEffect ? {
-          type: "XP_BOOST_PCT",
-          magnitude: Number(magnitude) || 1,
-          durationMinutes: Number(durationMinutes) || 1
-        } : undefined
-      }, asset);
+      await ItemRequests.createItem(
+        {
+          name: trimmedName,
+          kind,
+          category,
+          context,
+          consumable,
+          effect: buildEffect(),
+        },
+        asset
+      );
 
       notify.success("Item cadastrado com sucesso!");
 
       handleClose();
-
     } catch (error) {
       notify.error(error instanceof Error ? error.message : "Erro ao cadastrar item.");
     } finally {
@@ -166,69 +204,39 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
             id="item-category"
             className={styles.select}
             value={category}
-            onChange={(e) => setCategory(e.target.value as ItemCategory)}
+            onChange={(e) => handleCategoryChange(e.target.value as ItemCategory)}
             required
           >
-            {CATEGORIES.map((value) => (
+            {categories.map((value) => (
               <option key={value} value={value}>{value}</option>
             ))}
           </select>
         </div>
 
         <div className={styles.inputgroup}>
-          <span className={styles.label}>Contextos</span>
-          {CONTEXTS.map((context) => (
-            <label key={context}>
-              <input
-                type="checkbox"
-                checked={contexts.includes(context)}
-                onChange={() => toggleContext(context)}
-              />
-              {context}
-            </label>
-          ))}
-        </div>
-
-        <div className={styles.inputgroup}>
-          <label>
-            <input
-              type="checkbox"
-              checked={stackable}
-              onChange={(e) => setStackable(e.target.checked)}
-            />
-            Empilhável
+          <label htmlFor="item-context" className={styles.label}>
+            Contexto{consumable ? " (fixo: PROFILE)" : ""}
           </label>
+          <select
+            id="item-context"
+            className={styles.select}
+            value={context}
+            onChange={(e) => setContext(e.target.value as ItemContext)}
+            disabled={consumable}
+            required
+          >
+            {CONTEXTS.map((value) => (
+              <option key={value} value={value}>{value}</option>
+            ))}
+          </select>
         </div>
 
-        {stackable && (
-          <div className={styles.inputgroup}>
-            <label htmlFor="item-max-stack" className={styles.label}>Máximo por pilha</label>
-            <input
-              id="item-max-stack"
-              className={styles.input}
-              type="number"
-              min={1}
-              value={maxStack}
-              onChange={(e) => setMaxStack(e.target.value)}
-            />
-          </div>
-        )}
-
-        {consumable && (
-          <div className={styles.inputgroup}>
-            <label>
-              <input
-                type="checkbox"
-                checked={hasEffect}
-                onChange={(e) => setHasEffect(e.target.checked)}
-              />
-              Possui efeito (XP_BOOST_PCT)
-            </label>
-          </div>
-        )}
-
-        {consumable && hasEffect && (
+        {consumable && !isNicknameChange && effectType && (
           <>
+            <div className={styles.inputgroup}>
+              <span className={styles.label}>Efeito: {effectType} (PERCENTAGE_TIMED)</span>
+            </div>
+
             <div className={styles.inputgroup}>
               <label htmlFor="item-magnitude" className={styles.label}>Magnitude (%)</label>
               <input
@@ -238,6 +246,7 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
                 min={1}
                 value={magnitude}
                 onChange={(e) => setMagnitude(e.target.value)}
+                required
               />
             </div>
 
@@ -250,9 +259,16 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
                 min={1}
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(e.target.value)}
+                required
               />
             </div>
           </>
+        )}
+
+        {isNicknameChange && (
+          <div className={styles.inputgroup}>
+            <span className={styles.label}>Efeito: NICKNAME_CHANGE (sem magnitude/duração)</span>
+          </div>
         )}
 
         <div className={styles.inputgroup}>

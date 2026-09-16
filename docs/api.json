@@ -3396,19 +3396,19 @@
               "EMOTE",
               "BOARD_SKIN",
               "CELL_SKIN",
-              "XP_BOOST"
+              "XP_BOOST",
+              "RANKING_POINTS_BOOST",
+              "CHANGE_NICKNAME",
+              "COIN_BOOST",
+              "RANKING_POINTS_PROTECTION"
             ]
           },
-          "contexts": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "PROFILE",
-                "MATCH"
-              ]
-            },
-            "uniqueItems": true
+          "context": {
+            "type": "string",
+            "enum": [
+              "PROFILE",
+              "MATCH"
+            ]
           },
           "stackable": {
             "type": "boolean"
@@ -3421,7 +3421,14 @@
             "type": "boolean"
           },
           "effect": {
-            "$ref": "#/components/schemas/ItemEffectResponse"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NicknameChangeEffectResponse"
+              },
+              {
+                "$ref": "#/components/schemas/PercentageTimedEffectResponse"
+              }
+            ]
           },
           "assetPath": {
             "type": "string"
@@ -3436,23 +3443,54 @@
         }
       },
       "ItemEffectResponse": {
-        "type": "object",
+        "discriminator": {
+          "propertyName": "kind"
+        },
         "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "XP_BOOST_PCT"
-            ]
-          },
-          "magnitude": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "durationMinutes": {
-            "type": "integer",
-            "format": "int32"
+          "kind": {
+            "type": "string"
           }
-        }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "NicknameChangeEffectResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemEffectResponse"
+          }
+        ]
+      },
+      "PercentageTimedEffectResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemEffectResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "XP_BOOST_PCT",
+                  "RANKING_POINTS_BOOST_PCT",
+                  "COIN_BOOST_PCT",
+                  "RANKING_POINTS_SHIELD",
+                  "NICKNAME_CHANGE_GRANT"
+                ]
+              },
+              "magnitude": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "durationMinutes": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
       },
       "SuccessResponseItemDefinitionResponse": {
         "type": "object",
@@ -3584,17 +3622,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 1
-          },
-          "context": {
-            "type": "string",
-            "enum": [
-              "PROFILE",
-              "MATCH"
-            ]
           }
         },
         "required": [
-          "context",
           "quantity"
         ]
       },
@@ -4302,7 +4332,11 @@
               "EMOTE",
               "BOARD_SKIN",
               "CELL_SKIN",
-              "XP_BOOST"
+              "XP_BOOST",
+              "RANKING_POINTS_BOOST",
+              "CHANGE_NICKNAME",
+              "COIN_BOOST",
+              "RANKING_POINTS_PROTECTION"
             ]
           },
           "context": {
@@ -4432,61 +4466,92 @@
               "EMOTE",
               "BOARD_SKIN",
               "CELL_SKIN",
-              "XP_BOOST"
+              "XP_BOOST",
+              "RANKING_POINTS_BOOST",
+              "CHANGE_NICKNAME",
+              "COIN_BOOST",
+              "RANKING_POINTS_PROTECTION"
             ]
           },
-          "applicability": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "PROFILE",
-                "MATCH"
-              ]
-            },
-            "uniqueItems": true
-          },
-          "stackable": {
-            "type": "boolean"
-          },
-          "maxStack": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1
+          "context": {
+            "type": "string",
+            "enum": [
+              "PROFILE",
+              "MATCH"
+            ]
           },
           "consumable": {
             "type": "boolean"
           },
           "effect": {
-            "$ref": "#/components/schemas/ItemEffectRequest"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NicknameChangeEffectRequest"
+              },
+              {
+                "$ref": "#/components/schemas/PercentageTimedEffectRequest"
+              }
+            ]
           }
         },
         "required": [
           "category",
+          "context",
           "kind",
           "name"
         ]
       },
       "ItemEffectRequest": {
-        "type": "object",
+        "discriminator": {
+          "propertyName": "kind"
+        },
         "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "XP_BOOST_PCT"
-            ]
-          },
-          "magnitude": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1
-          },
-          "durationMinutes": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1
+          "kind": {
+            "type": "string"
           }
         },
+        "required": [
+          "kind"
+        ]
+      },
+      "NicknameChangeEffectRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemEffectRequest"
+          }
+        ]
+      },
+      "PercentageTimedEffectRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemEffectRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "XP_BOOST_PCT",
+                  "RANKING_POINTS_BOOST_PCT",
+                  "COIN_BOOST_PCT",
+                  "RANKING_POINTS_SHIELD",
+                  "NICKNAME_CHANGE_GRANT"
+                ]
+              },
+              "magnitude": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 1
+              },
+              "durationMinutes": {
+                "type": "integer",
+                "format": "int32",
+                "minimum": 1
+              }
+            }
+          }
+        ],
         "required": [
           "type"
         ]
@@ -4968,19 +5033,19 @@
               "EMOTE",
               "BOARD_SKIN",
               "CELL_SKIN",
-              "XP_BOOST"
+              "XP_BOOST",
+              "RANKING_POINTS_BOOST",
+              "CHANGE_NICKNAME",
+              "COIN_BOOST",
+              "RANKING_POINTS_PROTECTION"
             ]
           },
-          "contexts": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "PROFILE",
-                "MATCH"
-              ]
-            },
-            "uniqueItems": true
+          "context": {
+            "type": "string",
+            "enum": [
+              "PROFILE",
+              "MATCH"
+            ]
           },
           "quantity": {
             "type": "integer",
@@ -5394,7 +5459,11 @@
               "EMOTE",
               "BOARD_SKIN",
               "CELL_SKIN",
-              "XP_BOOST"
+              "XP_BOOST",
+              "RANKING_POINTS_BOOST",
+              "CHANGE_NICKNAME",
+              "COIN_BOOST",
+              "RANKING_POINTS_PROTECTION"
             ]
           },
           "equipped": {
