@@ -11,7 +11,11 @@ export const ITEM_CATEGORIES: ItemCategory[] = [
     "EMOTE",
     "BOARD_SKIN",
     "CELL_SKIN",
-    "XP_BOOST"
+    "XP_BOOST",
+    "RANKING_POINTS_BOOST",
+    "COIN_BOOST",
+    "RANKING_POINTS_PROTECTION",
+    "CHANGE_NICKNAME"
 ];
 
 export type BanType = "PERMANENT" | "TEMPORARY";
@@ -48,7 +52,7 @@ export type UserItem = {
     name: string;
     kind: ItemKind;
     category: ItemCategory;
-    contexts: ("PROFILE" | "MATCH")[];
+    context: "PROFILE" | "MATCH";
     quantity: number;
     equipped: boolean;
     acquiredAt: string;

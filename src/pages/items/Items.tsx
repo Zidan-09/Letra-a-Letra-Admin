@@ -21,7 +21,11 @@ const CATEGORY_OPTIONS: ("ALL" | ItemCategory)[] = [
   "EMOTE",
   "BOARD_SKIN",
   "CELL_SKIN",
-  "XP_BOOST"
+  "XP_BOOST",
+  "RANKING_POINTS_BOOST",
+  "COIN_BOOST",
+  "RANKING_POINTS_PROTECTION",
+  "CHANGE_NICKNAME"
 ];
 
 const AVAILABILITY_OPTIONS = ["ALL", "AVAILABLE", "UNAVAILABLE"] as const;
@@ -57,7 +61,7 @@ export function ItemsPage() {
 
       setCanRegister(permission?.actions.includes("CREATE") ?? false);
       setCanEdit(permission?.actions.includes("EDIT") ?? false);
-      setCanToggle(permission?.actions.includes("TOGGLE") ?? false);
+      setCanToggle(permission?.actions.includes("TOGGLE") || permission?.actions.includes("EDIT") || false);
       setCanDelete(permission?.actions.includes("DELETE") ?? false);
 
   }, [permissions]);
@@ -108,6 +112,14 @@ export function ItemsPage() {
       render: (item) => (
         <span className={`${styles.badge} ${styles[item.category.toLowerCase()] || styles.defaultBadge}`}>
           {item.category}
+        </span>
+      ),
+    },
+    {
+      header: "Contexto",
+      render: (item) => (
+        <span className={styles.badge}>
+          {item.context}
         </span>
       ),
     },

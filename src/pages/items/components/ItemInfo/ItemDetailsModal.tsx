@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { ItemDefinition } from "../../lib/Item";
+import { formatEffect, type ItemDefinition } from "../../lib/Item";
 import styles from "./ItemDetailsModal.module.css";
 
 interface ItemDetailsInfoProps {
@@ -28,6 +28,8 @@ export function ItemDetailsInfo({
     }, [item, isOpen, onClose]);
 
     if (!item || !isOpen) return null;
+
+    const consumable = item.kind === "CONSUMABLE";
 
     return (
         <div
@@ -123,7 +125,7 @@ export function ItemDetailsInfo({
                                     Empilhável
                                 </span>
 
-                                <strong>{item.stackable ? `Sim${item.maxStack ? ` (máx. ${item.maxStack})` : ""}` : "Não"}</strong>
+                                <strong>{item.stackable ? `Sim${item.maxStack != null ? ` (máx. ${item.maxStack})` : ""}` : "Não"}</strong>
                             </div>
 
                             <div className={styles.infoCard}>
@@ -140,37 +142,37 @@ export function ItemDetailsInfo({
                                 </span>
 
                                 <strong>
-                                    {item.effect
-                                        ? `${item.effect.type} (+${item.effect.magnitude}% por ${item.effect.durationMinutes}min)`
-                                        : "—"}
+                                    {formatEffect(item.effect)}
                                 </strong>
                             </div>
 
                             <div className={styles.infoCard}>
                                 <span className={styles.infoLabel}>
-                                    Contextos
+                                    Contexto
                                 </span>
 
-                                <strong>{item.contexts.join(", ")}</strong>
+                                <strong>{item.context}</strong>
                             </div>
                         </div>
                     </section>
 
-                    <section className={styles.section}>
-                        <h3 className={styles.sectionTitle}>
-                            Asset
-                        </h3>
+                    {!consumable && (
+                        <section className={styles.section}>
+                            <h3 className={styles.sectionTitle}>
+                                Asset
+                            </h3>
 
-                        <div className={styles.infoCard}>
-                            <span className={styles.infoLabel}>
-                                Caminho
-                            </span>
+                            <div className={styles.infoCard}>
+                                <span className={styles.infoLabel}>
+                                    Caminho
+                                </span>
 
-                            <strong className={styles.path}>
-                                {item.assetPath || "—"}
-                            </strong>
-                        </div>
-                    </section>
+                                <strong className={styles.path}>
+                                    {item.assetPath || "—"}
+                                </strong>
+                            </div>
+                        </section>
+                    )}
                 </div>
             </div>
         </div>

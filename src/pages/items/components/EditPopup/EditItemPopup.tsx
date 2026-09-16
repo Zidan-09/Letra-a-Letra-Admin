@@ -35,7 +35,7 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
 
   if (!isOpen || !item) return null;
 
-  const isCosmetic = item.kind === "COSMETIC";
+  const consumable = item.kind === "CONSUMABLE";
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -79,45 +79,26 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
         </button>
 
         <h1>Editar Item</h1>
-        <p className={styles.subtitle}>Tipo e categoria não são editáveis pela API. Campos com * são obrigatórios.</p>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Identificação</h2>
+        <div className={styles.inputgroup}>
+          <label htmlFor="edit-item-name" className={styles.label}>Nome</label>
+          <input
+            id="edit-item-name"
+            className={styles.input}
+            type="text"
+            placeholder="Digite o novo nome..."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-          <div className={styles.metaRow}>
-            <span className={styles.metaBadge}>{item.kind}</span>
-            <span className={styles.metaBadge}>{item.category}</span>
-            <span className={styles.metaBadge}>v{item.version}</span>
-          </div>
-
+        {!consumable && (
           <div className={styles.inputgroup}>
-            <label htmlFor="edit-item-name" className={styles.label}>Nome <span className={styles.required}>*</span></label>
-            <input
-              id="edit-item-name"
-              className={styles.input}
-              type="text"
-              placeholder="Digite o novo nome..."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          <label className={styles.check}>
-            <input
-              type="checkbox"
-              className={styles.checkInput}
-              checked={available}
-              onChange={(e) => setAvailable(e.target.checked)}
-            />
-            <span className={styles.checkText}>Disponível no catálogo</span>
-          </label>
-        </section>
-
-        {isCosmetic && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Asset <span className={styles.optional}>(opcional)</span></h2>
-            <label htmlFor="edit-item-asset" className={styles.fileUploadLabel}>
+            <span className={styles.label}>
+              Arquivo (Asset)
+            </span>
+            <label htmlFor="item-asset" className={`${styles.fileUploadLabel} ${item.category === "BANNER" ? styles.bannerFileLabel : ""}`}>
               {previewUrl ? (
                 <img
                   src={previewUrl}
@@ -129,14 +110,13 @@ export function EditItemPopup({ isOpen, onClose, item, onSuccess }: EditItemPopu
               )}
             </label>
             <input
-              id="edit-item-asset"
+              id="item-asset"
               className={styles.fileInput}
               type="file"
               onChange={handleFileChange}
               accept="image/*"
             />
-            <span className={styles.hint}>Envie um arquivo apenas para trocar o asset atual.</span>
-          </section>
+          </div>
         )}
 
         <button type="submit" disabled={loading} className={`${styles.submit} ${loading ? styles.disabled : ""}`}>Salvar Alterações</button>

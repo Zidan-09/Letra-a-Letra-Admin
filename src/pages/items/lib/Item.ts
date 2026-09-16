@@ -11,51 +11,80 @@ export type ItemCategory =
     | "EMOTE"
     | "BOARD_SKIN"
     | "CELL_SKIN"
-    | "XP_BOOST";
+    | "XP_BOOST"
+    | "RANKING_POINTS_BOOST"
+    | "COIN_BOOST"
+    | "RANKING_POINTS_PROTECTION"
+    | "CHANGE_NICKNAME";
 
 export type ItemContext = "PROFILE" | "MATCH";
+
+export type PercentageTimedEffectType =
+    | "XP_BOOST_PCT"
+    | "RANKING_POINTS_BOOST_PCT"
+    | "COIN_BOOST_PCT"
+    | "RANKING_POINTS_SHIELD";
+
+export type PercentageTimedEffect = {
+    kind: "PERCENTAGE_TIMED";
+    type: PercentageTimedEffectType;
+    magnitude: number;
+    durationMinutes: number;
+};
+
+export type NicknameChangeEffect = {
+    kind: "NICKNAME_CHANGE";
+};
+
+export type ItemEffect = PercentageTimedEffect | NicknameChangeEffect;
 
 export const COSMETIC_CATEGORIES: ItemCategory[] = [
     "AVATAR",
     "BANNER",
-    "EMOTE",
     "FRAME",
-    "CELL_SKIN",
+    "EMOTE",
     "BOARD_SKIN",
+    "CELL_SKIN",
 ];
 
 export const CONSUMABLE_CATEGORIES: ItemCategory[] = [
     "XP_BOOST",
+    "RANKING_POINTS_BOOST",
+    "COIN_BOOST",
+    "RANKING_POINTS_PROTECTION",
+    "CHANGE_NICKNAME",
 ];
 
-export const ITEM_CONTEXTS: ItemContext[] = ["PROFILE", "MATCH"];
-
-export function getCategoriesForKind(kind: ItemKind): ItemCategory[] {
-    return kind === "COSMETIC" ? COSMETIC_CATEGORIES : CONSUMABLE_CATEGORIES;
-}
-
-export function isCategoryValidForKind(kind: ItemKind, category: ItemCategory): boolean {
-    return getCategoriesForKind(kind).includes(category);
-}
-
-export type EffectType = "XP_BOOST_PCT";
-
-export type ItemEffect = {
-    type: EffectType;
-    magnitude: number;
-    durationMinutes: number;
+export const CATEGORY_EFFECT_TYPE: Record<ItemCategory, PercentageTimedEffectType | null> = {
+    AVATAR: null,
+    BANNER: null,
+    FRAME: null,
+    EMOTE: null,
+    BOARD_SKIN: null,
+    CELL_SKIN: null,
+    XP_BOOST: "XP_BOOST_PCT",
+    RANKING_POINTS_BOOST: "RANKING_POINTS_BOOST_PCT",
+    COIN_BOOST: "COIN_BOOST_PCT",
+    RANKING_POINTS_PROTECTION: "RANKING_POINTS_SHIELD",
+    CHANGE_NICKNAME: null,
 };
+
+export function formatEffect(effect: ItemEffect | null | undefined): string {
+    if (!effect) return "—";
+    if (effect.kind === "NICKNAME_CHANGE") return "Troca de nickname";
+    return `${effect.type} (+${effect.magnitude}% por ${effect.durationMinutes}min)`;
+}
 
 export type ItemDefinition = {
     itemId: string;
     name: string;
     kind: ItemKind;
     category: ItemCategory;
-    contexts: ItemContext[];
+    context: ItemContext;
     stackable: boolean;
     maxStack: number | null;
     consumable: boolean;
-    effect?: ItemEffect | null;
+    effect: ItemEffect | null;
     assetPath: string | null;
     version: number;
     available: boolean;
@@ -65,11 +94,9 @@ export type CreateItemRequest = {
     name: string;
     kind: ItemKind;
     category: ItemCategory;
-    applicability?: ItemContext[];
-    stackable?: boolean;
-    maxStack?: number;
-    consumable?: boolean;
-    effect?: ItemEffect;
+    context: ItemContext;
+    consumable: boolean;
+    effect: ItemEffect | null;
 };
 
 export type UpdateItemRequest = {
@@ -78,10 +105,15 @@ export type UpdateItemRequest = {
     isNewAsset: boolean;
 };
 
+export type UpdateItemAvailabilityRequest = {
+    available: boolean;
+};
+
 export type ItemCatalogFilters = {
     kind?: string;
     category?: string;
     available?: boolean;
+    sort?: string[];
 };
 
 function authHeaders(): HeadersInit {
@@ -148,7 +180,12 @@ export class ItemRequests {
     }
 
     static async setAvailable(itemId: string, available: boolean) {
-        return ItemRequests.updateItem(itemId, { available, isNewAsset: false });
+        const body: UpdateItemAvailabilityRequest = { available };
+
+        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}/availability`, {
+            method: "PATCH",
+            body
+        });
     }
 
     static async deleteItem(itemId: string) {
@@ -173,6 +210,7 @@ export class ItemRequests {
         if (filters.kind) params.append("kind", filters.kind);
         if (filters.category) params.append("category", filters.category);
         if (filters.available !== undefined) params.append("available", String(filters.available));
+        filters.sort?.forEach((s) => params.append("sort", s));
         params.append("page", String(page));
         params.append("size", String(size));
 
