@@ -15,6 +15,29 @@ export type ItemCategory =
 
 export type ItemContext = "PROFILE" | "MATCH";
 
+export const COSMETIC_CATEGORIES: ItemCategory[] = [
+    "AVATAR",
+    "BANNER",
+    "EMOTE",
+    "FRAME",
+    "CELL_SKIN",
+    "BOARD_SKIN",
+];
+
+export const CONSUMABLE_CATEGORIES: ItemCategory[] = [
+    "XP_BOOST",
+];
+
+export const ITEM_CONTEXTS: ItemContext[] = ["PROFILE", "MATCH"];
+
+export function getCategoriesForKind(kind: ItemKind): ItemCategory[] {
+    return kind === "COSMETIC" ? COSMETIC_CATEGORIES : CONSUMABLE_CATEGORIES;
+}
+
+export function isCategoryValidForKind(kind: ItemKind, category: ItemCategory): boolean {
+    return getCategoriesForKind(kind).includes(category);
+}
+
 export type EffectType = "XP_BOOST_PCT";
 
 export type ItemEffect = {

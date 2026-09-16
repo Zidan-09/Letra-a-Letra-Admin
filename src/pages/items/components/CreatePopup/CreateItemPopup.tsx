@@ -1,7 +1,15 @@
 import { useState, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import { useNotification } from "../../../../hooks/notification/useNotification";
-import { ItemRequests, type ItemCategory, type ItemContext, type ItemKind } from "../../lib/Item";
+import {
+  ItemRequests,
+  getCategoriesForKind,
+  isCategoryValidForKind,
+  ITEM_CONTEXTS,
+  type ItemCategory,
+  type ItemContext,
+  type ItemKind,
+} from "../../lib/Item";
 import styles from "./CreateItem.module.css";
 
 interface CreateItemPopupProps {
@@ -10,13 +18,11 @@ interface CreateItemPopupProps {
 }
 
 const KINDS: ItemKind[] = ["COSMETIC", "CONSUMABLE"];
-const CATEGORIES: ItemCategory[] = ["AVATAR", "BANNER", "FRAME", "EMOTE", "BOARD_SKIN", "CELL_SKIN", "XP_BOOST"];
-const CONTEXTS: ItemContext[] = ["PROFILE", "MATCH"];
 
 export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
   const [name, setName] = useState<string>("");
   const [kind, setKind] = useState<ItemKind>("COSMETIC");
-  const [category, setCategory] = useState<ItemCategory>("AVATAR");
+  const [category, setCategory] = useState<ItemCategory | "">("AVATAR");
   const [contexts, setContexts] = useState<ItemContext[]>(["PROFILE"]);
   const [stackable, setStackable] = useState(false);
   const [maxStack, setMaxStack] = useState("1");
@@ -38,6 +44,8 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
   if (!isOpen) return null;
 
   const consumable = kind === "CONSUMABLE";
+  const isCosmetic = kind === "COSMETIC";
+  const categories = getCategoriesForKind(kind);
 
   const toggleContext = (context: ItemContext) => {
     setContexts((prev) =>
@@ -53,7 +61,11 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
 
   const handleKindChange = (next: ItemKind) => {
     setKind(next);
+    if (!isCategoryValidForKind(next, category as ItemCategory)) {
+      setCategory("");
+    }
     if (next === "COSMETIC") setHasEffect(false);
+    if (next !== "COSMETIC") setAsset(null);
   };
 
   const handleClose = () => {
@@ -74,6 +86,11 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
     event.preventDefault();
 
     if (loading) return;
+
+    if (!category) {
+      notify.error("Selecione uma categoria válida para o tipo escolhido.");
+      return;
+    }
 
     if (contexts.length === 0) {
       notify.error("Selecione ao menos um contexto de aplicabilidade.");
@@ -131,154 +148,179 @@ export function CreateItemPopup({ isOpen, onClose }: CreateItemPopupProps) {
         </button>
 
         <h1>Criar Item</h1>
+        <p className={styles.subtitle}>Preencha os dados do catálogo. Campos com * são obrigatórios.</p>
 
-        <div className={styles.inputgroup}>
-          <label htmlFor="item-name" className={styles.label}>Nome</label>
-          <input
-            id="item-name"
-            className={styles.input}
-            type="text"
-            placeholder="Digite o nome do item..."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Informações básicas</h2>
 
-        <div className={styles.inputgroup}>
-          <label htmlFor="item-kind" className={styles.label}>Tipo</label>
-          <select
-            id="item-kind"
-            className={styles.select}
-            value={kind}
-            onChange={(e) => handleKindChange(e.target.value as ItemKind)}
-            required
-          >
-            {KINDS.map((value) => (
-              <option key={value} value={value}>{value}</option>
-            ))}
-          </select>
-        </div>
+          <div className={styles.inputgroup}>
+            <label htmlFor="item-name" className={styles.label}>Nome <span className={styles.required}>*</span></label>
+            <input
+              id="item-name"
+              className={styles.input}
+              type="text"
+              placeholder="Digite o nome do item..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className={styles.inputgroup}>
-          <label htmlFor="item-category" className={styles.label}>Categoria</label>
-          <select
-            id="item-category"
-            className={styles.select}
-            value={category}
-            onChange={(e) => setCategory(e.target.value as ItemCategory)}
-            required
-          >
-            {CATEGORIES.map((value) => (
-              <option key={value} value={value}>{value}</option>
-            ))}
-          </select>
-        </div>
+          <div className={styles.inputgroup}>
+            <span className={styles.label} id="item-kind-label">Tipo <span className={styles.required}>*</span></span>
+            <div className={styles.segmented} role="radiogroup" aria-labelledby="item-kind-label">
+              {KINDS.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={kind === value}
+                  className={`${styles.segment} ${kind === value ? styles.segmentActive : ""}`}
+                  onClick={() => handleKindChange(value)}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <span className={styles.hint}>
+              {isCosmetic ? "Cosmético: visual equipável, exige asset." : "Consumível: uso único ou temporário, sem asset."}
+            </span>
+          </div>
 
-        <div className={styles.inputgroup}>
-          <span className={styles.label}>Contextos</span>
-          {CONTEXTS.map((context) => (
-            <label key={context}>
-              <input
-                type="checkbox"
-                checked={contexts.includes(context)}
-                onChange={() => toggleContext(context)}
-              />
-              {context}
-            </label>
-          ))}
-        </div>
+          <div className={styles.inputgroup}>
+            <label htmlFor="item-category" className={styles.label}>Categoria <span className={styles.required}>*</span></label>
+            <select
+              id="item-category"
+              className={styles.select}
+              value={category}
+              onChange={(e) => setCategory(e.target.value as ItemCategory)}
+              required
+            >
+              <option value="" disabled>Selecione uma categoria</option>
+              {categories.map((value) => (
+                <option key={value} value={value}>{value}</option>
+              ))}
+            </select>
+            <span className={styles.hint}>
+              {categories.length} {categories.length === 1 ? "opção disponível" : "opções disponíveis"} para {kind}.
+            </span>
+          </div>
+        </section>
 
-        <div className={styles.inputgroup}>
-          <label>
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Contexto de uso <span className={styles.required}>*</span></h2>
+          <div className={styles.segmented} role="group" aria-label="Contextos">
+            {ITEM_CONTEXTS.map((context) => {
+              const active = contexts.includes(context);
+              return (
+                <button
+                  key={context}
+                  type="button"
+                  aria-pressed={active}
+                  className={`${styles.segment} ${active ? styles.segmentActive : ""}`}
+                  onClick={() => toggleContext(context)}
+                >
+                  {context}
+                </button>
+              );
+            })}
+          </div>
+          <span className={styles.hint}>Selecione ao menos um. É possível ativar os dois.</span>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Empilhamento e efeito <span className={styles.optional}>(opcional)</span></h2>
+
+          <label className={styles.check}>
             <input
               type="checkbox"
+              className={styles.checkInput}
               checked={stackable}
               onChange={(e) => setStackable(e.target.checked)}
             />
-            Empilhável
+            <span className={styles.checkText}>Empilhável</span>
           </label>
-        </div>
 
-        {stackable && (
-          <div className={styles.inputgroup}>
-            <label htmlFor="item-max-stack" className={styles.label}>Máximo por pilha</label>
-            <input
-              id="item-max-stack"
-              className={styles.input}
-              type="number"
-              min={1}
-              value={maxStack}
-              onChange={(e) => setMaxStack(e.target.value)}
-            />
-          </div>
-        )}
+          {stackable && (
+            <div className={styles.inputgroup}>
+              <label htmlFor="item-max-stack" className={styles.label}>Máximo por pilha</label>
+              <input
+                id="item-max-stack"
+                className={styles.input}
+                type="number"
+                min={1}
+                value={maxStack}
+                onChange={(e) => setMaxStack(e.target.value)}
+              />
+            </div>
+          )}
 
-        {consumable && (
-          <div className={styles.inputgroup}>
-            <label>
+          {consumable && (
+            <label className={styles.check}>
               <input
                 type="checkbox"
+                className={styles.checkInput}
                 checked={hasEffect}
                 onChange={(e) => setHasEffect(e.target.checked)}
               />
-              Possui efeito (XP_BOOST_PCT)
+              <span className={styles.checkText}>Possui efeito (XP_BOOST_PCT)</span>
             </label>
-          </div>
-        )}
+          )}
 
-        {consumable && hasEffect && (
-          <>
-            <div className={styles.inputgroup}>
-              <label htmlFor="item-magnitude" className={styles.label}>Magnitude (%)</label>
-              <input
-                id="item-magnitude"
-                className={styles.input}
-                type="number"
-                min={1}
-                value={magnitude}
-                onChange={(e) => setMagnitude(e.target.value)}
-              />
+          {consumable && hasEffect && (
+            <div className={styles.row}>
+              <div className={styles.inputgroup}>
+                <label htmlFor="item-magnitude" className={styles.label}>Magnitude (%)</label>
+                <input
+                  id="item-magnitude"
+                  className={styles.input}
+                  type="number"
+                  min={1}
+                  value={magnitude}
+                  onChange={(e) => setMagnitude(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.inputgroup}>
+                <label htmlFor="item-duration" className={styles.label}>Duração (min)</label>
+                <input
+                  id="item-duration"
+                  className={styles.input}
+                  type="number"
+                  min={1}
+                  value={durationMinutes}
+                  onChange={(e) => setDurationMinutes(e.target.value)}
+                />
+              </div>
             </div>
+          )}
+        </section>
 
-            <div className={styles.inputgroup}>
-              <label htmlFor="item-duration" className={styles.label}>Duração (minutos)</label>
-              <input
-                id="item-duration"
-                className={styles.input}
-                type="number"
-                min={1}
-                value={durationMinutes}
-                onChange={(e) => setDurationMinutes(e.target.value)}
-              />
-            </div>
-          </>
+        {isCosmetic && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Asset <span className={styles.required}>*</span></h2>
+            <label htmlFor="item-asset" className={styles.fileUploadLabel}>
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className={styles.previewImage}
+                />
+              ) : (
+                <span>Selecionar imagem</span>
+              )}
+            </label>
+            <input
+              id="item-asset"
+              className={styles.fileInput}
+              type="file"
+              onChange={handleFileChange}
+              accept="image/*"
+              required={isCosmetic}
+            />
+            <span className={styles.hint}>Obrigatório para itens COSMETIC.</span>
+          </section>
         )}
-
-        <div className={styles.inputgroup}>
-          <span className={styles.label}>
-            Arquivo (Asset){kind === "COSMETIC" ? " *" : ""}
-          </span>
-          <label htmlFor="item-asset" className={styles.fileUploadLabel}>
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            ) : (
-              <span>Selecionar imagem</span>
-            )}
-          </label>
-          <input
-            id="item-asset"
-            className={styles.fileInput}
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*"
-            required={kind === "COSMETIC"}
-          />
-        </div>
 
         <button type="submit" className={`${styles.submit} ${loading ? styles.disabled : ""}`} disabled={loading}>Cadastrar Item</button>
       </form>
