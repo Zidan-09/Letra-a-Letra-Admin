@@ -29,7 +29,7 @@ export function ItemDetailsInfo({
 
     if (!item || !isOpen) return null;
 
-    const consumable = item.kind === "CONSUMABLE";
+    const equippable = item.kind === "EQUIPPABLE";
 
     return (
         <div
@@ -43,7 +43,7 @@ export function ItemDetailsInfo({
                 <header className={styles.header}>
                     <div>
                         <span className={styles.typeBadge}>
-                            {item.kind} · {item.category}
+                            {item.kind}{item.category ? ` · ${item.category}` : item.effect ? ` · ${item.effect.kind}` : ""}
                         </span>
 
                         <h2 className={styles.title}>
@@ -101,7 +101,7 @@ export function ItemDetailsInfo({
                                     Categoria
                                 </span>
 
-                                <strong>{item.category}</strong>
+                                <strong>{item.category ?? (item.effect ? item.effect.kind : "—")}</strong>
                             </div>
 
                             <div className={styles.infoCard}>
@@ -151,12 +151,12 @@ export function ItemDetailsInfo({
                                     Contexto
                                 </span>
 
-                                <strong>{item.context}</strong>
+                                <strong>{item.context ?? "—"}</strong>
                             </div>
                         </div>
                     </section>
 
-                    {!consumable && (
+                    {equippable && (
                         <section className={styles.section}>
                             <h3 className={styles.sectionTitle}>
                                 Asset

@@ -2,28 +2,28 @@ import { API_URL, isSuccess } from "../../../lib/config";
 import { apiFetch, HttpError } from "../../../lib/http";
 import type { PageResponse } from "../../../lib/shared";
 
-export type ItemKind = "COSMETIC" | "CONSUMABLE";
+export type ItemKind = "EQUIPPABLE" | "CONSUMABLE";
 
 export type ItemCategory =
     | "AVATAR"
     | "BANNER"
     | "FRAME"
     | "EMOTE"
-    | "BOARD_SKIN"
-    | "CELL_SKIN"
-    | "XP_BOOST"
-    | "RANKING_POINTS_BOOST"
-    | "COIN_BOOST"
-    | "RANKING_POINTS_PROTECTION"
-    | "CHANGE_NICKNAME";
+    | "BOARD"
+    | "CELL";
 
 export type ItemContext = "PROFILE" | "MATCH";
 
-export type PercentageTimedEffectType =
+export type EffectKind = "PERCENTAGE_TIMED" | "NICKNAME_CHANGE";
+
+export type EffectType =
     | "XP_BOOST_PCT"
     | "RANKING_POINTS_BOOST_PCT"
     | "COIN_BOOST_PCT"
-    | "RANKING_POINTS_SHIELD";
+    | "RANKING_POINTS_SHIELD"
+    | "NICKNAME_CHANGE_GRANT";
+
+export type PercentageTimedEffectType = Exclude<EffectType, "NICKNAME_CHANGE_GRANT">;
 
 export type PercentageTimedEffect = {
     kind: "PERCENTAGE_TIMED";
@@ -38,36 +38,36 @@ export type NicknameChangeEffect = {
 
 export type ItemEffect = PercentageTimedEffect | NicknameChangeEffect;
 
-export const COSMETIC_CATEGORIES: ItemCategory[] = [
+export const EQUIPPABLE_CATEGORIES: ItemCategory[] = [
     "AVATAR",
     "BANNER",
     "FRAME",
     "EMOTE",
-    "BOARD_SKIN",
-    "CELL_SKIN",
+    "BOARD",
+    "CELL",
 ];
 
-export const CONSUMABLE_CATEGORIES: ItemCategory[] = [
-    "XP_BOOST",
-    "RANKING_POINTS_BOOST",
-    "COIN_BOOST",
-    "RANKING_POINTS_PROTECTION",
-    "CHANGE_NICKNAME",
-];
-
-export const CATEGORY_EFFECT_TYPE: Record<ItemCategory, PercentageTimedEffectType | null> = {
-    AVATAR: null,
-    BANNER: null,
-    FRAME: null,
-    EMOTE: null,
-    BOARD_SKIN: null,
-    CELL_SKIN: null,
-    XP_BOOST: "XP_BOOST_PCT",
-    RANKING_POINTS_BOOST: "RANKING_POINTS_BOOST_PCT",
-    COIN_BOOST: "COIN_BOOST_PCT",
-    RANKING_POINTS_PROTECTION: "RANKING_POINTS_SHIELD",
-    CHANGE_NICKNAME: null,
+export const CATEGORY_CONTEXT: Record<ItemCategory, ItemContext> = {
+    AVATAR: "PROFILE",
+    BANNER: "PROFILE",
+    FRAME: "PROFILE",
+    EMOTE: "MATCH",
+    BOARD: "MATCH",
+    CELL: "MATCH",
 };
+
+export const EFFECT_KINDS: EffectKind[] = ["PERCENTAGE_TIMED", "NICKNAME_CHANGE"];
+
+export const PERCENTAGE_TIMED_TYPES: PercentageTimedEffectType[] = [
+    "XP_BOOST_PCT",
+    "RANKING_POINTS_BOOST_PCT",
+    "COIN_BOOST_PCT",
+    "RANKING_POINTS_SHIELD",
+];
+
+export function getContextForCategory(category: ItemCategory): ItemContext {
+    return CATEGORY_CONTEXT[category];
+}
 
 export function formatEffect(effect: ItemEffect | null | undefined): string {
     if (!effect) return "—";
@@ -79,8 +79,8 @@ export type ItemDefinition = {
     itemId: string;
     name: string;
     kind: ItemKind;
-    category: ItemCategory;
-    context: ItemContext;
+    category: ItemCategory | null;
+    context: ItemContext | null;
     stackable: boolean;
     maxStack: number | null;
     consumable: boolean;
@@ -90,23 +90,35 @@ export type ItemDefinition = {
     available: boolean;
 };
 
-export type CreateItemRequest = {
+export type CreateEquippablePayload = {
     name: string;
-    kind: ItemKind;
+    kind: "EQUIPPABLE";
     category: ItemCategory;
     context: ItemContext;
-    consumable: boolean;
-    effect: ItemEffect | null;
+    asset: File;
 };
 
-export type UpdateItemRequest = {
+export type CreateConsumablePayload = {
+    name: string;
+    kind: "CONSUMABLE";
+    effectKind: EffectKind;
+    effectType?: PercentageTimedEffectType;
+    magnitude?: number;
+    durationMinutes?: number;
+};
+
+export type CreateItemPayload = CreateEquippablePayload | CreateConsumablePayload;
+
+export type UpdateItemPayload = {
     name?: string;
     available?: boolean;
-    isNewAsset: boolean;
-};
-
-export type UpdateItemAvailabilityRequest = {
-    available: boolean;
+    category?: ItemCategory;
+    context?: ItemContext;
+    effectKind?: EffectKind;
+    effectType?: PercentageTimedEffectType;
+    magnitude?: number;
+    durationMinutes?: number;
+    isNewAsset?: boolean;
 };
 
 export type ItemCatalogFilters = {
@@ -120,6 +132,11 @@ function authHeaders(): HeadersInit {
     const token = localStorage.getItem("token");
 
     return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
+function appendIfDefined(form: FormData, key: string, value: string | number | boolean | undefined | null) {
+    if (value === undefined || value === null) return;
+    form.append(key, String(value));
 }
 
 async function parseItemDefinition(res: Response): Promise<ItemDefinition> {
@@ -149,11 +166,23 @@ async function parseItemDefinition(res: Response): Promise<ItemDefinition> {
 }
 
 export class ItemRequests {
-    static async createItem(body: CreateItemRequest, asset?: File | null) {
+    static async createItem(payload: CreateItemPayload) {
         const formData = new FormData();
-        formData.append("item", new Blob([JSON.stringify(body)], { type: "application/json" }));
+        formData.append("name", payload.name.trim());
+        formData.append("kind", payload.kind);
 
-        if (asset) formData.append("asset", asset);
+        if (payload.kind === "EQUIPPABLE") {
+            formData.append("category", payload.category);
+            formData.append("context", payload.context);
+            formData.append("asset", payload.asset);
+        } else {
+            formData.append("effectKind", payload.effectKind);
+            if (payload.effectKind === "PERCENTAGE_TIMED") {
+                appendIfDefined(formData, "effectType", payload.effectType);
+                appendIfDefined(formData, "magnitude", payload.magnitude);
+                appendIfDefined(formData, "durationMinutes", payload.durationMinutes);
+            }
+        }
 
         const res = await fetch(`${API_URL}/admin/items`, {
             method: "POST",
@@ -164,9 +193,18 @@ export class ItemRequests {
         return parseItemDefinition(res);
     }
 
-    static async updateItem(itemId: string, body: UpdateItemRequest, asset?: File | null) {
+    static async updateItem(itemId: string, payload: UpdateItemPayload, asset?: File | null) {
         const formData = new FormData();
-        formData.append("item", new Blob([JSON.stringify(body)], { type: "application/json" }));
+        const name = payload.name?.trim();
+        if (name) formData.append("name", name);
+        appendIfDefined(formData, "available", payload.available);
+        appendIfDefined(formData, "category", payload.category);
+        appendIfDefined(formData, "context", payload.context);
+        appendIfDefined(formData, "effectKind", payload.effectKind);
+        appendIfDefined(formData, "effectType", payload.effectType);
+        appendIfDefined(formData, "magnitude", payload.magnitude);
+        appendIfDefined(formData, "durationMinutes", payload.durationMinutes);
+        appendIfDefined(formData, "isNewAsset", payload.isNewAsset);
 
         if (asset) formData.append("asset", asset);
 
@@ -180,11 +218,10 @@ export class ItemRequests {
     }
 
     static async setAvailable(itemId: string, available: boolean) {
-        const body: UpdateItemAvailabilityRequest = { available };
+        const action = available ? "enable" : "disable";
 
-        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}/availability`, {
-            method: "PATCH",
-            body
+        return apiFetch<ItemDefinition>(`/admin/items/${encodeURIComponent(itemId)}/${action}`, {
+            method: "PATCH"
         });
     }
 

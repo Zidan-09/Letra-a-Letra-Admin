@@ -9,13 +9,8 @@ export const ITEM_CATEGORIES: ItemCategory[] = [
     "BANNER",
     "FRAME",
     "EMOTE",
-    "BOARD_SKIN",
-    "CELL_SKIN",
-    "XP_BOOST",
-    "RANKING_POINTS_BOOST",
-    "COIN_BOOST",
-    "RANKING_POINTS_PROTECTION",
-    "CHANGE_NICKNAME"
+    "BOARD",
+    "CELL",
 ];
 
 export type BanType = "PERMANENT" | "TEMPORARY";
@@ -40,24 +35,24 @@ export type InventoryItem = {
     itemId: string;
     name: string;
     kind: ItemKind;
-    category: ItemCategory;
-    context: "PROFILE" | "MATCH";
+    category: ItemCategory | null;
+    context: "PROFILE" | "MATCH" | null;
     quantity: number;
     equipped: boolean;
-    assetPath: string;
+    assetPath: string | null;
 }
 
 export type UserItem = {
     itemId: string;
     name: string;
     kind: ItemKind;
-    category: ItemCategory;
-    context: "PROFILE" | "MATCH";
+    category: ItemCategory | null;
+    context: "PROFILE" | "MATCH" | null;
     quantity: number;
     equipped: boolean;
     acquiredAt: string;
     expiresAt: string | null;
-    assetPath: string;
+    assetPath: string | null;
 }
 
 type Wallet = {

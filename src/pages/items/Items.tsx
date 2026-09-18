@@ -4,29 +4,16 @@ import { useProfile } from "../../hooks/profile/useProfile";
 import { Table, type Column } from "../../components/Table/Table";
 import { CreateItemPopup } from "./components/CreatePopup/CreateItemPopup";
 import { EditItemPopup } from "./components/EditPopup/EditItemPopup";
-import { type ItemDefinition, type ItemKind, type ItemCategory, ItemRequests } from "./lib/Item";
+import { EQUIPPABLE_CATEGORIES, formatEffect, type ItemDefinition, type ItemKind, type ItemCategory, ItemRequests } from "./lib/Item";
 import styles from "./Items.module.css";
 import { ItemDetailsInfo } from "./components/ItemInfo/ItemDetailsModal";
 import { Trash2 } from "lucide-react";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 5;
 
-const KIND_OPTIONS: ("ALL" | ItemKind)[] = ["ALL", "COSMETIC", "CONSUMABLE"];
+const KIND_OPTIONS: ("ALL" | ItemKind)[] = ["ALL", "EQUIPPABLE", "CONSUMABLE"];
 
-const CATEGORY_OPTIONS: ("ALL" | ItemCategory)[] = [
-  "ALL",
-  "AVATAR",
-  "BANNER",
-  "FRAME",
-  "EMOTE",
-  "BOARD_SKIN",
-  "CELL_SKIN",
-  "XP_BOOST",
-  "RANKING_POINTS_BOOST",
-  "COIN_BOOST",
-  "RANKING_POINTS_PROTECTION",
-  "CHANGE_NICKNAME"
-];
+const CATEGORY_OPTIONS: ("ALL" | ItemCategory)[] = ["ALL", ...EQUIPPABLE_CATEGORIES];
 
 const AVAILABILITY_OPTIONS = ["ALL", "AVAILABLE", "UNAVAILABLE"] as const;
 
@@ -61,7 +48,7 @@ export function ItemsPage() {
 
       setCanRegister(permission?.actions.includes("CREATE") ?? false);
       setCanEdit(permission?.actions.includes("EDIT") ?? false);
-      setCanToggle(permission?.actions.includes("TOGGLE") || permission?.actions.includes("EDIT") || false);
+      setCanToggle(permission?.actions.includes("EDIT") ?? false);
       setCanDelete(permission?.actions.includes("DELETE") ?? false);
 
   }, [permissions]);
@@ -110,16 +97,16 @@ export function ItemsPage() {
     {
       header: "Categoria",
       render: (item) => (
-        <span className={`${styles.badge} ${styles[item.category.toLowerCase()] || styles.defaultBadge}`}>
-          {item.category}
+        <span className={`${styles.badge} ${item.category ? styles[item.category.toLowerCase()] || styles.defaultBadge : styles.defaultBadge}`}>
+          {item.category ?? "—"}
         </span>
       ),
     },
     {
-      header: "Contexto",
+      header: "Contexto / Efeito",
       render: (item) => (
         <span className={styles.badge}>
-          {item.context}
+          {item.kind === "EQUIPPABLE" ? (item.context ?? "—") : formatEffect(item.effect)}
         </span>
       ),
     },
@@ -169,11 +156,12 @@ export function ItemsPage() {
   };
 
   const applyFilters = (kind: "ALL" | ItemKind, category: "ALL" | ItemCategory, availability: AvailabilityFilter) => {
+    const nextCategory = kind === "CONSUMABLE" ? "ALL" as const : category;
     setKindFilter(kind);
-    setCategoryFilter(category);
+    setCategoryFilter(nextCategory);
     setAvailabilityFilter(availability);
     setPage(0);
-    fetchItems(0, kind, category, availability);
+    fetchItems(0, kind, nextCategory, availability);
   };
 
   return (
@@ -204,7 +192,11 @@ export function ItemsPage() {
 
         <label className={styles.filterField}>
           <span>Categoria</span>
-          <select value={categoryFilter} onChange={(e) => applyFilters(kindFilter, e.target.value as "ALL" | ItemCategory, availabilityFilter)}>
+          <select
+            value={categoryFilter}
+            disabled={kindFilter === "CONSUMABLE"}
+            onChange={(e) => applyFilters(kindFilter, e.target.value as "ALL" | ItemCategory, availabilityFilter)}
+          >
             {CATEGORY_OPTIONS.map((category) => (
               <option key={category} value={category}>{category === "ALL" ? "Todas" : category}</option>
             ))}

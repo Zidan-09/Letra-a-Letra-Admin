@@ -29,6 +29,10 @@
       "description": "Rotas relacionadas a funcionalidade de salas"
     },
     {
+      "name": "Items",
+      "description": "Rotas do catǭlogo de itens"
+    },
+    {
       "name": "Ticket",
       "description": "Rotas de criação e consulta de tickets de suporte pelo usuário"
     },
@@ -237,7 +241,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
                 }
               }
             }
@@ -264,19 +268,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "item": {
-                    "$ref": "#/components/schemas/UpdateItemDefinitionRequest"
-                  },
-                  "asset": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "item"
-                ]
+                "$ref": "#/components/schemas/UpdateItemRequest"
               }
             }
           }
@@ -287,7 +279,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
                 }
               }
             }
@@ -316,7 +308,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
                 }
               }
             }
@@ -925,7 +917,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponsePageResponseItemDefinitionResponse"
+                  "$ref": "#/components/schemas/SuccessResponsePageResponseItemResponse"
                 }
               }
             }
@@ -941,19 +933,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "item": {
-                    "$ref": "#/components/schemas/CreateItemDefinitionRequest"
-                  },
-                  "asset": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "item"
-                ]
+                "$ref": "#/components/schemas/CreateItemRequest"
               }
             }
           }
@@ -964,7 +944,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponseItemDefinitionResponse"
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
                 }
               }
             }
@@ -1498,12 +1478,74 @@
         }
       }
     },
+    "/admin/items/{itemId}/enable": {
+      "patch": {
+        "tags": [
+          "Items"
+        ],
+        "operationId": "handle_41",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/items/{itemId}/disable": {
+      "patch": {
+        "tags": [
+          "Items"
+        ],
+        "operationId": "handle_42",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponseItemResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/activate": {
       "patch": {
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_41",
+        "operationId": "handle_43",
         "parameters": [
           {
             "name": "token",
@@ -1543,7 +1585,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_42",
+        "operationId": "handle_44",
         "parameters": [
           {
             "name": "userId",
@@ -1606,7 +1648,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_43",
+        "operationId": "handle_45",
         "parameters": [
           {
             "name": "username",
@@ -1645,7 +1687,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_44",
+        "operationId": "handle_46",
         "parameters": [
           {
             "name": "pageable",
@@ -1675,7 +1717,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "handle_45",
+        "operationId": "handle_47",
         "responses": {
           "200": {
             "description": "OK",
@@ -1695,7 +1737,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_46",
+        "operationId": "handle_48",
         "parameters": [
           {
             "name": "kind",
@@ -1749,7 +1791,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_47",
+        "operationId": "handle_49",
         "parameters": [
           {
             "name": "pageable",
@@ -1779,7 +1821,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_48",
+        "operationId": "handle_50",
         "parameters": [
           {
             "name": "transactionId",
@@ -1810,7 +1852,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_49",
+        "operationId": "handle_51",
         "parameters": [
           {
             "name": "userId",
@@ -1849,7 +1891,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "handle_50",
+        "operationId": "handle_52",
         "parameters": [
           {
             "name": "username",
@@ -1887,7 +1929,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_51",
+        "operationId": "handle_53",
         "parameters": [
           {
             "name": "ticketId",
@@ -1918,7 +1960,7 @@
         "tags": [
           "Ticket"
         ],
-        "operationId": "handle_52",
+        "operationId": "handle_54",
         "parameters": [
           {
             "name": "pageable",
@@ -1948,7 +1990,7 @@
         "tags": [
           "Shop"
         ],
-        "operationId": "handle_53",
+        "operationId": "handle_55",
         "responses": {
           "200": {
             "description": "OK",
@@ -1968,7 +2010,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_54",
+        "operationId": "handle_56",
         "parameters": [
           {
             "name": "offerId",
@@ -1997,7 +2039,7 @@
         "tags": [
           "Offer"
         ],
-        "operationId": "handle_55",
+        "operationId": "handle_57",
         "parameters": [
           {
             "name": "offerId",
@@ -2028,7 +2070,7 @@
         "tags": [
           "Level"
         ],
-        "operationId": "handle_56",
+        "operationId": "handle_58",
         "parameters": [
           {
             "name": "value",
@@ -2059,7 +2101,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_57",
+        "operationId": "handle_59",
         "parameters": [
           {
             "name": "pageable",
@@ -2150,7 +2192,7 @@
         "tags": [
           "Game"
         ],
-        "operationId": "handle_58",
+        "operationId": "handle_60",
         "parameters": [
           {
             "name": "pageable",
@@ -2180,7 +2222,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_59",
+        "operationId": "handle_61",
         "parameters": [
           {
             "name": "pageable",
@@ -2210,7 +2252,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_60",
+        "operationId": "handle_62",
         "responses": {
           "200": {
             "description": "OK",
@@ -2230,7 +2272,7 @@
         "tags": [
           "Friend"
         ],
-        "operationId": "handle_61",
+        "operationId": "handle_63",
         "responses": {
           "200": {
             "description": "OK",
@@ -2250,7 +2292,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_62",
+        "operationId": "handle_64",
         "parameters": [
           {
             "name": "status",
@@ -2315,7 +2357,7 @@
         "tags": [
           "Ticket Admin"
         ],
-        "operationId": "handle_63",
+        "operationId": "handle_65",
         "parameters": [
           {
             "name": "username",
@@ -2353,7 +2395,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_64",
+        "operationId": "handle_66",
         "responses": {
           "200": {
             "description": "OK",
@@ -2633,7 +2675,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "handle_65",
+        "operationId": "handle_67",
         "parameters": [
           {
             "name": "email",
@@ -2664,7 +2706,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_66",
+        "operationId": "handle_68",
         "parameters": [
           {
             "name": "targetUserId",
@@ -2871,7 +2913,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_67",
+        "operationId": "handle_69",
         "parameters": [
           {
             "name": "userId",
@@ -2987,7 +3029,7 @@
         "tags": [
           "Audit"
         ],
-        "operationId": "handle_68",
+        "operationId": "handle_70",
         "parameters": [
           {
             "name": "type",
@@ -3072,7 +3114,7 @@
         "tags": [
           "Inventory"
         ],
-        "operationId": "handle_69",
+        "operationId": "handle_71",
         "parameters": [
           {
             "name": "itemId",
@@ -3356,7 +3398,7 @@
           }
         }
       },
-      "UpdateItemDefinitionRequest": {
+      "UpdateItemRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -3365,12 +3407,68 @@
           "available": {
             "type": "boolean"
           },
+          "category": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "BANNER",
+              "FRAME",
+              "EMOTE",
+              "BOARD",
+              "CELL"
+            ]
+          },
+          "context": {
+            "type": "string",
+            "enum": [
+              "PROFILE",
+              "MATCH"
+            ]
+          },
+          "effectKind": {
+            "type": "string"
+          },
+          "effectType": {
+            "type": "string",
+            "enum": [
+              "XP_BOOST_PCT",
+              "RANKING_POINTS_BOOST_PCT",
+              "COIN_BOOST_PCT",
+              "RANKING_POINTS_SHIELD",
+              "NICKNAME_CHANGE_GRANT"
+            ]
+          },
+          "magnitude": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "asset": {
+            "type": "string",
+            "format": "binary"
+          },
           "isNewAsset": {
             "type": "boolean"
           }
         }
       },
-      "ItemDefinitionResponse": {
+      "ItemEffectResponse": {
+        "discriminator": {
+          "propertyName": "kind"
+        },
+        "properties": {
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "ItemResponse": {
         "type": "object",
         "properties": {
           "itemId": {
@@ -3383,7 +3481,7 @@
           "kind": {
             "type": "string",
             "enum": [
-              "COSMETIC",
+              "EQUIPPABLE",
               "CONSUMABLE"
             ]
           },
@@ -3394,13 +3492,8 @@
               "BANNER",
               "FRAME",
               "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST",
-              "RANKING_POINTS_BOOST",
-              "CHANGE_NICKNAME",
-              "COIN_BOOST",
-              "RANKING_POINTS_PROTECTION"
+              "BOARD",
+              "CELL"
             ]
           },
           "context": {
@@ -3442,19 +3535,6 @@
           }
         }
       },
-      "ItemEffectResponse": {
-        "discriminator": {
-          "propertyName": "kind"
-        },
-        "properties": {
-          "kind": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind"
-        ]
-      },
       "NicknameChangeEffectResponse": {
         "allOf": [
           {
@@ -3492,14 +3572,14 @@
           }
         ]
       },
-      "SuccessResponseItemDefinitionResponse": {
+      "SuccessResponseItemResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean"
           },
           "data": {
-            "$ref": "#/components/schemas/ItemDefinitionResponse"
+            "$ref": "#/components/schemas/ItemResponse"
           }
         }
       },
@@ -4319,7 +4399,7 @@
           "kind": {
             "type": "string",
             "enum": [
-              "COSMETIC",
+              "EQUIPPABLE",
               "CONSUMABLE"
             ]
           },
@@ -4330,13 +4410,8 @@
               "BANNER",
               "FRAME",
               "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST",
-              "RANKING_POINTS_BOOST",
-              "CHANGE_NICKNAME",
-              "COIN_BOOST",
-              "RANKING_POINTS_PROTECTION"
+              "BOARD",
+              "CELL"
             ]
           },
           "context": {
@@ -4443,7 +4518,7 @@
           }
         }
       },
-      "CreateItemDefinitionRequest": {
+      "CreateItemRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -4453,7 +4528,7 @@
           "kind": {
             "type": "string",
             "enum": [
-              "COSMETIC",
+              "EQUIPPABLE",
               "CONSUMABLE"
             ]
           },
@@ -4464,13 +4539,8 @@
               "BANNER",
               "FRAME",
               "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST",
-              "RANKING_POINTS_BOOST",
-              "CHANGE_NICKNAME",
-              "COIN_BOOST",
-              "RANKING_POINTS_PROTECTION"
+              "BOARD",
+              "CELL"
             ]
           },
           "context": {
@@ -4480,80 +4550,37 @@
               "MATCH"
             ]
           },
-          "consumable": {
-            "type": "boolean"
+          "effectKind": {
+            "type": "string"
           },
-          "effect": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NicknameChangeEffectRequest"
-              },
-              {
-                "$ref": "#/components/schemas/PercentageTimedEffectRequest"
-              }
+          "effectType": {
+            "type": "string",
+            "enum": [
+              "XP_BOOST_PCT",
+              "RANKING_POINTS_BOOST_PCT",
+              "COIN_BOOST_PCT",
+              "RANKING_POINTS_SHIELD",
+              "NICKNAME_CHANGE_GRANT"
             ]
+          },
+          "magnitude": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "asset": {
+            "type": "string",
+            "format": "binary"
           }
         },
         "required": [
-          "category",
-          "context",
           "kind",
           "name"
-        ]
-      },
-      "ItemEffectRequest": {
-        "discriminator": {
-          "propertyName": "kind"
-        },
-        "properties": {
-          "kind": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind"
-        ]
-      },
-      "NicknameChangeEffectRequest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemEffectRequest"
-          }
-        ]
-      },
-      "PercentageTimedEffectRequest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemEffectRequest"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "XP_BOOST_PCT",
-                  "RANKING_POINTS_BOOST_PCT",
-                  "COIN_BOOST_PCT",
-                  "RANKING_POINTS_SHIELD",
-                  "NICKNAME_CHANGE_GRANT"
-                ]
-              },
-              "magnitude": {
-                "type": "integer",
-                "format": "int32",
-                "minimum": 1
-              },
-              "durationMinutes": {
-                "type": "integer",
-                "format": "int32",
-                "minimum": 1
-              }
-            }
-          }
-        ],
-        "required": [
-          "type"
         ]
       },
       "AuthAdminRequest": {
@@ -4729,9 +4756,14 @@
             "type": "string",
             "maxLength": 16,
             "minLength": 3
+          },
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
+          "itemId",
           "nickname"
         ]
       },
@@ -5020,7 +5052,7 @@
           "kind": {
             "type": "string",
             "enum": [
-              "COSMETIC",
+              "EQUIPPABLE",
               "CONSUMABLE"
             ]
           },
@@ -5031,13 +5063,8 @@
               "BANNER",
               "FRAME",
               "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST",
-              "RANKING_POINTS_BOOST",
-              "CHANGE_NICKNAME",
-              "COIN_BOOST",
-              "RANKING_POINTS_PROTECTION"
+              "BOARD",
+              "CELL"
             ]
           },
           "context": {
@@ -5457,13 +5484,8 @@
               "BANNER",
               "FRAME",
               "EMOTE",
-              "BOARD_SKIN",
-              "CELL_SKIN",
-              "XP_BOOST",
-              "RANKING_POINTS_BOOST",
-              "CHANGE_NICKNAME",
-              "COIN_BOOST",
-              "RANKING_POINTS_PROTECTION"
+              "BOARD",
+              "CELL"
             ]
           },
           "equipped": {
@@ -5811,13 +5833,13 @@
           }
         }
       },
-      "PageResponseItemDefinitionResponse": {
+      "PageResponseItemResponse": {
         "type": "object",
         "properties": {
           "content": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ItemDefinitionResponse"
+              "$ref": "#/components/schemas/ItemResponse"
             }
           },
           "page": {
@@ -5844,14 +5866,14 @@
           }
         }
       },
-      "SuccessResponsePageResponseItemDefinitionResponse": {
+      "SuccessResponsePageResponseItemResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean"
           },
           "data": {
-            "$ref": "#/components/schemas/PageResponseItemDefinitionResponse"
+            "$ref": "#/components/schemas/PageResponseItemResponse"
           }
         }
       },

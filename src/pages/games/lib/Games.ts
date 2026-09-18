@@ -5,7 +5,7 @@ import { HttpError } from "../../../lib/http";
 type GameType = "CUSTOM" | "MATCHMAKING" | "RANKING";
 export type GameStatus = "WAITING" | "RUNNING" | "CLOSED" | "CANCELED";
 type Role = "PLAYER" | "SPECTATOR";
-type ItemCategory = "AVATAR" | "BANNER" | "FRAME" | "EMOTE" | "BOARD_SKIN" | "CELL_SKIN" | "XP_BOOST";
+type ItemCategory = "AVATAR" | "BANNER" | "FRAME" | "EMOTE" | "BOARD" | "CELL";
 
 type EquippedCosmetic = {
     itemId: string;
