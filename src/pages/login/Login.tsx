@@ -55,7 +55,7 @@ export function LoginPage() {
       navigate("/admin");
 
     } catch (err: unknown) {
-      notify.error("Ocorreu um erro inesperado...");
+      notify.error("Credenciais inválidas");
     } finally {
       setLoading(false);
     }
